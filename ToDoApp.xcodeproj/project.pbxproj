@@ -10,6 +10,13 @@
 		280C3B2415D67EC6A80B6F80 /* Pods_ToDoApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 014D47EE9950DF5C153FD434 /* Pods_ToDoApp.framework */; };
 		509E00E024757CCF28FEDF1B /* Pods_ToDoAppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0449AC1F3C877EB371380EBA /* Pods_ToDoAppTests.framework */; };
 		6484D7C1A446647BC421B355 /* Pods_ToDoApp_ToDoAppUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CAAECAD95D807E0A953E6BF0 /* Pods_ToDoApp_ToDoAppUITests.framework */; };
+		6E576BB9256F070D0072E829 /* TemplateListViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E576BB8256F070D0072E829 /* TemplateListViewController.swift */; };
+		6E576BC1256F07390072E829 /* TemplateListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E576BC0256F07390072E829 /* TemplateListTableViewCell.swift */; };
+		6E576BC9256F24380072E829 /* Template.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E576BC8256F24380072E829 /* Template.swift */; };
+		6E576BCE256F28F70072E829 /* CreateTemplateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E576BCD256F28F70072E829 /* CreateTemplateViewController.swift */; };
+		6E576BD3256F29190072E829 /* TemplateMemoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E576BD2256F29190072E829 /* TemplateMemoTableViewCell.swift */; };
+		6E576BE3256F4BC90072E829 /* EditTemplateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E576BE2256F4BC90072E829 /* EditTemplateViewController.swift */; };
+		6E576C00256F780C0072E829 /* MyNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E576BFF256F780C0072E829 /* MyNavigationController.swift */; };
 		6EC4286E256DD5530082BED8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EC4286D256DD5530082BED8 /* AppDelegate.swift */; };
 		6EC42870256DD5530082BED8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EC4286F256DD5530082BED8 /* SceneDelegate.swift */; };
 		6EC42875256DD5530082BED8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6EC42873256DD5530082BED8 /* Main.storyboard */; };
@@ -48,6 +55,13 @@
 		014D47EE9950DF5C153FD434 /* Pods_ToDoApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ToDoApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0449AC1F3C877EB371380EBA /* Pods_ToDoAppTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ToDoAppTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CE8AE1566A09FE5436D1156 /* Pods-ToDoAppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ToDoAppTests.debug.xcconfig"; path = "Target Support Files/Pods-ToDoAppTests/Pods-ToDoAppTests.debug.xcconfig"; sourceTree = "<group>"; };
+		6E576BB8256F070D0072E829 /* TemplateListViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateListViewController.swift; sourceTree = "<group>"; };
+		6E576BC0256F07390072E829 /* TemplateListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateListTableViewCell.swift; sourceTree = "<group>"; };
+		6E576BC8256F24380072E829 /* Template.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Template.swift; sourceTree = "<group>"; };
+		6E576BCD256F28F70072E829 /* CreateTemplateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreateTemplateViewController.swift; sourceTree = "<group>"; };
+		6E576BD2256F29190072E829 /* TemplateMemoTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateMemoTableViewCell.swift; sourceTree = "<group>"; };
+		6E576BE2256F4BC90072E829 /* EditTemplateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTemplateViewController.swift; sourceTree = "<group>"; };
+		6E576BFF256F780C0072E829 /* MyNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyNavigationController.swift; sourceTree = "<group>"; };
 		6EC4286A256DD5530082BED8 /* ToDoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToDoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6EC4286D256DD5530082BED8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6EC4286F256DD5530082BED8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -118,6 +132,25 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		6E576BB6256F06D70072E829 /* Memo */ = {
+			isa = PBXGroup;
+			children = (
+				6EC428D8256DE0A20082BED8 /* MemoTableViewController.swift */,
+				6EC42909256E4E0F0082BED8 /* ItemListViewController.swift */,
+			);
+			path = Memo;
+			sourceTree = "<group>";
+		};
+		6E576BB7256F06EE0072E829 /* Template */ = {
+			isa = PBXGroup;
+			children = (
+				6E576BB8256F070D0072E829 /* TemplateListViewController.swift */,
+				6E576BCD256F28F70072E829 /* CreateTemplateViewController.swift */,
+				6E576BE2256F4BC90072E829 /* EditTemplateViewController.swift */,
+			);
+			path = Template;
+			sourceTree = "<group>";
+		};
 		6EC42861256DD5530082BED8 = {
 			isa = PBXGroup;
 			children = (
@@ -146,9 +179,9 @@
 				6EC428D5256DE0570082BED8 /* Model */,
 				6EC428D6256DE0710082BED8 /* View */,
 				6EC428D7256DE07F0082BED8 /* Controller */,
+				6EC42873256DD5530082BED8 /* Main.storyboard */,
 				6EC4286D256DD5530082BED8 /* AppDelegate.swift */,
 				6EC4286F256DD5530082BED8 /* SceneDelegate.swift */,
-				6EC42873256DD5530082BED8 /* Main.storyboard */,
 				6EC42876256DD5530082BED8 /* Assets.xcassets */,
 				6EC42878256DD5530082BED8 /* LaunchScreen.storyboard */,
 				6EC4287B256DD5530082BED8 /* Info.plist */,
@@ -181,6 +214,7 @@
 			children = (
 				6EC428E5256DE73D0082BED8 /* Memo.swift */,
 				6EC4290E256E509F0082BED8 /* Item.swift */,
+				6E576BC8256F24380072E829 /* Template.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -190,6 +224,8 @@
 			children = (
 				6EC428E0256DE0B70082BED8 /* MemoTableViewCell.swift */,
 				6EC42918256E753A0082BED8 /* ItemListTableViewCell.swift */,
+				6E576BC0256F07390072E829 /* TemplateListTableViewCell.swift */,
+				6E576BD2256F29190072E829 /* TemplateMemoTableViewCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -197,8 +233,9 @@
 		6EC428D7256DE07F0082BED8 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
-				6EC428D8256DE0A20082BED8 /* MemoTableViewController.swift */,
-				6EC42909256E4E0F0082BED8 /* ItemListViewController.swift */,
+				6E576BFF256F780C0072E829 /* MyNavigationController.swift */,
+				6E576BB6256F06D70072E829 /* Memo */,
+				6E576BB7256F06EE0072E829 /* Template */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -224,7 +261,7 @@
 				6EC42866256DD5530082BED8 /* Sources */,
 				6EC42867256DD5530082BED8 /* Frameworks */,
 				6EC42868256DD5530082BED8 /* Resources */,
-				E2AFD0C16E49465D34C508C8 /* [CP] Embed Pods Frameworks */,
+				38CC9834EB0A31C009CEB4CD /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -262,7 +299,7 @@
 				6EC42887256DD5540082BED8 /* Sources */,
 				6EC42888256DD5540082BED8 /* Frameworks */,
 				6EC42889256DD5540082BED8 /* Resources */,
-				7AED10DA7D475531A7C077A1 /* [CP] Embed Pods Frameworks */,
+				F085ECF4D5AC62D350621702 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -410,24 +447,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		7AED10DA7D475531A7C077A1 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ToDoApp-ToDoAppUITests/Pods-ToDoApp-ToDoAppUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ToDoApp-ToDoAppUITests/Pods-ToDoApp-ToDoAppUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ToDoApp-ToDoAppUITests/Pods-ToDoApp-ToDoAppUITests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		E2AFD0C16E49465D34C508C8 /* [CP] Embed Pods Frameworks */ = {
+		38CC9834EB0A31C009CEB4CD /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -444,6 +464,23 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ToDoApp/Pods-ToDoApp-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		F085ECF4D5AC62D350621702 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ToDoApp-ToDoAppUITests/Pods-ToDoApp-ToDoAppUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ToDoApp-ToDoAppUITests/Pods-ToDoApp-ToDoAppUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ToDoApp-ToDoAppUITests/Pods-ToDoApp-ToDoAppUITests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -452,12 +489,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				6EC42914256E55090082BED8 /* Extension.swift in Sources */,
+				6E576C00256F780C0072E829 /* MyNavigationController.swift in Sources */,
+				6E576BC1256F07390072E829 /* TemplateListTableViewCell.swift in Sources */,
+				6E576BC9256F24380072E829 /* Template.swift in Sources */,
 				6EC4286E256DD5530082BED8 /* AppDelegate.swift in Sources */,
+				6E576BB9256F070D0072E829 /* TemplateListViewController.swift in Sources */,
 				6EC42919256E753A0082BED8 /* ItemListTableViewCell.swift in Sources */,
 				6EC4290A256E4E0F0082BED8 /* ItemListViewController.swift in Sources */,
 				6EC42870256DD5530082BED8 /* SceneDelegate.swift in Sources */,
+				6E576BE3256F4BC90072E829 /* EditTemplateViewController.swift in Sources */,
 				6EC428D9256DE0A20082BED8 /* MemoTableViewController.swift in Sources */,
+				6E576BD3256F29190072E829 /* TemplateMemoTableViewCell.swift in Sources */,
 				6EC4290F256E509F0082BED8 /* Item.swift in Sources */,
+				6E576BCE256F28F70072E829 /* CreateTemplateViewController.swift in Sources */,
 				6EC428E1256DE0B70082BED8 /* MemoTableViewCell.swift in Sources */,
 				6EC428E6256DE73D0082BED8 /* Memo.swift in Sources */,
 				6EC42905256E03CF0082BED8 /* Constant.swift in Sources */,

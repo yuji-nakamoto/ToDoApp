@@ -12,12 +12,13 @@ class MemoTableViewCell: UITableViewCell, UITextFieldDelegate {
     
     @IBOutlet weak var memoImageView: UIImageView!
     @IBOutlet weak var memoTextField: UITextField!
+    @IBOutlet weak var deleteButton: UIButton!
     
     var memo = Memo()
     var memoVC: MemoTableViewController?
     
     func configureCell(_ memo: Memo) {
-        memoTextField.text = memo.text
+        memoTextField.text = memo.name
         memoTextField.delegate = self
         
         let realm = try! Realm()
@@ -40,7 +41,7 @@ class MemoTableViewCell: UITableViewCell, UITextFieldDelegate {
         memoImageView.addGestureRecognizer(tap)
         memoTextField.text = ""
         memoImageView.image = UIImage(systemName: "square")
-        
+        memoTextField.returnKeyType = .done
         memoTextField.addTarget(self, action: #selector(textFieldBeginEditing), for: .editingDidBegin)
     }
     
@@ -87,15 +88,22 @@ class MemoTableViewCell: UITableViewCell, UITextFieldDelegate {
         
         let realm = try! Realm()
         let memos = realm.objects(Memo.self).filter("id == '\(memo.id)'")
+        let items = realm.objects(Item.self).filter("name == '\(memoTextField.text ?? "")'")
         let item = Item()
+        let id = UUID().uuidString
         
-        memos.forEach { (memo) in
-            item.name = memoTextField.text!
-            try! realm.write() {
-                realm.add(item)
-                memo.text = memoTextField.text!
+        if items.count == 0 {
+            memos.forEach { (memo) in
+
+                item.name = memoTextField.text!
+                item.id = id
+                try! realm.write() {
+                    realm.add(item)
+                    memo.name = memoTextField.text!
+                }
             }
         }
+        
         UserDefaults.standard.removeObject(forKey: "edit")
         UserDefaults.standard.removeObject(forKey: "plus")
         memoTextField.resignFirstResponder()

@@ -19,7 +19,6 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var viewBottomConst: NSLayoutConstraint!
     @IBOutlet weak var viewHeight: NSLayoutConstraint!
     
-    var firstWord = ""
     private var items = [Item]()
     
     override func viewDidLoad() {
@@ -27,15 +26,9 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
         setup()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        fetchItem()
-    }
-    
     // MARK: - Actions
     
     @objc func tapPlusImageView() {
-        print("aaaaaaaa")
         UserDefaults.standard.removeObject(forKey: "plus")
         UserDefaults.standard.set(true, forKey: "back")
         navigationController?.popViewController(animated: false)
@@ -46,12 +39,17 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
         if memoTextField.text == "" { return }
         
         let realm = try! Realm()
+        let item = Item()
         let memo = Memo()
         let id = UUID().uuidString
         
+        item.id = id
+        item.name = memoTextField.text!
+        
         memo.id = id
-        memo.text = memoTextField.text!
+        memo.name = memoTextField.text!
         try! realm.write() {
+            realm.add(item)
             realm.add(memo)
             memoTextField.text = ""
             UserDefaults.standard.removeObject(forKey: "plus")
@@ -61,15 +59,6 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
     }
     
     // MARK: - Helpers
-    
-    private func fetchItem() {
-        
-        let realm = try! Realm()
-        let itemArray = realm.objects(Item.self).filter("name CONTAINS '\(firstWord)'")
-        items.removeAll()
-        items.append(contentsOf: itemArray)
-        tableView.reloadData()
-    }
     
     @objc func adjustForKeyboard(notification: Notification) {
         let userInfo = notification.userInfo!
@@ -101,13 +90,14 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
     
     private func setup() {
         
-        memoTextField.text = firstWord
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapPlusImageView))
         plusImageView.addGestureRecognizer(tap)
-        navigationItem.title = "買い物メモ"
-
+        navigationItem.title = "入力候補"
+        
         tableView.tableFooterView = UIView()
         createButton.layer.cornerRadius = 5
+        createButton.isHidden = false
+        baseView.isHidden = false
         
         tableView.emptyDataSetSource = self
         tableView.emptyDataSetDelegate = self

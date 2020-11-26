@@ -16,11 +16,12 @@ class MemoTableViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var memoTextField: UITextField!
     @IBOutlet weak var createButton: UIButton!
     @IBOutlet weak var baseView: UIView!
+    @IBOutlet weak var templateLabel: UILabel!
+    @IBOutlet weak var deleteButton: UIButton!
     @IBOutlet weak var viewBottomConst: NSLayoutConstraint!
     @IBOutlet weak var viewHeight: NSLayoutConstraint!
     
     private var memoArray = [Memo]()
-    private var firstWord = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -32,7 +33,10 @@ class MemoTableViewController: UIViewController, UITextFieldDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         memoTextField.text = ""
+        UserDefaults.standard.removeObject(forKey: "plus")
         UserDefaults.standard.removeObject(forKey: "next")
+        navigationController?.navigationBar.isHidden = true
+        fetchTemplate()
         fetchMemo()
         setBackAction()
         setPlusImageView()
@@ -44,6 +48,11 @@ class MemoTableViewController: UIViewController, UITextFieldDelegate {
         setPlusImageView()
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.navigationBar.isHidden = false
+    }
+    
     // MARK: - Actions
     
     @objc func tapPlusImageView() {
@@ -52,6 +61,9 @@ class MemoTableViewController: UIViewController, UITextFieldDelegate {
             memoTextField.becomeFirstResponder()
             UserDefaults.standard.set(true, forKey: "plus")
             plusImageView.image = UIImage(named: "cancel")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                self.performSegue(withIdentifier: "ItemListVC", sender: nil)
+            }
         } else {
             memoTextField.resignFirstResponder()
             UserDefaults.standard.removeObject(forKey: "plus")
@@ -86,17 +98,59 @@ class MemoTableViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
-    // MARK: - Helpers
+    // MARK: - Fetch
     
     func fetchMemo() {
         
         let realm = try! Realm()
         let memos = realm.objects(Memo.self)
+        let templates = realm.objects(Template.self).filter("isSelect == true")
+
         memoArray.removeAll()
         memoArray.append(contentsOf: memos)
         tableView.reloadData()
+        
+        if templates.count == 1 {
+            try! realm.write {
+                realm.delete(memos)
+                memoArray.removeAll()
+            }
+            templates.forEach { (t) in
+                let templateMemos = realm.objects(TemplateMemo.self).filter("id == '\(t.id)'")
+                
+                templateMemos.forEach { (tm) in
+                    let memo = Memo()
+                    memo.name = tm.name
+                    memo.id = tm.uid
+                    try! realm.write() {
+                        realm.add(memo)
+                        t.isSelect = false
+                        t.selected = true
+                        fetchTemplate()
+                    }
+                    memoArray.append(memo)
+                    tableView.reloadData()
+                }
+            }
+        }
     }
     
+    private func fetchTemplate() {
+        
+        let realm = try! Realm()
+        let templates = realm.objects(Template.self).filter("selected == true")
+        
+        if templates.count == 1 {
+            templates.forEach { (template) in
+                templateLabel.text = "\(template.name)を選択中"
+            }
+        } else {
+            templateLabel.text = "ひな形未選択"
+        }
+    }
+    
+    // MARK: - Helpers
+
     func selectedItemName() {
         
         if UserDefaults.standard.object(forKey: "itemName") != nil {
@@ -107,7 +161,7 @@ class MemoTableViewController: UIViewController, UITextFieldDelegate {
             let id = UUID().uuidString
             
             memo.id = id
-            memo.text = itemName
+            memo.name = itemName
             try! realm.write() {
                 realm.add(memo)
                 fetchMemo()
@@ -127,7 +181,10 @@ class MemoTableViewController: UIViewController, UITextFieldDelegate {
             
             itemArray.forEach { (i) in
                 let item = Item()
+                let id = UUID().uuidString
+                
                 item.name = i
+                item.id = id
                 try! realm.write() {
                     realm.add(item)
                     UserDefaults.standard.set(true, forKey: "itemSet")
@@ -137,7 +194,7 @@ class MemoTableViewController: UIViewController, UITextFieldDelegate {
     }
     
     private func setPlusImageView() {
-        
+
         if UserDefaults.standard.object(forKey: "edit") != nil {
             plusImageView.isHidden = true
             baseView.isHidden = true
@@ -181,17 +238,6 @@ class MemoTableViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
-    @objc func textFieldBeginEditing() {
-        guard memoTextField.text != "" else { return }
-        
-        if UserDefaults.standard.object(forKey: "next") == nil {
-            firstWord = memoTextField.text!
-            performSegue(withIdentifier: "ItemListVC", sender: nil)
-            memoTextField.text = ""
-            UserDefaults.standard.set(true, forKey: "next")
-        }
-    }
-    
     private func setup() {
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapPlusImageView))
@@ -199,6 +245,7 @@ class MemoTableViewController: UIViewController, UITextFieldDelegate {
         navigationItem.title = "買い物メモ"
         UserDefaults.standard.removeObject(forKey: "plus")
         UserDefaults.standard.removeObject(forKey: "edit")
+        templateLabel.text = "ひな形未選択"
 
         tableView.tableFooterView = UIView()
         tableView.emptyDataSetSource = self
@@ -207,7 +254,6 @@ class MemoTableViewController: UIViewController, UITextFieldDelegate {
         viewHeight.constant = 0
         
         memoTextField.delegate = self
-        memoTextField.addTarget(self, action: #selector(textFieldBeginEditing), for: .editingChanged)
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
         notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
@@ -218,14 +264,6 @@ class MemoTableViewController: UIViewController, UITextFieldDelegate {
         UserDefaults.standard.removeObject(forKey: "plus")
         plusImageView.image = UIImage(named: "plus")
         return true
-    }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
-        if segue.identifier == "ItemListVC" {
-            let itemListVC = segue.destination as! ItemListViewController
-            itemListVC.firstWord = firstWord
-        }
     }
 }
 
@@ -244,23 +282,6 @@ extension MemoTableViewController: UITableViewDelegate, UITableViewDataSource {
         cell.memo = memoArray[indexPath.row]
         cell.configureCell(memoArray[indexPath.row])
         return cell
-    }
-    
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        
-        if editingStyle == .delete {
-            
-            let memoId = memoArray[indexPath.row].id
-            let realm = try! Realm()
-            let memos = realm.objects(Memo.self).filter("id == '\(memoId)'")
-            
-            try! realm.write() {
-                realm.delete(memos)
-            }
-            memoArray.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-            tableView.reloadData()
-        }
     }
 }
 

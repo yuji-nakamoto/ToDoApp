@@ -21,7 +21,7 @@ class ItemListTableViewCell: UITableViewCell {
     @IBAction func deleteButtonTapped(_ sender: Any) {
         
         let realm = try! Realm()
-        let items = realm.objects(Item.self).filter("name == '\(item.name)'")
+        let items = realm.objects(Item.self).filter("id == '\(item.id)'")
         
         try! realm.write() {
             realm.delete(items)

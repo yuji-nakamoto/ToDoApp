@@ -10,4 +10,5 @@ import RealmSwift
 
 class Item: Object {
     @objc dynamic var name = ""
+    @objc dynamic var id = ""
 }
