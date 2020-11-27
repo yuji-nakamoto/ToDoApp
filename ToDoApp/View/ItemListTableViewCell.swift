@@ -10,14 +10,15 @@ import RealmSwift
 
 class ItemListTableViewCell: UITableViewCell {
     
+    @IBOutlet weak var itemNameLabel: UILabel!
+    
     var item = Item()
     var itemVC: ItemListViewController?
-
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        
+    
+    func configureCell(_ item: Item) {
+        itemNameLabel.text = item.name
     }
-
+    
     @IBAction func deleteButtonTapped(_ sender: Any) {
         
         let realm = try! Realm()

@@ -7,6 +7,8 @@
 
 import UIKit
 import PKHUD
+import GoogleMobileAds
+import EmptyDataSet_Swift
 import RealmSwift
 
 class EditTemplateViewController: UIViewController, UITextFieldDelegate {
@@ -15,10 +17,12 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var memoTextField: UITextField!
     @IBOutlet weak var templateTextField: UITextField!
     @IBOutlet weak var plusImageView: UIImageView!
+    @IBOutlet weak var bannerView: GADBannerView!
     @IBOutlet weak var baseView: UIView!
     @IBOutlet weak var createButton: UIButton!
     @IBOutlet weak var viewBottomConst: NSLayoutConstraint!
     @IBOutlet weak var viewHeight: NSLayoutConstraint!
+    @IBOutlet weak var viewTopConst: NSLayoutConstraint!
     
     private var templateMemos = [TemplateMemo]()
     var id = ""
@@ -26,6 +30,7 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
+        setupBanner()
         setSwipeBack()
     }
     
@@ -44,6 +49,13 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate {
     // MARK: - Actions
     
     @IBAction func backButtonTapped(_ sender: Any) {
+        
+        let realm = try! Realm()
+        let templateMemos = realm.objects(TemplateMemo.self).filter("id == '\(id)'")
+        if templateMemos.count == 0 {
+            HUD.flash(.labeledError(title: "", subtitle: "メモが作成されていません"), delay: 1)
+            return
+        }
         navigationController?.popViewController(animated: true)
     }
     
@@ -87,6 +99,25 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate {
             realm.add(templateMemo)
             memoTextField.text = ""
             fetchTemplateMemo()
+            let index = IndexPath(row: templateMemos.count - 1, section: 0)
+            tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
+        }
+    }
+    
+    @objc func tapPlusImageView() {
+        
+        if UserDefaults.standard.object(forKey: "plus") == nil {
+            memoTextField.becomeFirstResponder()
+            UserDefaults.standard.set(true, forKey: "plus")
+            plusImageView.image = UIImage(named: "cancel")
+            if templateMemos.count != 0 {
+                let index = IndexPath(row: templateMemos.count - 1, section: 0)
+                tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
+            }
+        } else {
+            memoTextField.resignFirstResponder()
+            UserDefaults.standard.removeObject(forKey: "plus")
+            plusImageView.image = UIImage(named: "plus")
         }
     }
     
@@ -130,19 +161,6 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
-    @objc func tapPlusImageView() {
-        
-        if UserDefaults.standard.object(forKey: "plus") == nil {
-            memoTextField.becomeFirstResponder()
-            UserDefaults.standard.set(true, forKey: "plus")
-            plusImageView.image = UIImage(named: "cancel")
-        } else {
-            memoTextField.resignFirstResponder()
-            UserDefaults.standard.removeObject(forKey: "plus")
-            plusImageView.image = UIImage(named: "plus")
-        }
-    }
-    
     @objc func adjustForKeyboard(notification: Notification) {
         let userInfo = notification.userInfo!
         let keyboardScreenEndFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
@@ -151,10 +169,12 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate {
         if notification.name == UIResponder.keyboardWillHideNotification {
             viewBottomConst.constant = 0
             viewHeight.constant = 0
+            viewTopConst.constant = 50
         } else {
             if #available(iOS 11.0, *) {
-                viewBottomConst.constant = view.safeAreaInsets.bottom + keyboardViewEndFrame.height - 165
+                viewBottomConst.constant = view.safeAreaInsets.bottom - keyboardViewEndFrame.height
                 viewHeight.constant = 50
+                viewTopConst.constant = 10
             } else {
                 viewBottomConst.constant = keyboardViewEndFrame.height
             }
@@ -173,10 +193,13 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate {
         plusImageView.addGestureRecognizer(tap)
         UserDefaults.standard.removeObject(forKey: "edit")
         navigationItem.title = "ひな形の編集"
+        navigationItem.rightBarButtonItem?.setTitleTextAttributes([NSAttributedString.Key.font : UIFont(name: "Helvetica Bold", size: 15) as Any], for: .normal)
         tableView.tableFooterView = UIView()
         createButton.layer.cornerRadius = 5
         viewHeight.constant = 0
         
+        tableView.emptyDataSetSource = self
+        tableView.emptyDataSetDelegate = self
         templateTextField.delegate = self
         templateTextField.returnKeyType = .next
         templateTextField.addTarget(self, action: #selector(textFieldBeginEditing), for: .editingDidBegin)
@@ -204,6 +227,13 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate {
         templateTextField.resignFirstResponder()
         return true
     }
+    
+    private func setupBanner() {
+        
+        bannerView.adUnitID = "ca-app-pub-3940256099942544/2934735716"
+        bannerView.rootViewController = self
+        bannerView.load(GADRequest())
+    }
 }
 
 // MARK: - Table view
@@ -221,5 +251,14 @@ extension EditTemplateViewController: UITableViewDelegate, UITableViewDataSource
         cell.templateMemo = templateMemos[indexPath.row]
         cell.configureCell(templateMemos[indexPath.row])
         return cell
+    }
+}
+
+extension EditTemplateViewController: EmptyDataSetSource, EmptyDataSetDelegate {
+    
+    func title(forEmptyDataSet scrollView: UIScrollView) -> NSAttributedString? {
+        
+        let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor(named: O_BLACK) as Any, .font: UIFont(name: "HiraMaruProN-W4", size: 15) as Any]
+        return NSAttributedString(string: "メモはありません", attributes: attributes)
     }
 }

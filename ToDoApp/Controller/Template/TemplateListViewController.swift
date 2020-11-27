@@ -7,16 +7,19 @@
 
 import UIKit
 import RealmSwift
+import GoogleMobileAds
 
 class TemplateListViewController: UIViewController, UITextFieldDelegate {
 
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var bannerView: GADBannerView!
     
     private var templates = [Template]()
     private var id = ""
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupBanner()
         navigationItem.title = "ひな形"
     }
     
@@ -48,6 +51,13 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
             let editTemplateVC = segue.destination as! EditTemplateViewController
             editTemplateVC.id = id
         }
+    }
+    
+    private func setupBanner() {
+        
+        bannerView.adUnitID = "ca-app-pub-3940256099942544/2934735716"
+        bannerView.rootViewController = self
+        bannerView.load(GADRequest())
     }
 }
 

@@ -12,6 +12,7 @@ class TemplateListTableViewCell: UITableViewCell {
 
     @IBOutlet weak var checkMarkImageView: UIImageView!
     @IBOutlet weak var templateLabel: UILabel!
+    @IBOutlet weak var frontView: UIView!
     
     var templateListVC: TemplateListViewController?
     var template = Template()
@@ -29,7 +30,7 @@ class TemplateListTableViewCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapCheckMarkImageView))
-        checkMarkImageView.addGestureRecognizer(tap)
+        frontView.addGestureRecognizer(tap)
     }
     
     @objc func tapCheckMarkImageView() {
@@ -50,7 +51,9 @@ class TemplateListTableViewCell: UITableViewCell {
                 try! realm.write() {
                     template.isSelect = true
                     checkMarkImageView.image = UIImage(systemName: "checkmark.square")
-                }
+                    if UserDefaults.standard.object(forKey: "onCheck") != nil {
+                        generator.notificationOccurred(.success)
+                    }                }
             } else {
                 try! realm.write() {
                     template.isSelect = false

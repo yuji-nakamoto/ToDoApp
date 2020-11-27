@@ -41,7 +41,6 @@ class TemplateMemoTableViewCell: UITableViewCell, UITextFieldDelegate {
         try! realm.write() {
             realm.delete(templateMemos)
             UserDefaults.standard.removeObject(forKey: "edit")
-            UserDefaults.standard.removeObject(forKey: "plus")
             createTemplateVC?.viewWillAppear(true)
             editTemplateVC?.viewWillAppear(true)
         }

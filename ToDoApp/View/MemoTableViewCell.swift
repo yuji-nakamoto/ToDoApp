@@ -13,6 +13,7 @@ class MemoTableViewCell: UITableViewCell, UITextFieldDelegate {
     @IBOutlet weak var memoImageView: UIImageView!
     @IBOutlet weak var memoTextField: UITextField!
     @IBOutlet weak var deleteButton: UIButton!
+    @IBOutlet weak var fronView: UIView!
     
     var memo = Memo()
     var memoVC: MemoTableViewController?
@@ -38,7 +39,7 @@ class MemoTableViewCell: UITableViewCell, UITextFieldDelegate {
     override func awakeFromNib() {
         super.awakeFromNib()
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapMemoImageView))
-        memoImageView.addGestureRecognizer(tap)
+        fronView.addGestureRecognizer(tap)
         memoTextField.text = ""
         memoImageView.image = UIImage(systemName: "square")
         memoTextField.returnKeyType = .done
@@ -57,7 +58,7 @@ class MemoTableViewCell: UITableViewCell, UITextFieldDelegate {
     }
     
     @objc func textFieldBeginEditing() {
-        UserDefaults.standard.set(true, forKey: "edit")
+        UserDefaults.standard.set(true, forKey: "edit2")
         memoVC?.viewDidAppear(true)
     }
     
@@ -70,6 +71,9 @@ class MemoTableViewCell: UITableViewCell, UITextFieldDelegate {
             if memoImageView.image == UIImage(systemName: "square") {
                 memoImageView.image = UIImage(systemName: "square.slash")
                 memoTextField.textColor = .systemGray3
+                if UserDefaults.standard.object(forKey: "onCheck") != nil {
+                    generator.notificationOccurred(.success)
+                }
                 try! realm.write() {
                     memo.isCheck = true
                 }
@@ -104,7 +108,7 @@ class MemoTableViewCell: UITableViewCell, UITextFieldDelegate {
             }
         }
         
-        UserDefaults.standard.removeObject(forKey: "edit")
+        UserDefaults.standard.removeObject(forKey: "edit2")
         UserDefaults.standard.removeObject(forKey: "plus")
         memoTextField.resignFirstResponder()
         memoVC?.viewDidAppear(true)

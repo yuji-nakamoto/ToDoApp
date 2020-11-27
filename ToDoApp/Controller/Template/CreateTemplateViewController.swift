@@ -7,6 +7,7 @@
 
 import UIKit
 import PKHUD
+import GoogleMobileAds
 import EmptyDataSet_Swift
 import RealmSwift
 
@@ -17,9 +18,11 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var templateTextField: UITextField!
     @IBOutlet weak var plusImageView: UIImageView!
     @IBOutlet weak var baseView: UIView!
+    @IBOutlet weak var bannerView: GADBannerView!
     @IBOutlet weak var createButton: UIButton!
     @IBOutlet weak var viewBottomConst: NSLayoutConstraint!
     @IBOutlet weak var viewHeight: NSLayoutConstraint!
+    @IBOutlet weak var viewTopConst: NSLayoutConstraint!
     
     private var templateMemos = [TemplateMemo]()
     private let id = UUID().uuidString
@@ -27,6 +30,7 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
+        setupBanner()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -47,6 +51,11 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate {
         if templateTextField.text != "" {
             let alert = UIAlertController(title: "", message: "保存していません\n戻ってもよろしいですか？", preferredStyle: .alert)
             let back = UIAlertAction(title: "戻る", style: UIAlertAction.Style.default) { [self] (alert) in
+                let realm = try! Realm()
+                let templateMemos = realm.objects(TemplateMemo.self).filter("id == '\(id)'")
+                try! realm.write() {
+                    realm.delete(templateMemos)
+                }
                 navigationController?.popViewController(animated: true)
             }
             let cancel = UIAlertAction(title: "キャンセル", style: .cancel)
@@ -96,6 +105,26 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate {
             realm.add(templateMemo)
             memoTextField.text = ""
             fetchTemplateMemo()
+            let index = IndexPath(row: templateMemos.count - 1, section: 0)
+            tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
+        }
+    }
+    
+    @objc func tapPlusImageView() {
+        
+        if UserDefaults.standard.object(forKey: "plus") == nil {
+            memoTextField.becomeFirstResponder()
+            UserDefaults.standard.set(true, forKey: "plus")
+            plusImageView.image = UIImage(named: "cancel")
+            if templateMemos.count != 0 {
+                let index = IndexPath(row: templateMemos.count - 1, section: 0)
+                tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
+            }
+            
+        } else {
+            memoTextField.resignFirstResponder()
+            UserDefaults.standard.removeObject(forKey: "plus")
+            plusImageView.image = UIImage(named: "plus")
         }
     }
     
@@ -130,19 +159,6 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
-    @objc func tapPlusImageView() {
-        
-        if UserDefaults.standard.object(forKey: "plus") == nil {
-            memoTextField.becomeFirstResponder()
-            UserDefaults.standard.set(true, forKey: "plus")
-            plusImageView.image = UIImage(named: "cancel")
-        } else {
-            memoTextField.resignFirstResponder()
-            UserDefaults.standard.removeObject(forKey: "plus")
-            plusImageView.image = UIImage(named: "plus")
-        }
-    }
-    
     @objc func adjustForKeyboard(notification: Notification) {
         let userInfo = notification.userInfo!
         let keyboardScreenEndFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
@@ -151,10 +167,12 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate {
         if notification.name == UIResponder.keyboardWillHideNotification {
             viewBottomConst.constant = 0
             viewHeight.constant = 0
+            viewTopConst.constant = 50
         } else {
             if #available(iOS 11.0, *) {
-                viewBottomConst.constant = view.safeAreaInsets.bottom + keyboardViewEndFrame.height - 165
+                viewBottomConst.constant = view.safeAreaInsets.bottom - keyboardViewEndFrame.height
                 viewHeight.constant = 50
+                viewTopConst.constant = 10
             } else {
                 viewBottomConst.constant = keyboardViewEndFrame.height
             }
@@ -172,6 +190,7 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate {
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapPlusImageView))
         plusImageView.addGestureRecognizer(tap)
         navigationItem.title = "ひな形の作成"
+        navigationItem.rightBarButtonItem?.setTitleTextAttributes([NSAttributedString.Key.font : UIFont(name: "Helvetica Bold", size: 15) as Any], for: .normal)
         UserDefaults.standard.set(true, forKey: "edit")
         tableView.tableFooterView = UIView()
         tableView.emptyDataSetSource = self
@@ -204,6 +223,13 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate {
             memoTextField.becomeFirstResponder()
         }
         return true
+    }
+    
+    private func setupBanner() {
+        
+        bannerView.adUnitID = "ca-app-pub-3940256099942544/2934735716"
+        bannerView.rootViewController = self
+        bannerView.load(GADRequest())
     }
 }
 
