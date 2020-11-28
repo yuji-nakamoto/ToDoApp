@@ -11,7 +11,7 @@ import GoogleMobileAds
 import EmptyDataSet_Swift
 import RealmSwift
 
-class EditTemplateViewController: UIViewController, UITextFieldDelegate {
+class EditTemplateViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var memoTextField: UITextField!
@@ -50,53 +50,35 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate {
     
     @IBAction func backButtonTapped(_ sender: Any) {
         
-        let realm = try! Realm()
-        let templateMemos = realm.objects(TemplateMemo.self).filter("id == '\(id)'")
-        if templateMemos.count == 0 {
-            HUD.flash(.labeledError(title: "", subtitle: "メモが作成されていません"), delay: 1)
-            return
+        TemplateMemo.checkTemplateMemo(id: id) { (bool) in
+            if bool == true {
+                HUD.flash(.labeledError(title: "", subtitle: "メモが作成されていません"), delay: 1)
+                return
+            }
+            self.navigationController?.popViewController(animated: true)
         }
-        navigationController?.popViewController(animated: true)
     }
     
     @IBAction func deleteButtonTapped(_ sender: Any) {
-                
-        let realm = try! Realm()
-        let templates = realm.objects(Template.self).filter("id == '\(id)'")
-        let templateMemos = realm.objects(TemplateMemo.self).filter("id == '\(id)'")
         
-        templates.forEach { (t) in
-            let alert = UIAlertController(title: "", message: "\(t.name)を\n削除してよろしいですか？", preferredStyle: .alert)
-            let delete = UIAlertAction(title: "削除する", style: UIAlertAction.Style.default) { [self] (alert) in
-                
-                try! realm.write() {
-                    realm.delete(templates)
-                    realm.delete(templateMemos)
-                }
-                navigationController?.popViewController(animated: true)
+        let alert = UIAlertController(title: "", message: "ひな形を\n削除してよろしいですか？", preferredStyle: .alert)
+        let delete = UIAlertAction(title: "削除する", style: UIAlertAction.Style.default) { [self] (alert) in
+            
+            Template.deleteTempMemo(id: id) {
+                self.navigationController?.popViewController(animated: true)
             }
-            let cancel = UIAlertAction(title: "キャンセル", style: .cancel)
-      
-            alert.addAction(delete)
-            alert.addAction(cancel)
-            self.present(alert, animated: true, completion: nil)
         }
+        let cancel = UIAlertAction(title: "キャンセル", style: .cancel)
+        
+        alert.addAction(delete)
+        alert.addAction(cancel)
+        self.present(alert, animated: true, completion: nil)
     }
     
     @IBAction func createButtonTapped(_ sender: Any) {
+        guard memoTextField.text != "" else { return }
         
-        if memoTextField.text == "" { return }
-        
-        let realm = try! Realm()
-        let templateMemo = TemplateMemo()
-        let uid = UUID().uuidString
-        
-        templateMemo.id = id
-        templateMemo.uid = uid
-        templateMemo.name = memoTextField.text!
-        
-        try! realm.write() {
-            realm.add(templateMemo)
+        TemplateMemo.createTemplateMemo(text: memoTextField.text!, id: id) { [self] in
             memoTextField.text = ""
             fetchTemplateMemo()
             let index = IndexPath(row: templateMemos.count - 1, section: 0)
@@ -106,17 +88,18 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate {
     
     @objc func tapPlusImageView() {
         
-        if UserDefaults.standard.object(forKey: "plus") == nil {
+        if UserDefaults.standard.object(forKey: CLOSE) == nil {
+            UserDefaults.standard.set(true, forKey: CLOSE)
             memoTextField.becomeFirstResponder()
-            UserDefaults.standard.set(true, forKey: "plus")
             plusImageView.image = UIImage(named: "cancel")
+            
             if templateMemos.count != 0 {
                 let index = IndexPath(row: templateMemos.count - 1, section: 0)
                 tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
             }
         } else {
+            UserDefaults.standard.removeObject(forKey: CLOSE)
             memoTextField.resignFirstResponder()
-            UserDefaults.standard.removeObject(forKey: "plus")
             plusImageView.image = UIImage(named: "plus")
         }
     }
@@ -125,19 +108,16 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate {
     
     private func fetchTemplateMemo() {
         
-        let realm = try! Realm()
-        let templateMemo = realm.objects(TemplateMemo.self).filter("id == '\(id)'")
-        
-        templateMemos.removeAll()
-        templateMemos.append(contentsOf: templateMemo)
-        tableView.reloadData()
+        TemplateMemo.fetchTemplateMemo(id: id) { [self] (templateMemo) in
+            templateMemos.removeAll()
+            templateMemos.append(contentsOf: templateMemo)
+            tableView.reloadData()
+        }
     }
     
     private func fetchTemplate() {
         
-        let realm = try! Realm()
-        let templates = realm.objects(Template.self).filter("id == '\(id)'")
-        templates.forEach { (template) in
+        Template.fetchTemplate(id: id) { [self] (template) in
             templateTextField.text = template.name
         }
     }
@@ -146,7 +126,7 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate {
     
     private func setPlusImageView() {
         
-        if UserDefaults.standard.object(forKey: "edit") != nil {
+        if UserDefaults.standard.object(forKey: EDIT_TEMP) != nil {
             plusImageView.isHidden = true
             baseView.isHidden = true
         } else {
@@ -154,7 +134,7 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate {
             baseView.isHidden = false
         }
         
-        if UserDefaults.standard.object(forKey: "plus") == nil {
+        if UserDefaults.standard.object(forKey: CLOSE) == nil {
             plusImageView.image = UIImage(named: "plus")
         } else {
             plusImageView.image = UIImage(named: "cancel")
@@ -169,12 +149,15 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate {
         if notification.name == UIResponder.keyboardWillHideNotification {
             viewBottomConst.constant = 0
             viewHeight.constant = 0
-            viewTopConst.constant = 50
+            viewTopConst.constant = 55
         } else {
             if #available(iOS 11.0, *) {
                 viewBottomConst.constant = view.safeAreaInsets.bottom - keyboardViewEndFrame.height
                 viewHeight.constant = 50
                 viewTopConst.constant = 10
+                if UserDefaults.standard.object(forKey: CLOSE) == nil {
+                    viewHeight.constant = 0
+                }
             } else {
                 viewBottomConst.constant = keyboardViewEndFrame.height
             }
@@ -191,17 +174,18 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate {
         
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapPlusImageView))
         plusImageView.addGestureRecognizer(tap)
-        UserDefaults.standard.removeObject(forKey: "edit")
+        UserDefaults.standard.removeObject(forKey: EDIT_TEMP)
         navigationItem.title = "ひな形の編集"
         navigationItem.rightBarButtonItem?.setTitleTextAttributes([NSAttributedString.Key.font : UIFont(name: "Helvetica Bold", size: 15) as Any], for: .normal)
-        tableView.tableFooterView = UIView()
         createButton.layer.cornerRadius = 5
         viewHeight.constant = 0
-        
+        tableView.tableFooterView = UIView()
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 10000
         tableView.emptyDataSetSource = self
         tableView.emptyDataSetDelegate = self
         templateTextField.delegate = self
-        templateTextField.returnKeyType = .next
+        templateTextField.returnKeyType = .done
         templateTextField.addTarget(self, action: #selector(textFieldBeginEditing), for: .editingDidBegin)
         
         let notificationCenter = NotificationCenter.default
@@ -210,26 +194,17 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate {
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        guard templateTextField.text != "" else { return false }
         
-        if templateTextField.text == "" { return false }
-        
-        let realm = try! Realm()
-        let templates = realm.objects(Template.self).filter("id == '\(id)'")
-        
-        templates.forEach { (t) in
-            try! realm.write() {
-                t.name = templateTextField.text!
-            }
+        Template.updateTemplate(text: templateTextField.text!, id: id) { [self] in
+            baseView.isHidden = false
+            plusImageView.isHidden = false
+            templateTextField.resignFirstResponder()
         }
-        
-        baseView.isHidden = false
-        plusImageView.isHidden = false
-        templateTextField.resignFirstResponder()
         return true
     }
     
     private func setupBanner() {
-        
         bannerView.adUnitID = "ca-app-pub-3940256099942544/2934735716"
         bannerView.rootViewController = self
         bannerView.load(GADRequest())
@@ -247,10 +222,26 @@ extension EditTemplateViewController: UITableViewDelegate, UITableViewDataSource
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! TemplateMemoTableViewCell
         
         cell.editTemplateVC = self
-        cell.memoTextField.delegate = self
+        cell.memoTextView.delegate = self
         cell.templateMemo = templateMemos[indexPath.row]
         cell.configureCell(templateMemos[indexPath.row])
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        
+        if editingStyle == .delete {
+            TemplateMemo.deleteTemplateMemoUid(uid: templateMemos[indexPath.row].uid) { [self] in
+                templateMemos.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .fade)
+                tableView.reloadData()
+                viewWillAppear(true)
+            }
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
+        return "削除"
     }
 }
 

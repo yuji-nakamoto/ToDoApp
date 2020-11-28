@@ -23,10 +23,10 @@ class SettingTableViewController: UITableViewController {
         
         if sender.isOn {
             checkLabel.text = "チェック時の振動オン"
-            UserDefaults.standard.set(true, forKey: "onCheck")
+            UserDefaults.standard.set(true, forKey: ON_CHECK)
         } else {
             checkLabel.text = "チェック時の振動オフ"
-            UserDefaults.standard.removeObject(forKey: "onCheck")
+            UserDefaults.standard.removeObject(forKey: ON_CHECK)
         }
     }
     
@@ -34,16 +34,16 @@ class SettingTableViewController: UITableViewController {
         
         if sender.isOn {
             inputLabel.text = "入力候補を表示する"
-            UserDefaults.standard.set(true, forKey: "onInput")
+            UserDefaults.standard.set(true, forKey: ON_INPUT)
         } else {
             inputLabel.text = "入力候補を表示しない"
-            UserDefaults.standard.removeObject(forKey: "onInput")
+            UserDefaults.standard.removeObject(forKey: ON_INPUT)
         }
     }
     
     private func setup() {
         
-        if UserDefaults.standard.object(forKey: "onCheck") != nil {
+        if UserDefaults.standard.object(forKey: ON_CHECK) != nil {
             checkLabel.text = "チェック時の振動オン"
             checkSwitch.isOn = true
         } else {
@@ -51,7 +51,7 @@ class SettingTableViewController: UITableViewController {
             checkSwitch.isOn = false
         }
         
-        if UserDefaults.standard.object(forKey: "onInput") != nil {
+        if UserDefaults.standard.object(forKey: ON_INPUT) != nil {
             inputLabel.text = "入力候補を表示する"
             inputSwitch.isOn = true
         } else {

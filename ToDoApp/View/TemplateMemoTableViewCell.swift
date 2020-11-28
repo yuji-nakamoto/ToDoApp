@@ -8,29 +8,35 @@
 import UIKit
 import RealmSwift
 
-class TemplateMemoTableViewCell: UITableViewCell, UITextFieldDelegate {
+class TemplateMemoTableViewCell: UITableViewCell, UITextViewDelegate {
 
-    @IBOutlet weak var memoTextField: UITextField!
+    @IBOutlet weak var memoTextView: UITextView!
     
     var createTemplateVC: CreateTemplateViewController?
     var editTemplateVC: EditTemplateViewController?
     var templateMemo = TemplateMemo()
     
     func configureCell(_ templateMemo: TemplateMemo) {
-        memoTextField.delegate = self
-        memoTextField.text = templateMemo.name
+        memoTextView.delegate = self
+        memoTextView.text = templateMemo.name
     }
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        memoTextField.returnKeyType = .done
-        memoTextField.addTarget(self, action: #selector(textFieldBeginEditing), for: .editingDidBegin)
+        memoTextView.returnKeyType = .done
     }
     
-    @objc func textFieldBeginEditing() {
-        UserDefaults.standard.set(true, forKey: "edit")
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        UserDefaults.standard.set(true, forKey: EDIT_TEMP)
         createTemplateVC?.viewDidAppear(true)
         editTemplateVC?.viewDidAppear(true)
+    }
+    
+    func textViewDidChange(_ textView: UITextView) {
+        createTemplateVC?.tableView.beginUpdates()
+        createTemplateVC?.tableView.endUpdates()
+        editTemplateVC?.tableView.beginUpdates()
+        editTemplateVC?.tableView.endUpdates()
     }
     
     @IBAction func deleteButtonTapped(_ sender: Any) {
@@ -40,28 +46,31 @@ class TemplateMemoTableViewCell: UITableViewCell, UITextFieldDelegate {
         
         try! realm.write() {
             realm.delete(templateMemos)
-            UserDefaults.standard.removeObject(forKey: "edit")
+            UserDefaults.standard.removeObject(forKey: EDIT_TEMP)
             createTemplateVC?.viewWillAppear(true)
             editTemplateVC?.viewWillAppear(true)
         }
     }
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if memoTextField.text == "" { return false }
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+        if memoTextView.text == "" { return false }
         
-        let realm = try! Realm()
-        let templateMemos = realm.objects(TemplateMemo.self).filter("uid == '\(templateMemo.uid)'")
-        
-        templateMemos.forEach { (template) in
-            try! realm.write() {
-                template.name = memoTextField.text!
+        if text == "\n" {
+            let realm = try! Realm()
+            let templateMemos = realm.objects(TemplateMemo.self).filter("uid == '\(templateMemo.uid)'")
+            
+            templateMemos.forEach { (template) in
+                try! realm.write() {
+                    template.name = memoTextView.text!
+                }
             }
+            memoTextView.resignFirstResponder()
+            UserDefaults.standard.removeObject(forKey: EDIT_TEMP)
+            UserDefaults.standard.removeObject(forKey: CLOSE)
+            createTemplateVC?.viewWillAppear(true)
+            editTemplateVC?.viewWillAppear(true)
+            return false
         }
-        memoTextField.resignFirstResponder()
-        UserDefaults.standard.removeObject(forKey: "edit")
-        UserDefaults.standard.removeObject(forKey: "plus")
-        createTemplateVC?.viewWillAppear(true)
-        editTemplateVC?.viewWillAppear(true)
         return true
     }
 }

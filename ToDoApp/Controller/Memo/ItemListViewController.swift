@@ -36,31 +36,18 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
     // MARK: - Actions
     
     @objc func tapPlusImageView() {
-        UserDefaults.standard.removeObject(forKey: "plus")
-        UserDefaults.standard.set(true, forKey: "back")
+        UserDefaults.standard.removeObject(forKey: CLOSE)
+        UserDefaults.standard.set(true, forKey: BACK)
         navigationController?.popViewController(animated: false)
     }
     
     @IBAction func createButtonTapped(_ sender: Any) {
+        guard memoTextField.text != "" else { return }
         
-        if memoTextField.text == "" { return }
-        
-        let realm = try! Realm()
-        let item = Item()
-        let memo = Memo()
-        let id = UUID().uuidString
-        
-        item.id = id
-        item.name = memoTextField.text!
-        
-        memo.id = id
-        memo.name = memoTextField.text!
-        try! realm.write() {
-            realm.add(item)
-            realm.add(memo)
+        Memo.createMemo(text: memoTextField.text!) { [self] in
             memoTextField.text = ""
-            UserDefaults.standard.removeObject(forKey: "plus")
-            UserDefaults.standard.set(true, forKey: "back")
+            UserDefaults.standard.removeObject(forKey: CLOSE)
+            UserDefaults.standard.set(true, forKey: BACK)
             navigationController?.popViewController(animated: false)
         }
     }
@@ -89,10 +76,12 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
             let i2 = realm.objects(Item.self).filter("name BEGINSWITH '芋'")
             let i3 = realm.objects(Item.self).filter("name BEGINSWITH '鰯'")
             let i4 = realm.objects(Item.self).filter("name BEGINSWITH '胃薬'")
+            let i5 = realm.objects(Item.self).filter("name BEGINSWITH '痛み'")
             items.append(contentsOf: i1)
             items.append(contentsOf: i2)
             items.append(contentsOf: i3)
             items.append(contentsOf: i4)
+            items.append(contentsOf: i5)
         }
         if memoTextField.text?.prefix(1) == "う"{
             let u1 = realm.objects(Item.self).filter("name BEGINSWITH '烏'")
@@ -123,6 +112,10 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
             items.append(contentsOf: ka5)
             items.append(contentsOf: ka6)
         }
+        if memoTextField.text?.prefix(1) == "き"{
+            let ki1 = realm.objects(Item.self).filter("name BEGINSWITH '絹ごし'")
+            items.append(contentsOf: ki1)
+        }
         if memoTextField.text?.prefix(1) == "け"{
             let ke1 = realm.objects(Item.self).filter("name BEGINSWITH '化粧'")
             items.append(contentsOf: ke1)
@@ -143,6 +136,8 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
             items.append(contentsOf: sa1)
             let sa2 = realm.objects(Item.self).filter("name BEGINSWITH '砂糖'")
             items.append(contentsOf: sa2)
+            let sa3 = realm.objects(Item.self).filter("name BEGINSWITH '刺身'")
+            items.append(contentsOf: sa3)
         }
         if memoTextField.text?.prefix(1) == "し"{
             let si1 = realm.objects(Item.self).filter("name BEGINSWITH '椎茸'")
@@ -152,6 +147,7 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
             let si5 = realm.objects(Item.self).filter("name BEGINSWITH '塩'")
             let si6 = realm.objects(Item.self).filter("name BEGINSWITH '焼酎'")
             let si7 = realm.objects(Item.self).filter("name BEGINSWITH 'C'")
+            let si8 = realm.objects(Item.self).filter("name BEGINSWITH '消臭'")
 
             items.append(contentsOf: si1)
             items.append(contentsOf: si2)
@@ -160,6 +156,7 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
             items.append(contentsOf: si5)
             items.append(contentsOf: si6)
             items.append(contentsOf: si7)
+            items.append(contentsOf: si8)
         }
         if memoTextField.text?.prefix(1) == "せ"{
             let se1 = realm.objects(Item.self).filter("name BEGINSWITH '洗剤'")
@@ -273,12 +270,18 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
             let me2 = realm.objects(Item.self).filter("name BEGINSWITH '綿'")
             items.append(contentsOf: me2)
         }
+        if memoTextField.text?.prefix(1) == "も"{
+            let mo1 = realm.objects(Item.self).filter("name BEGINSWITH '木綿'")
+            items.append(contentsOf: mo1)
+        }
         if memoTextField.text?.prefix(1) == "む"{
             let mu1 = realm.objects(Item.self).filter("name BEGINSWITH '麦茶'")
             let mu2 = realm.objects(Item.self).filter("name BEGINSWITH '麦飯'")
+            let mu3 = realm.objects(Item.self).filter("name BEGINSWITH '無洗'")
 
             items.append(contentsOf: mu1)
             items.append(contentsOf: mu2)
+            items.append(contentsOf: mu3)
         }
         if memoTextField.text?.prefix(1) == "や"{
             let ya1 = realm.objects(Item.self).filter("name BEGINSWITH '野菜'")
@@ -349,8 +352,10 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
         }
         if memoTextField.text?.prefix(1) == "じ"{
             let zi1 = realm.objects(Item.self).filter("name BEGINSWITH '柔軟'")
+            let zi2 = realm.objects(Item.self).filter("name BEGINSWITH '上白'")
 
             items.append(contentsOf: zi1)
+            items.append(contentsOf: zi2)
         }
         if memoTextField.text?.prefix(1) == "ぜ"{
             let ze1 = realm.objects(Item.self).filter("name BEGINSWITH '全'")
@@ -441,8 +446,8 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        UserDefaults.standard.set(true, forKey: "back")
-        UserDefaults.standard.removeObject(forKey: "plus")
+        UserDefaults.standard.set(true, forKey: BACK)
+        UserDefaults.standard.removeObject(forKey: CLOSE)
         navigationController?.popViewController(animated: false)
         return true
     }
@@ -470,8 +475,8 @@ extension ItemListViewController: UITableViewDelegate, UITableViewDataSource {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [self] in
             UserDefaults.standard.set(items[indexPath.row].name, forKey: "itemName")
             navigationController?.popViewController(animated: false)
-            UserDefaults.standard.removeObject(forKey: "plus")
-            UserDefaults.standard.set(true, forKey: "back")
+            UserDefaults.standard.removeObject(forKey: CLOSE)
+            UserDefaults.standard.set(true, forKey: BACK)
         }
     }
 }

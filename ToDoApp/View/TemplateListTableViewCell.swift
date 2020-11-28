@@ -51,7 +51,7 @@ class TemplateListTableViewCell: UITableViewCell {
                 try! realm.write() {
                     template.isSelect = true
                     checkMarkImageView.image = UIImage(systemName: "checkmark.square")
-                    if UserDefaults.standard.object(forKey: "onCheck") != nil {
+                    if UserDefaults.standard.object(forKey: ON_CHECK) != nil {
                         generator.notificationOccurred(.success)
                     }                }
             } else {

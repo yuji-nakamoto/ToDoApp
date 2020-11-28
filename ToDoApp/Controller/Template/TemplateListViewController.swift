@@ -20,13 +20,15 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
     override func viewDidLoad() {
         super.viewDidLoad()
         setupBanner()
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 10000
         navigationItem.title = "ひな形"
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         fetchTemplate()
-        UserDefaults.standard.removeObject(forKey: "plus")
+        UserDefaults.standard.removeObject(forKey: CLOSE)
     }
     
     private func fetchTemplate() {

@@ -11,7 +11,7 @@ import GoogleMobileAds
 import EmptyDataSet_Swift
 import RealmSwift
 
-class CreateTemplateViewController: UIViewController, UITextFieldDelegate {
+class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var memoTextField: UITextField!
@@ -51,12 +51,9 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate {
         if templateTextField.text != "" {
             let alert = UIAlertController(title: "", message: "保存していません\n戻ってもよろしいですか？", preferredStyle: .alert)
             let back = UIAlertAction(title: "戻る", style: UIAlertAction.Style.default) { [self] (alert) in
-                let realm = try! Realm()
-                let templateMemos = realm.objects(TemplateMemo.self).filter("id == '\(id)'")
-                try! realm.write() {
-                    realm.delete(templateMemos)
+                TemplateMemo.deleteTemplateMemoId(id: id) {
+                    self.navigationController?.popViewController(animated: true)
                 }
-                navigationController?.popViewController(animated: true)
             }
             let cancel = UIAlertAction(title: "キャンセル", style: .cancel)
             
@@ -69,40 +66,23 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func completionButtonTapped(_ sender: Any) {
+        guard templateTextField.text != "" else { return }
         
-        if templateTextField.text == "" { return }
-        
-        let realm = try! Realm()
-        let template = Template()
-        let templateMemos = realm.objects(TemplateMemo.self).filter("id == '\(id)'")
-        
-        if templateMemos.count == 0 {
-            HUD.flash(.labeledError(title: "", subtitle: "メモを作成していません"), delay: 1)
-            return
+        TemplateMemo.checkTemplateMemo(id: id) { [self] (bool) in
+            if bool == true {
+                HUD.flash(.labeledError(title: "", subtitle: "メモを作成していません"), delay: 1)
+                return
+            }
+            Template.createTemplate(text: templateTextField.text!, id: id) {
+                self.navigationController?.popViewController(animated: true)
+            }
         }
-        
-        template.id = id
-        template.name = templateTextField.text!
-        try! realm.write() {
-            realm.add(template)
-        }
-        navigationController?.popViewController(animated: true)
     }
     
     @IBAction func createButtonTapped(_ sender: Any) {
-        
-        if memoTextField.text == "" { return }
-        
-        let realm = try! Realm()
-        let templateMemo = TemplateMemo()
-        let uid = UUID().uuidString
-        
-        templateMemo.id = id
-        templateMemo.uid = uid
-        templateMemo.name = memoTextField.text!
-        
-        try! realm.write() {
-            realm.add(templateMemo)
+        guard memoTextField.text != "" else { return }
+
+        TemplateMemo.createTemplateMemo(text: memoTextField.text!, id: id) { [self] in
             memoTextField.text = ""
             fetchTemplateMemo()
             let index = IndexPath(row: templateMemos.count - 1, section: 0)
@@ -112,18 +92,18 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate {
     
     @objc func tapPlusImageView() {
         
-        if UserDefaults.standard.object(forKey: "plus") == nil {
+        if UserDefaults.standard.object(forKey: CLOSE) == nil {
+            UserDefaults.standard.set(true, forKey: CLOSE)
             memoTextField.becomeFirstResponder()
-            UserDefaults.standard.set(true, forKey: "plus")
             plusImageView.image = UIImage(named: "cancel")
+            
             if templateMemos.count != 0 {
                 let index = IndexPath(row: templateMemos.count - 1, section: 0)
                 tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
             }
-            
         } else {
+            UserDefaults.standard.removeObject(forKey: CLOSE)
             memoTextField.resignFirstResponder()
-            UserDefaults.standard.removeObject(forKey: "plus")
             plusImageView.image = UIImage(named: "plus")
         }
     }
@@ -132,19 +112,18 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate {
     
     private func fetchTemplateMemo() {
         
-        let realm = try! Realm()
-        let templateMemo = realm.objects(TemplateMemo.self).filter("id == '\(id)'")
-        
-        templateMemos.removeAll()
-        templateMemos.append(contentsOf: templateMemo)
-        tableView.reloadData()
+        TemplateMemo.fetchTemplateMemo(id: id) { [self] (templateMemo) in
+            templateMemos.removeAll()
+            templateMemos.append(contentsOf: templateMemo)
+            tableView.reloadData()
+        }
     }
     
     // MARK: - Helpers
     
     private func setPlusImageView() {
         
-        if UserDefaults.standard.object(forKey: "edit") != nil {
+        if UserDefaults.standard.object(forKey: EDIT_TEMP) != nil {
             plusImageView.isHidden = true
             baseView.isHidden = true
         } else {
@@ -152,7 +131,7 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate {
             baseView.isHidden = false
         }
         
-        if UserDefaults.standard.object(forKey: "plus") == nil {
+        if UserDefaults.standard.object(forKey: CLOSE) == nil {
             plusImageView.image = UIImage(named: "plus")
         } else {
             plusImageView.image = UIImage(named: "cancel")
@@ -167,12 +146,15 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate {
         if notification.name == UIResponder.keyboardWillHideNotification {
             viewBottomConst.constant = 0
             viewHeight.constant = 0
-            viewTopConst.constant = 50
+            viewTopConst.constant = 55
         } else {
             if #available(iOS 11.0, *) {
                 viewBottomConst.constant = view.safeAreaInsets.bottom - keyboardViewEndFrame.height
                 viewHeight.constant = 50
                 viewTopConst.constant = 10
+                if UserDefaults.standard.object(forKey: CLOSE) == nil {
+                    viewHeight.constant = 0
+                }
             } else {
                 viewBottomConst.constant = keyboardViewEndFrame.height
             }
@@ -191,8 +173,10 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate {
         plusImageView.addGestureRecognizer(tap)
         navigationItem.title = "ひな形の作成"
         navigationItem.rightBarButtonItem?.setTitleTextAttributes([NSAttributedString.Key.font : UIFont(name: "Helvetica Bold", size: 15) as Any], for: .normal)
-        UserDefaults.standard.set(true, forKey: "edit")
+        UserDefaults.standard.set(true, forKey: EDIT_TEMP)
         tableView.tableFooterView = UIView()
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 10000
         tableView.emptyDataSetSource = self
         tableView.emptyDataSetDelegate = self
         createButton.layer.cornerRadius = 5
@@ -200,7 +184,7 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate {
         plusImageView.isHidden = true
         
         templateTextField.delegate = self
-        templateTextField.returnKeyType = .next
+        templateTextField.returnKeyType = .done
         templateTextField.becomeFirstResponder()
         templateTextField.addTarget(self, action: #selector(textFieldBeginEditing), for: .editingDidBegin)
         
@@ -210,15 +194,14 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate {
     }
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        
-        if templateTextField.text == "" { return false }
+        guard templateTextField.text != "" else { return false }
         
         baseView.isHidden = false
         plusImageView.isHidden = false
         templateTextField.resignFirstResponder()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { [self] in
-            UserDefaults.standard.set(true, forKey: "plus")
-            UserDefaults.standard.removeObject(forKey: "edit")
+            UserDefaults.standard.set(true, forKey: CLOSE)
+            UserDefaults.standard.removeObject(forKey: EDIT_TEMP)
             plusImageView.image = UIImage(named: "cancel")
             memoTextField.becomeFirstResponder()
         }
@@ -244,7 +227,7 @@ extension CreateTemplateViewController: UITableViewDelegate, UITableViewDataSour
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! TemplateMemoTableViewCell
      
         cell.createTemplateVC = self
-        cell.memoTextField.delegate = self
+        cell.memoTextView.delegate = self
         cell.templateMemo = templateMemos[indexPath.row]
         cell.configureCell(templateMemos[indexPath.row])
         return cell

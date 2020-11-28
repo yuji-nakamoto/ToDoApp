@@ -8,10 +8,10 @@
 import UIKit
 import RealmSwift
 
-class MemoTableViewCell: UITableViewCell, UITextFieldDelegate {
+class MemoTableViewCell: UITableViewCell, UITextViewDelegate {
     
     @IBOutlet weak var memoImageView: UIImageView!
-    @IBOutlet weak var memoTextField: UITextField!
+    @IBOutlet weak var memoTextView: UITextView!
     @IBOutlet weak var deleteButton: UIButton!
     @IBOutlet weak var fronView: UIView!
     
@@ -19,8 +19,8 @@ class MemoTableViewCell: UITableViewCell, UITextFieldDelegate {
     var memoVC: MemoTableViewController?
     
     func configureCell(_ memo: Memo) {
-        memoTextField.text = memo.name
-        memoTextField.delegate = self
+        memoTextView.text = memo.name
+        memoTextView.delegate = self
         
         let realm = try! Realm()
         let memos = realm.objects(Memo.self).filter("id == '\(memo.id)'")
@@ -28,10 +28,10 @@ class MemoTableViewCell: UITableViewCell, UITextFieldDelegate {
         memos.forEach { (memo) in
             if memo.isCheck == true {
                 memoImageView.image = UIImage(systemName: "square.slash")
-                memoTextField.textColor = .systemGray3
+                memoTextView.textColor = .systemGray3
             } else {
                 memoImageView.image = UIImage(systemName: "square")
-                memoTextField.textColor = UIColor(named: O_BLACK)
+                memoTextView.textColor = UIColor(named: O_BLACK)
             }
         }
     }
@@ -40,10 +40,9 @@ class MemoTableViewCell: UITableViewCell, UITextFieldDelegate {
         super.awakeFromNib()
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapMemoImageView))
         fronView.addGestureRecognizer(tap)
-        memoTextField.text = ""
+        memoTextView.text = ""
         memoImageView.image = UIImage(systemName: "square")
-        memoTextField.returnKeyType = .done
-        memoTextField.addTarget(self, action: #selector(textFieldBeginEditing), for: .editingDidBegin)
+        memoTextView.returnKeyType = .done
     }
     
     @IBAction func deleteButtonTapped(_ sender: Any) {
@@ -53,13 +52,9 @@ class MemoTableViewCell: UITableViewCell, UITextFieldDelegate {
         
         try! realm.write() {
             realm.delete(memos)
+            UserDefaults.standard.removeObject(forKey: EDIT_MEMO)
             memoVC?.viewWillAppear(true)
         }
-    }
-    
-    @objc func textFieldBeginEditing() {
-        UserDefaults.standard.set(true, forKey: "edit2")
-        memoVC?.viewDidAppear(true)
     }
     
     @objc func tapMemoImageView() {
@@ -70,8 +65,8 @@ class MemoTableViewCell: UITableViewCell, UITextFieldDelegate {
         memos.forEach { (memo) in
             if memoImageView.image == UIImage(systemName: "square") {
                 memoImageView.image = UIImage(systemName: "square.slash")
-                memoTextField.textColor = .systemGray3
-                if UserDefaults.standard.object(forKey: "onCheck") != nil {
+                memoTextView.textColor = .systemGray3
+                if UserDefaults.standard.object(forKey: ON_CHECK) != nil {
                     generator.notificationOccurred(.success)
                 }
                 try! realm.write() {
@@ -79,7 +74,7 @@ class MemoTableViewCell: UITableViewCell, UITextFieldDelegate {
                 }
             } else {
                 memoImageView.image = UIImage(systemName: "square")
-                memoTextField.textColor = UIColor(named: O_BLACK)
+                memoTextView.textColor = UIColor(named: O_BLACK)
                 try! realm.write() {
                     memo.isCheck = false
                 }
@@ -87,31 +82,43 @@ class MemoTableViewCell: UITableViewCell, UITextFieldDelegate {
         }
     }
     
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        if memoTextField.text == "" { return false }
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        UserDefaults.standard.set(true, forKey: EDIT_MEMO)
+        memoVC?.viewDidAppear(true)
+    }
+    
+    func textViewDidChange(_ textView: UITextView) {
+        memoVC?.tableView.beginUpdates()
+        memoVC?.tableView.endUpdates()
+    }
+    
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
         
-        let realm = try! Realm()
-        let memos = realm.objects(Memo.self).filter("id == '\(memo.id)'")
-        let items = realm.objects(Item.self).filter("name == '\(memoTextField.text ?? "")'")
-        let item = Item()
-        let id = UUID().uuidString
+        if memoTextView.text == "" { return false }
         
-        if items.count == 0 {
-            memos.forEach { (memo) in
-
-                item.name = memoTextField.text!
-                item.id = id
-                try! realm.write() {
-                    realm.add(item)
-                    memo.name = memoTextField.text!
+        if text == "\n" {
+            let realm = try! Realm()
+            let memos = realm.objects(Memo.self).filter("id == '\(memo.id)'")
+            let items = realm.objects(Item.self).filter("name == '\(memoTextView.text ?? "")'")
+            let item = Item()
+            let id = UUID().uuidString
+            
+            if items.count == 0 {
+                memos.forEach { (memo) in
+                    item.name = memoTextView.text!
+                    item.id = id
+                    try! realm.write() {
+                        realm.add(item)
+                        memo.name = memoTextView.text!
+                    }
                 }
             }
+            UserDefaults.standard.removeObject(forKey: EDIT_MEMO)
+            UserDefaults.standard.removeObject(forKey: CLOSE)
+            memoTextView.resignFirstResponder()
+            memoVC?.viewDidAppear(true)
+            return false
         }
-        
-        UserDefaults.standard.removeObject(forKey: "edit2")
-        UserDefaults.standard.removeObject(forKey: "plus")
-        memoTextField.resignFirstResponder()
-        memoVC?.viewDidAppear(true)
         return true
     }
 }
