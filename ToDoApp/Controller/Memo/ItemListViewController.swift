@@ -13,12 +13,11 @@ import RealmSwift
 class ItemListViewController: UIViewController, UITextFieldDelegate {
     
     @IBOutlet weak var tableView: UITableView!
-    @IBOutlet weak var plusImageView: UIImageView!
     @IBOutlet weak var memoTextField: UITextField!
     @IBOutlet weak var createButton: UIButton!
+    @IBOutlet weak var closeButton: UIButton!
     @IBOutlet weak var baseView: UIView!
     @IBOutlet weak var viewBottomConst: NSLayoutConstraint!
-    @IBOutlet weak var viewHeight: NSLayoutConstraint!
     
     private var items = [Item]()
     
@@ -31,13 +30,14 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         fetchItem()
+        selectColor()
     }
     
     // MARK: - Actions
     
-    @objc func tapPlusImageView() {
-        UserDefaults.standard.removeObject(forKey: CLOSE)
+    @IBAction func closeButonnTapped(_ sender: Any) {
         UserDefaults.standard.set(true, forKey: BACK)
+        UserDefaults.standard.removeObject(forKey: CLOSE)
         navigationController?.popViewController(animated: false)
     }
     
@@ -394,14 +394,10 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
     }
     
     private func setup() {
-        
-        let tap = UITapGestureRecognizer(target: self, action: #selector(tapPlusImageView))
-        plusImageView.addGestureRecognizer(tap)
         navigationItem.title = "買い物メモ"
-        
         tableView.tableFooterView = UIView()
         createButton.layer.cornerRadius = 5
-        
+        closeButton.layer.cornerRadius = 5
         tableView.emptyDataSetSource = self
         tableView.emptyDataSetDelegate = self
         memoTextField.delegate = self
@@ -415,31 +411,24 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
         //iPhone8
         case 1334:
             viewBottomConst.constant = -211
-            break
         //iPhone8Plus
         case 1792:
             viewBottomConst.constant = -263
-            break
         //iPhone12mini
         case 2208:
             viewBottomConst.constant = -222
-            break
         //iPhone11 & iPhone11Pro
         case 2436:
             viewBottomConst.constant = -253
-            break
         //iPhone12
         case 2532:
             viewBottomConst.constant = -253
-            break
         //iPhone11ProMax
         case 2688:
             viewBottomConst.constant = -263
-            break
         //iPhone12ProMax
         case 2778:
             viewBottomConst.constant = -263
-            break
         default:
             break
         }
@@ -473,7 +462,7 @@ extension ItemListViewController: UITableViewDelegate, UITableViewDataSource {
         tableView.deselectRow(at: indexPath, animated: true)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [self] in
-            UserDefaults.standard.set(items[indexPath.row].name, forKey: "itemName")
+            UserDefaults.standard.set(items[indexPath.row].name, forKey: ITEM_NAME)
             navigationController?.popViewController(animated: false)
             UserDefaults.standard.removeObject(forKey: CLOSE)
             UserDefaults.standard.set(true, forKey: BACK)
@@ -487,5 +476,10 @@ extension ItemListViewController: EmptyDataSetSource, EmptyDataSetDelegate {
         
         let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor(named: O_BLACK) as Any, .font: UIFont(name: "HiraMaruProN-W4", size: 15) as Any]
         return NSAttributedString(string: "入力候補はありません", attributes: attributes)
+    }
+    
+    func description(forEmptyDataSet scrollView: UIScrollView) -> NSAttributedString? {
+        let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.systemGray2 as Any, .font: UIFont(name: "HiraMaruProN-W4", size: 13) as Any]
+        return NSAttributedString(string: "文字を入力することで、入力候補が表示されます", attributes: attributes)
     }
 }

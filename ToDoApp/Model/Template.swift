@@ -10,17 +10,34 @@ import RealmSwift
 
 class Template: Object {
     @objc dynamic var name = ""
-    @objc dynamic var id = ""
+    @objc dynamic var sourceRow = 0
+    @objc dynamic var originRow = 0
+    @objc dynamic var sorted = false
+    @objc dynamic var templateId = ""
     @objc dynamic var isSelect = false
     @objc dynamic var selected = false
     
     class func fetchTemplate(id: String, completion: @escaping(Template) -> Void) {
         
         let realm = try! Realm()
-        let templates = realm.objects(Template.self).filter("id == '\(id)'")
+        let templates = realm.objects(Template.self).filter("templateId == '\(id)'")
         templates.forEach { (template) in
             completion(template)
         }
+    }
+    
+    class func updateSelected(completion: @escaping(Results<Template>) -> Void) {
+        
+        let realm = try! Realm()
+        let templateArray = realm.objects(Template.self)
+ 
+        templateArray.forEach { (t) in
+            try! realm.write() {
+                t.selected = false
+                completion(templateArray)
+            }
+        }
+        completion(templateArray)
     }
     
     class func fetchSelectedTemplate(completion: @escaping(Bool, Template) -> Void) {
@@ -43,7 +60,7 @@ class Template: Object {
         let realm = try! Realm()
         let template = Template()
         
-        template.id = id
+        template.templateId = id
         template.name = text
         try! realm.write() {
             realm.add(template)
@@ -54,7 +71,7 @@ class Template: Object {
     class func updateTemplate(text: String, id: String, completion: @escaping() -> Void) {
         
         let realm = try! Realm()
-        let templates = realm.objects(Template.self).filter("id == '\(id)'")
+        let templates = realm.objects(Template.self).filter("templateId == '\(id)'")
         
         templates.forEach { (t) in
             try! realm.write() {
@@ -63,46 +80,41 @@ class Template: Object {
             }
         }
     }
-    
-    class func deleteTempMemo(id: String, completion: @escaping() -> Void) {
-        
-        let realm = try! Realm()
-        let templates = realm.objects(Template.self).filter("id == '\(id)'")
-        let templateMemos = realm.objects(TemplateMemo.self).filter("id == '\(id)'")
-        
-        templates.forEach { (t) in
-            try! realm.write() {
-                realm.delete(templates)
-                realm.delete(templateMemos)
-                completion()
-            }
-        }
-    }
 }
 
 class TemplateMemo: Object {
     @objc dynamic var name = ""
-    @objc dynamic var id = ""
+    @objc dynamic var sourceRow = 0
+    @objc dynamic var originRow = 0
+    @objc dynamic var sorted = false
+    @objc dynamic var date: Double = 0
+    @objc dynamic var templateId = ""
     @objc dynamic var uid = ""
     
     class func fetchTemplateMemo(id: String, completion: @escaping(Results<TemplateMemo>) -> Void) {
         let realm = try! Realm()
-        let templateMemo = realm.objects(TemplateMemo.self).filter("id == '\(id)'")
+        let templateMemo = realm.objects(TemplateMemo.self).filter("templateId == '\(id)'").sorted(byKeyPath: "sourceRow", ascending: true)
         completion(templateMemo)
     }
     
     class func createTemplateMemo(text: String, id: String, completion: @escaping() -> Void) {
         
         let realm = try! Realm()
-        let templateMemo = TemplateMemo()
+        let tempMemo = TemplateMemo()
+        let tempMemos = realm.objects(TemplateMemo.self).filter("templateId == '\(id)'")
         let uid = UUID().uuidString
         
-        templateMemo.id = id
-        templateMemo.uid = uid
-        templateMemo.name = text
+        tempMemo.templateId = id
+        tempMemo.uid = uid
+        tempMemo.name = text
+        
+        if tempMemos.count != 0 {
+            tempMemo.sourceRow = tempMemos.count
+            tempMemo.originRow = tempMemos.count
+        }
         
         try! realm.write() {
-            realm.add(templateMemo)
+            realm.add(tempMemo)
             completion()
         }
     }
@@ -110,7 +122,7 @@ class TemplateMemo: Object {
     class func checkTemplateMemo(id: String, completion: @escaping(Bool) -> Void) {
         
         let realm = try! Realm()
-        let templateMemos = realm.objects(TemplateMemo.self).filter("id == '\(id)'")
+        let templateMemos = realm.objects(TemplateMemo.self).filter("templateId == '\(id)'")
         if templateMemos.count == 0 {
             completion(true)
         } else {
@@ -121,7 +133,7 @@ class TemplateMemo: Object {
     class func deleteTemplateMemoId(id: String, completion: @escaping() -> Void) {
         
         let realm = try! Realm()
-        let templateMemos = realm.objects(TemplateMemo.self).filter("id == '\(id)'")
+        let templateMemos = realm.objects(TemplateMemo.self).filter("templateId == '\(id)'")
         try! realm.write() {
             realm.delete(templateMemos)
             completion()
@@ -131,9 +143,31 @@ class TemplateMemo: Object {
     class func deleteTemplateMemoUid(uid: String, completion: @escaping() -> Void) {
         
         let realm = try! Realm()
-        let templateMemos = realm.objects(TemplateMemo.self).filter("uid == '\(uid)'")
+        let tempMemos = realm.objects(TemplateMemo.self).filter("uid == '\(uid)'")
+        
         try! realm.write() {
+            tempMemos.forEach { (t) in
+                let tempMemos2 = realm.objects(TemplateMemo.self).filter("templateId == '\(t.templateId)'")
+                tempMemos2.forEach { (t2) in
+                    if t.originRow < t2.originRow {
+                        t2.sourceRow = t2.sourceRow - 1
+                        t2.originRow = t2.originRow - 1
+                    }
+                }
+            }
+            realm.delete(tempMemos)
+            completion()
+        }
+    }
+    
+    class func deleteTempMemo(id: String, completion: @escaping() -> Void) {
+        let realm = try! Realm()
+        let templates = realm.objects(Template.self).filter("templateId == '\(id)'")
+        let templateMemos = realm.objects(TemplateMemo.self).filter("templateId == '\(id)'")
+        
+        try! realm.safeWrite {
             realm.delete(templateMemos)
+            realm.delete(templates)
             completion()
         }
     }

@@ -16,13 +16,15 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var memoTextField: UITextField!
     @IBOutlet weak var templateTextField: UITextField!
-    @IBOutlet weak var plusImageView: UIImageView!
+    @IBOutlet weak var backButton: UIBarButtonItem!
+    @IBOutlet weak var closeButton: UIButton!
+    @IBOutlet weak var saveButton: UIBarButtonItem!
     @IBOutlet weak var baseView: UIView!
+    @IBOutlet weak var plusImageView: UIImageView!
     @IBOutlet weak var bannerView: GADBannerView!
     @IBOutlet weak var createButton: UIButton!
     @IBOutlet weak var viewBottomConst: NSLayoutConstraint!
     @IBOutlet weak var viewHeight: NSLayoutConstraint!
-    @IBOutlet weak var viewTopConst: NSLayoutConstraint!
     
     private var templateMemos = [TemplateMemo]()
     private let id = UUID().uuidString
@@ -31,17 +33,22 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
         super.viewDidLoad()
         setup()
         setupBanner()
+        tableView.dragDelegate = self
+        tableView.dropDelegate = self
+        tableView.dragInteractionEnabled = true
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         fetchTemplateMemo()
-        setPlusImageView()
+        baseViewHidden()
+        selectColor()
+        setColor()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        setPlusImageView()
+        baseViewHidden()
     }
     
     // MARK: - Actions
@@ -79,32 +86,30 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
         }
     }
     
+    @IBAction func closeButtonTapped(_ sender: Any) {
+        memoTextField.resignFirstResponder()
+    }
+    
     @IBAction func createButtonTapped(_ sender: Any) {
         guard memoTextField.text != "" else { return }
-
-        TemplateMemo.createTemplateMemo(text: memoTextField.text!, id: id) { [self] in
-            memoTextField.text = ""
-            fetchTemplateMemo()
-            let index = IndexPath(row: templateMemos.count - 1, section: 0)
-            tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
+        if let text = memoTextField.text {
+            TemplateMemo.createTemplateMemo(text: text, id: id) { [self] in
+                memoTextField.text = ""
+                fetchTemplateMemo()
+                let index = IndexPath(row: templateMemos.count - 1, section: 0)
+                tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
+            }
         }
     }
     
     @objc func tapPlusImageView() {
         
-        if UserDefaults.standard.object(forKey: CLOSE) == nil {
-            UserDefaults.standard.set(true, forKey: CLOSE)
-            memoTextField.becomeFirstResponder()
-            plusImageView.image = UIImage(named: "cancel")
-            
-            if templateMemos.count != 0 {
-                let index = IndexPath(row: templateMemos.count - 1, section: 0)
-                tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
-            }
-        } else {
-            UserDefaults.standard.removeObject(forKey: CLOSE)
-            memoTextField.resignFirstResponder()
-            plusImageView.image = UIImage(named: "plus")
+        UserDefaults.standard.set(true, forKey: CLOSE)
+        memoTextField.becomeFirstResponder()
+        
+        if templateMemos.count != 0 {
+            let index = IndexPath(row: templateMemos.count - 1, section: 0)
+            tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
         }
     }
     
@@ -113,6 +118,12 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
     private func fetchTemplateMemo() {
         
         TemplateMemo.fetchTemplateMemo(id: id) { [self] (templateMemo) in
+            if templateMemo.count == 0 { saveButton.isEnabled = false }
+            templateMemo.forEach { (t) in
+                if t.templateId != "" {
+                    saveButton.isEnabled = true
+                }
+            }
             templateMemos.removeAll()
             templateMemos.append(contentsOf: templateMemo)
             tableView.reloadData()
@@ -121,20 +132,12 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
     
     // MARK: - Helpers
     
-    private func setPlusImageView() {
+    private func baseViewHidden() {
         
         if UserDefaults.standard.object(forKey: EDIT_TEMP) != nil {
-            plusImageView.isHidden = true
             baseView.isHidden = true
         } else {
-            plusImageView.isHidden = false
             baseView.isHidden = false
-        }
-        
-        if UserDefaults.standard.object(forKey: CLOSE) == nil {
-            plusImageView.image = UIImage(named: "plus")
-        } else {
-            plusImageView.image = UIImage(named: "cancel")
         }
     }
     
@@ -146,12 +149,10 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
         if notification.name == UIResponder.keyboardWillHideNotification {
             viewBottomConst.constant = 0
             viewHeight.constant = 0
-            viewTopConst.constant = 55
         } else {
             if #available(iOS 11.0, *) {
                 viewBottomConst.constant = view.safeAreaInsets.bottom - keyboardViewEndFrame.height
                 viewHeight.constant = 50
-                viewTopConst.constant = 10
                 if UserDefaults.standard.object(forKey: CLOSE) == nil {
                     viewHeight.constant = 0
                 }
@@ -164,11 +165,9 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
     
     @objc func textFieldBeginEditing() {
         baseView.isHidden = true
-        plusImageView.isHidden = true
     }
     
     private func setup() {
-        
         let tap = UITapGestureRecognizer(target: self, action: #selector(tapPlusImageView))
         plusImageView.addGestureRecognizer(tap)
         navigationItem.title = "ひな形の作成"
@@ -180,8 +179,9 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
         tableView.emptyDataSetSource = self
         tableView.emptyDataSetDelegate = self
         createButton.layer.cornerRadius = 5
+        closeButton.layer.cornerRadius = 5
         viewHeight.constant = 0
-        plusImageView.isHidden = true
+        saveButton.isEnabled = false
         
         templateTextField.delegate = self
         templateTextField.returnKeyType = .done
@@ -193,30 +193,79 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
         notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
     
+    private func setColor() {
+        if UserDefaults.standard.object(forKey: GREEN_COLOR) != nil {
+            saveButton.tintColor = UIColor.white
+            backButton.tintColor = UIColor.white
+        } else {
+            saveButton.tintColor = UIColor(named: EMERALD_GREEN)
+            backButton.tintColor = UIColor(named: O_BLACK)
+        }
+    }
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         guard templateTextField.text != "" else { return false }
+        if templateTextField.text!.count >= 16 {
+            HUD.flash(.labeledError(title: "", subtitle: "15文字以内で入力してください"), delay: 1)
+            return false
+        }
         
         baseView.isHidden = false
-        plusImageView.isHidden = false
         templateTextField.resignFirstResponder()
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) { [self] in
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
             UserDefaults.standard.set(true, forKey: CLOSE)
             UserDefaults.standard.removeObject(forKey: EDIT_TEMP)
-            plusImageView.image = UIImage(named: "cancel")
             memoTextField.becomeFirstResponder()
         }
         return true
     }
     
     private func setupBanner() {
-        
-        bannerView.adUnitID = "ca-app-pub-3940256099942544/2934735716"
+        bannerView.adUnitID = "ca-app-pub-4750883229624981/1980065426"
         bannerView.rootViewController = self
         bannerView.load(GADRequest())
+    }
+    
+    func dragItem(for indexPath: IndexPath) -> UIDragItem {
+        let tempName = templateMemos[indexPath.row].name
+        let itemProvider = NSItemProvider(object: tempName as NSString)
+        
+        return UIDragItem(itemProvider: itemProvider)
+    }
+    
+    func moveItem(sourcePath: Int, destinationPath: Int) {
+        let temps = templateMemos.remove(at: sourcePath)
+        templateMemos.insert(temps, at: destinationPath)
     }
 }
 
 // MARK: - Table view
+
+extension CreateTemplateViewController: UITableViewDragDelegate, UITableViewDropDelegate {
+    
+    func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        return [dragItem(for: indexPath)]
+    }
+    
+    func tableView(_ tableView: UITableView, dropSessionDidUpdate session: UIDropSession,
+                   withDestinationIndexPath destinationIndexPath: IndexPath?) -> UITableViewDropProposal {
+        return UITableViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
+    }
+    
+    func tableView(_ tableView: UITableView, performDropWith coordinator: UITableViewDropCoordinator) {
+        guard let item = coordinator.items.first,
+              let destinationIndexPath = coordinator.destinationIndexPath,
+              let sourceIndexPath = item.sourceIndexPath else { return }
+        
+        tableView.performBatchUpdates({ [weak self] in
+            guard let strongSelf = self else { return }
+            strongSelf.moveItem(sourcePath: sourceIndexPath.row, destinationPath: destinationIndexPath.row)
+            tableView.deleteRows(at: [sourceIndexPath], with: .automatic)
+            tableView.insertRows(at: [destinationIndexPath], with: .automatic)
+        }, completion: nil)
+        coordinator.drop(item.dragItem, toRowAt: destinationIndexPath)
+    }
+}
 
 extension CreateTemplateViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -225,12 +274,91 @@ extension CreateTemplateViewController: UITableViewDelegate, UITableViewDataSour
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! TemplateMemoTableViewCell
-     
+        
         cell.createTemplateVC = self
         cell.memoTextView.delegate = self
         cell.templateMemo = templateMemos[indexPath.row]
         cell.configureCell(templateMemos[indexPath.row])
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        let tempMemo = templateMemos[sourceIndexPath.row]
+        templateMemos.remove(at: sourceIndexPath.row)
+        templateMemos.insert(tempMemo, at: destinationIndexPath.row)
+        
+        if sourceIndexPath.row == destinationIndexPath.row { return }
+
+        print("-------start-------")
+        let realm = try! Realm()
+        let tempMemos = realm.objects(TemplateMemo.self)
+            .filter("sourceRow == \(sourceIndexPath.row)").filter("templateId == '\(id)'")
+        tempMemos.forEach { (t) in
+
+            try! realm.write() {
+                t.sourceRow = destinationIndexPath.row
+                t.sorted = true
+                let tempMemos2 = realm.objects(TemplateMemo.self)
+                    .filter("sorted == false").filter("templateId == '\(id)'")
+                tempMemos2.forEach { (t2) in
+
+                    if t.sourceRow > t2.sourceRow {
+                        if t.originRow > t2.sourceRow {
+                            print("stay1: ", t2.name)
+                        } else {
+                            t2.sourceRow = t2.sourceRow - 1
+                            t2.originRow = t2.sourceRow
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                try! realm.write() {
+                                    t.originRow = t.sourceRow
+                                }
+                            }
+                            print("minus: ", t2.name)
+                        }
+
+                    } else if t.sourceRow < t2.sourceRow {
+                        if t.originRow < t2.sourceRow {
+                            print("stay2: ", t2.name)
+                        } else {
+                            t2.sourceRow = t2.sourceRow + 1
+                            t2.originRow = t2.sourceRow
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                try! realm.write() {
+                                    t.originRow = t.sourceRow
+                                }
+                            }
+                            print("plus: ", t2.name)
+                        }
+                    } else if t.sourceRow == t2.sourceRow {
+                        if t.originRow < t2.sourceRow {
+                            t2.sourceRow = t2.sourceRow - 1
+                            t2.originRow = t2.sourceRow
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                try! realm.write() {
+                                    t.originRow = t.sourceRow
+                                }
+                            }
+                            print("== minus: ", t2.name)
+                        } else if t.originRow > t2.sourceRow {
+                            t2.sourceRow = t2.sourceRow + 1
+                            t2.originRow = t2.sourceRow
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                                try! realm.write() {
+                                    t.originRow = t.sourceRow
+                                }
+                            }
+                            print("== plus: ", t2.name)
+                        }
+                    }
+
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                        try! realm.write() {
+                            t.sorted = false
+                        }
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -239,6 +367,6 @@ extension CreateTemplateViewController: EmptyDataSetSource, EmptyDataSetDelegate
     func title(forEmptyDataSet scrollView: UIScrollView) -> NSAttributedString? {
         
         let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor(named: O_BLACK) as Any, .font: UIFont(name: "HiraMaruProN-W4", size: 15) as Any]
-        return NSAttributedString(string: "メモはありません", attributes: attributes)
+        return NSAttributedString(string: "メモ作成後、保存をタップしてください", attributes: attributes)
     }
 }

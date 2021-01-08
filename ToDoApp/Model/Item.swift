@@ -10,7 +10,7 @@ import RealmSwift
 
 class Item: Object {
     @objc dynamic var name = ""
-    @objc dynamic var id = ""
+    @objc dynamic var uid = ""
     
     class func fetchItem(completion: @escaping(Int) -> Void) {
         let realm = try! Realm()
@@ -27,7 +27,7 @@ class Item: Object {
                 count += 1
 
                 item.name = i
-                item.id = String(count)
+                item.uid = String(count)
                 try! realm.write() {
                     realm.add(item)
                     completion(count)

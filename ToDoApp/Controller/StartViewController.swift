@@ -11,10 +11,19 @@ import RealmSwift
 class StartViewController: UIViewController {
     
     @IBOutlet weak var indicator: UIActivityIndicatorView!
+    private var date = Date()
+    private let calendar = Calendar.current
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         indicator.startAnimating()
+        UserDefaults.standard.set(true, forKey: GREEN_COLOR)
+        UserDefaults.standard.set(true, forKey: ON_INPUT)
+        UserDefaults.standard.set(true, forKey: ON_PUSH)
+        let threeWeek =  calendar.date(byAdding: .day, value: 21, to: date)
+        UserDefaults.standard.set(threeWeek, forKey: REVIEW)
+        UserDefaults.standard.set(true, forKey: MIDIUM1)
 //        UserDefaults.standard.removeObject(forKey: SET_ITEM)
     }
     
@@ -26,7 +35,6 @@ class StartViewController: UIViewController {
     private func setItem() {
         
         Item.fetchItem { [self] count in
-            
             if count == itemArray.count {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                     UserDefaults.standard.set(true, forKey: SET_ITEM)

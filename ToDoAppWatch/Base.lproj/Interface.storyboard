@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="17506" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
+    <device id="watch38"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="17500"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+    </dependencies>
+    <scenes>
+        <!--Interface Controller-->
+        <scene sceneID="aou-V4-d1y">
+            <objects>
+                <controller id="AgC-eL-Hgc" customClass="InterfaceController" customModule="ToDoAppWatch" customModuleProvider="target">
+                    <items>
+                        <table alignment="left" id="ABe-Io-dHT">
+                            <items>
+                                <tableRow identifier="RowController" id="xsR-Dd-dD9" customClass="RowController" customModule="ToDoAppWatch_Extension">
+                                    <group key="rootItem" width="1" height="35" alignment="left" id="ZcM-AH-zww">
+                                        <items>
+                                            <button width="37" height="38" alignment="left" backgroundImage="square" id="5R8-bR-Fqs">
+                                                <color key="backgroundColor" name="emerald_green"/>
+                                                <connections>
+                                                    <action selector="tapBtn" destination="xsR-Dd-dD9" id="slp-1Q-AfR"/>
+                                                </connections>
+                                            </button>
+                                            <label width="105" height="45" alignment="left" text="Label" numberOfLines="0" id="TU8-xb-9lo">
+                                                <color key="textColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
+                                            </label>
+                                        </items>
+                                    </group>
+                                    <connections>
+                                        <outlet property="checkBtn" destination="5R8-bR-Fqs" id="0fD-g1-hvo"/>
+                                        <outlet property="rowLabel" destination="TU8-xb-9lo" id="2JN-vr-ssG"/>
+                                    </connections>
+                                </tableRow>
+                            </items>
+                        </table>
+                        <label width="136" height="29" alignment="center" verticalAlignment="center" text="メモはありません" textAlignment="center" id="41g-Ks-0b0">
+                            <fontDescription key="font" style="UICTFontTextStyleBody"/>
+                        </label>
+                        <label width="136" height="52" alignment="center" verticalAlignment="center" text="iPhone側でメモを入力すると、こちらに表示されます" textAlignment="center" numberOfLines="0" id="xMK-2i-tf1">
+                            <color key="textColor" white="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                            <fontDescription key="font" style="UICTFontTextStyleFootnote"/>
+                        </label>
+                    </items>
+                    <connections>
+                        <outlet property="descriptionLabel" destination="xMK-2i-tf1" id="7s2-8A-Pw8"/>
+                        <outlet property="nodataLabel" destination="41g-Ks-0b0" id="1pL-md-MiZ"/>
+                        <outlet property="tableView" destination="ABe-Io-dHT" id="Xuc-we-DdN"/>
+                    </connections>
+                </controller>
+            </objects>
+            <point key="canvasLocation" x="-17" y="-20"/>
+        </scene>
+        <!--DetailIC-->
+        <scene sceneID="tXn-Lg-L2k">
+            <objects>
+                <controller identifier="DetailIC" id="pFS-rI-hOK" customClass="DetailInterfaceController" customModule="ToDoAppWatch_Extension">
+                    <items>
+                        <label width="136" height="162" alignment="center" verticalAlignment="center" text="Label" textAlignment="center" numberOfLines="0" id="AWA-8a-9O8">
+                            <fontDescription key="font" style="UICTFontTextStyleTitle3"/>
+                        </label>
+                    </items>
+                    <connections>
+                        <outlet property="detailLabel" destination="AWA-8a-9O8" id="bLH-am-yxs"/>
+                    </connections>
+                </controller>
+            </objects>
+            <point key="canvasLocation" x="255" y="-20"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="square" width="50" height="50"/>
+        <namedColor name="emerald_green">
+            <color red="0.0" green="0.66274509803921566" blue="0.40784313725490196" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

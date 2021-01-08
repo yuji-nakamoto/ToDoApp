@@ -22,11 +22,53 @@ class ItemListTableViewCell: UITableViewCell {
     @IBAction func deleteButtonTapped(_ sender: Any) {
         
         let realm = try! Realm()
-        let items = realm.objects(Item.self).filter("id == '\(item.id)'")
+        let items = realm.objects(Item.self).filter("uid == '\(item.uid)'")
         
         try! realm.write() {
             realm.delete(items)
             itemVC?.viewWillAppear(true)
+        }
+    }
+    
+    override func awakeFromNib() {
+        super.awakeFromNib()
+        if UserDefaults.standard.object(forKey: SMALL1) != nil {
+            itemNameLabel.font = UIFont.systemFont(ofSize: 13)
+        } else if UserDefaults.standard.object(forKey: SMALL2) != nil {
+            itemNameLabel.font = UIFont.systemFont(ofSize: 13, weight: .medium)
+        } else if UserDefaults.standard.object(forKey: MIDIUM1) != nil {
+            itemNameLabel.font = UIFont.systemFont(ofSize: 15)
+        } else if UserDefaults.standard.object(forKey: MIDIUM2) != nil {
+            itemNameLabel.font = UIFont.systemFont(ofSize: 15, weight: .medium)
+        } else if UserDefaults.standard.object(forKey: MIDIUM3) != nil {
+            itemNameLabel.font = UIFont.systemFont(ofSize: 17)
+        } else if UserDefaults.standard.object(forKey: MIDIUM4) != nil {
+            itemNameLabel.font = UIFont.systemFont(ofSize: 17, weight: .medium)
+        } else if UserDefaults.standard.object(forKey: BIG1) != nil {
+            itemNameLabel.font = UIFont.systemFont(ofSize: 19)
+        } else if UserDefaults.standard.object(forKey: BIG2) != nil {
+            itemNameLabel.font = UIFont.systemFont(ofSize: 19, weight: .medium)
+        }
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        if UserDefaults.standard.object(forKey: SMALL1) != nil {
+            itemNameLabel.font = UIFont.systemFont(ofSize: 13)
+        } else if UserDefaults.standard.object(forKey: SMALL2) != nil {
+            itemNameLabel.font = UIFont.systemFont(ofSize: 13, weight: .medium)
+        } else if UserDefaults.standard.object(forKey: MIDIUM1) != nil {
+            itemNameLabel.font = UIFont.systemFont(ofSize: 15)
+        } else if UserDefaults.standard.object(forKey: MIDIUM2) != nil {
+            itemNameLabel.font = UIFont.systemFont(ofSize: 15, weight: .medium)
+        } else if UserDefaults.standard.object(forKey: MIDIUM3) != nil {
+            itemNameLabel.font = UIFont.systemFont(ofSize: 17)
+        } else if UserDefaults.standard.object(forKey: MIDIUM4) != nil {
+            itemNameLabel.font = UIFont.systemFont(ofSize: 17, weight: .medium)
+        } else if UserDefaults.standard.object(forKey: BIG1) != nil {
+            itemNameLabel.font = UIFont.systemFont(ofSize: 19)
+        } else if UserDefaults.standard.object(forKey: BIG2) != nil {
+            itemNameLabel.font = UIFont.systemFont(ofSize: 19, weight: .medium)
         }
     }
 }
