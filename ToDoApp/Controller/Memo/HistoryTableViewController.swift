@@ -59,11 +59,8 @@ class HistoryTableViewController: UIViewController {
     }
     
     func setColor() {
-        if UserDefaults.standard.object(forKey: GREEN_COLOR) != nil {
-            dismissButton.tintColor = UIColor.white
-        } else {
-            dismissButton.tintColor = UIColor(named: O_BLACK)
-        }
+        let color: UIColor = UserDefaults.standard.object(forKey: GREEN_COLOR) != nil ? .white : UIColor(named: O_BLACK)!
+        dismissButton.tintColor = color
     }
     
     @IBAction func dismissButtonTapped(_ sender: Any) {

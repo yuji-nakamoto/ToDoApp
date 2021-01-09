@@ -17,12 +17,12 @@ public let FOREST_GREEN = "forest_green"
 
 public let EDIT_MEMO = "editMemo"
 public let EDIT_TEMP = "editTemp"
-public let CLOSE = "close"
 public let BACK = "back"
 public let SET_ITEM = "setItem"
 public let ITEM_NAME = "itemName"
 public let ID = "id"
 public let RELOAD = "reload"
+public let PAN = "pan"
 
 public let ON_INPUT = "onInput"
 public let ON_PUSH = "onPush"

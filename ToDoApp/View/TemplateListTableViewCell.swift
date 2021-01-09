@@ -65,11 +65,8 @@ class TemplateListTableViewCell: UITableViewCell {
     func configureCell(_ template: Template) {
         
         templateLabel.text = template.name
-        if template.isSelect == true {
-            checkMarkImageView.image = UIImage(systemName: "checkmark.square")
-        } else {
-            checkMarkImageView.image = UIImage(systemName: "square")
-        }
+        let image = template.isSelect ? UIImage(systemName: "checkmark.square") : UIImage(systemName: "square")
+        checkMarkImageView.image = image
     }
     
     @objc func tapCheckMarkImageView() {

@@ -8,7 +8,6 @@
 import UIKit
 import PKHUD
 import GoogleMobileAds
-import EmptyDataSet_Swift
 import RealmSwift
 
 class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate {
@@ -20,7 +19,6 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
     @IBOutlet weak var closeButton: UIButton!
     @IBOutlet weak var saveButton: UIBarButtonItem!
     @IBOutlet weak var baseView: UIView!
-    @IBOutlet weak var plusImageView: UIImageView!
     @IBOutlet weak var bannerView: GADBannerView!
     @IBOutlet weak var createButton: UIButton!
     @IBOutlet weak var viewBottomConst: NSLayoutConstraint!
@@ -28,6 +26,8 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
     
     private var templateMemos = [TemplateMemo]()
     private let id = UUID().uuidString
+    private var allowMove = false
+    private var forbidden = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,48 +41,52 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         fetchTemplateMemo()
-        baseViewHidden()
         selectColor()
         setColor()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        baseViewHidden()
+        if UserDefaults.standard.object(forKey: EDIT_TEMP) != nil {
+            baseViewIsHidden()
+        }
     }
     
     // MARK: - Actions
     
+    @IBAction func plusButtonTapped(_ sender: Any) {
+        baseView.isHidden = false
+        memoTextField.becomeFirstResponder()
+        
+        if templateMemos.count != 0 {
+            let index = IndexPath(row: templateMemos.count - 1, section: 0)
+            tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
+        }
+    }
+    
     @IBAction func backButtonTapped(_ sender: Any) {
         
-        if templateTextField.text != "" {
-            let alert = UIAlertController(title: "", message: "保存していません\n戻ってもよろしいですか？", preferredStyle: .alert)
-            let back = UIAlertAction(title: "戻る", style: UIAlertAction.Style.default) { [self] (alert) in
-                TemplateMemo.deleteTemplateMemoId(id: id) {
-                    self.navigationController?.popViewController(animated: true)
-                }
+        let alert = UIAlertController(title: "保存していない場合、\nデータが消去されます", message: "戻ってもよろしいですか？", preferredStyle: .alert)
+        let back = UIAlertAction(title: "戻る", style: UIAlertAction.Style.default) { [self] (alert) in
+            TemplateMemo.deleteTemplateMemoId(id: id) {
+                self.navigationController?.popViewController(animated: true)
             }
-            let cancel = UIAlertAction(title: "キャンセル", style: .cancel)
-            
-            alert.addAction(back)
-            alert.addAction(cancel)
-            self.present(alert, animated: true, completion: nil)
-            return
         }
-        navigationController?.popViewController(animated: true)
+        let cancel = UIAlertAction(title: "キャンセル", style: .cancel)
+            
+        alert.addAction(back)
+        alert.addAction(cancel)
+        self.present(alert, animated: true, completion: nil)
     }
     
     @IBAction func completionButtonTapped(_ sender: Any) {
-        guard templateTextField.text != "" else { return }
+        guard templateTextField.text != "" else {
+            HUD.flash(.labeledError(title: "", subtitle: "ひな形の名前を作成していません"), delay: 1)
+            return
+        }
         
-        TemplateMemo.checkTemplateMemo(id: id) { [self] (bool) in
-            if bool == true {
-                HUD.flash(.labeledError(title: "", subtitle: "メモを作成していません"), delay: 1)
-                return
-            }
-            Template.createTemplate(text: templateTextField.text!, id: id) {
-                self.navigationController?.popViewController(animated: true)
-            }
+        Template.createTemplate(text: templateTextField.text!, id: id) {
+            self.navigationController?.popViewController(animated: true)
         }
     }
     
@@ -99,17 +103,6 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
                 let index = IndexPath(row: templateMemos.count - 1, section: 0)
                 tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
             }
-        }
-    }
-    
-    @objc func tapPlusImageView() {
-        
-        UserDefaults.standard.set(true, forKey: CLOSE)
-        memoTextField.becomeFirstResponder()
-        
-        if templateMemos.count != 0 {
-            let index = IndexPath(row: templateMemos.count - 1, section: 0)
-            tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
         }
     }
     
@@ -132,12 +125,14 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
     
     // MARK: - Helpers
     
-    private func baseViewHidden() {
+    private func baseViewIsHidden() {
         
         if UserDefaults.standard.object(forKey: EDIT_TEMP) != nil {
             baseView.isHidden = true
+            viewHeight.constant = 0
         } else {
             baseView.isHidden = false
+            viewHeight.constant = 50
         }
     }
     
@@ -153,9 +148,6 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
             if #available(iOS 11.0, *) {
                 viewBottomConst.constant = view.safeAreaInsets.bottom - keyboardViewEndFrame.height
                 viewHeight.constant = 50
-                if UserDefaults.standard.object(forKey: CLOSE) == nil {
-                    viewHeight.constant = 0
-                }
             } else {
                 viewBottomConst.constant = keyboardViewEndFrame.height
             }
@@ -168,16 +160,12 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
     }
     
     private func setup() {
-        let tap = UITapGestureRecognizer(target: self, action: #selector(tapPlusImageView))
-        plusImageView.addGestureRecognizer(tap)
         navigationItem.title = "ひな形の作成"
         navigationItem.rightBarButtonItem?.setTitleTextAttributes([NSAttributedString.Key.font : UIFont(name: "Helvetica Bold", size: 15) as Any], for: .normal)
         UserDefaults.standard.set(true, forKey: EDIT_TEMP)
         tableView.tableFooterView = UIView()
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 10000
-        tableView.emptyDataSetSource = self
-        tableView.emptyDataSetDelegate = self
         createButton.layer.cornerRadius = 5
         closeButton.layer.cornerRadius = 5
         viewHeight.constant = 0
@@ -213,7 +201,6 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
         baseView.isHidden = false
         templateTextField.resignFirstResponder()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [self] in
-            UserDefaults.standard.set(true, forKey: CLOSE)
             UserDefaults.standard.removeObject(forKey: EDIT_TEMP)
             memoTextField.becomeFirstResponder()
         }
@@ -244,12 +231,31 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
 extension CreateTemplateViewController: UITableViewDragDelegate, UITableViewDropDelegate {
     
     func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        guard indexPath.row != templateMemos.count else {
+            forbidden = true
+            return []
+        }
+        forbidden = false
         return [dragItem(for: indexPath)]
     }
     
     func tableView(_ tableView: UITableView, dropSessionDidUpdate session: UIDropSession,
                    withDestinationIndexPath destinationIndexPath: IndexPath?) -> UITableViewDropProposal {
-        return UITableViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
+        let realm = try! Realm()
+        let tempMemos = realm.objects(TemplateMemo.self)
+            .sorted(byKeyPath: "sourceRow", ascending: true).filter("templateId == '\(id)'")
+        
+        if forbidden {
+            return UITableViewDropProposal(operation: .forbidden, intent: .unspecified)
+        }
+        
+        tempMemos.forEach { (tm) in
+            let allow = destinationIndexPath?.row == nil || destinationIndexPath!.row >= tm.sourceRow + 1 ? false : true
+            allowMove = allow
+        }
+        
+        let operation: UIDropOperation = allowMove ? .move : .cancel
+        return UITableViewDropProposal(operation: operation, intent: .insertAtDestinationIndexPath)
     }
     
     func tableView(_ tableView: UITableView, performDropWith coordinator: UITableViewDropCoordinator) {
@@ -269,11 +275,16 @@ extension CreateTemplateViewController: UITableViewDragDelegate, UITableViewDrop
 
 extension CreateTemplateViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return templateMemos.count
+        return templateMemos.count + 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! TemplateMemoTableViewCell
+        let cell2 = tableView.dequeueReusableCell(withIdentifier: "Cell2")
+        
+        if indexPath.row == templateMemos.count {
+            return cell2!
+        }
         
         cell.createTemplateVC = self
         cell.memoTextView.delegate = self
@@ -359,14 +370,5 @@ extension CreateTemplateViewController: UITableViewDelegate, UITableViewDataSour
                 }
             }
         }
-    }
-}
-
-extension CreateTemplateViewController: EmptyDataSetSource, EmptyDataSetDelegate {
-    
-    func title(forEmptyDataSet scrollView: UIScrollView) -> NSAttributedString? {
-        
-        let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor(named: O_BLACK) as Any, .font: UIFont(name: "HiraMaruProN-W4", size: 15) as Any]
-        return NSAttributedString(string: "メモ作成後、保存をタップしてください", attributes: attributes)
     }
 }

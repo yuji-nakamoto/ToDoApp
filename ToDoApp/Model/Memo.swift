@@ -101,10 +101,9 @@ class Memo: Object {
         }
     }
     
-    class func selectedItemName(completion: @escaping() -> Void) {
+    class func selectedItemName(completion: @escaping(Bool) -> Void) {
         
-        if UserDefaults.standard.object(forKey: ITEM_NAME) != nil {
-            let itemName = UserDefaults.standard.object(forKey: ITEM_NAME) as! String
+        if let itemName = UserDefaults.standard.object(forKey: ITEM_NAME) as? String {
             let realm = try! Realm()
             let memo = Memo()
             let memos = realm.objects(Memo.self)
@@ -121,7 +120,7 @@ class Memo: Object {
             
             try! realm.write() {
                 realm.add(memo)
-                completion()
+                completion(false)
             }
         }
     }

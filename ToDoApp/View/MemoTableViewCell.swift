@@ -241,7 +241,6 @@ class MemoTableViewCell: UITableViewCell, UITextViewDelegate {
                 }
             }
             UserDefaults.standard.removeObject(forKey: EDIT_MEMO)
-            UserDefaults.standard.removeObject(forKey: CLOSE)
             memoTextView.resignFirstResponder()
             memoVC?.viewDidAppear(true)
             return false

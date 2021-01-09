@@ -48,7 +48,6 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
         selectColor()
         setColor()
         UserDefaults.standard.removeObject(forKey: ID)
-        UserDefaults.standard.removeObject(forKey: CLOSE)
         if UserDefaults.standard.object(forKey: END_TUTORIAL2) == nil {
             navigationController?.navigationBar.isHidden = true
         }
@@ -69,13 +68,9 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
     // MARK: - Actions
     
     @IBAction func editButtonTapped(_ sender: Any) {
-        if edit == false {
-            tableView.isEditing = true
-            edit = true
-        } else {
-            tableView.isEditing = false
-            edit = false
-        }
+        let bool = edit ? false : true
+        tableView.isEditing = bool
+        edit = bool
     }
     
     @IBAction func onSlider(_ sender: UISlider) {
@@ -100,7 +95,7 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
     
     // MARK: - Helpers
     
-    private func showHintView() {
+    func showHintView() {
         
         if UserDefaults.standard.object(forKey: END_TUTORIAL2) == nil {
             setupVideoViewHeight()
@@ -122,7 +117,7 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
-    private func setVideoPlayer() {
+    func setVideoPlayer() {
         
         guard let path = Bundle.main.path(forResource: "tutorial2", ofType: "mp4") else {
             fatalError("Movie file can not find.")
@@ -157,7 +152,7 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
         videoPlayer.play()
     }
     
-    private func updateSelected() {
+    func updateSelected() {
         
         Template.updateSelected { [self] (templateArray) in
             templates.removeAll()
@@ -166,7 +161,7 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
-    private func setupVideoViewHeight() {
+    func setupVideoViewHeight() {
         
         print(UIScreen.main.nativeBounds.height)
         switch (UIScreen.main.nativeBounds.height) {
@@ -191,7 +186,7 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
-    private func setup() {
+    func setup() {
         hintView.alpha = 0
         bannerHeight.constant = 0
         startButton.layer.cornerRadius = 35 / 2
@@ -212,7 +207,7 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
-    private func setColor() {
+    func setColor() {
         if UserDefaults.standard.object(forKey: GREEN_COLOR) != nil {
             titleLabel.textColor = .white
             editButton.tintColor = .white
@@ -228,7 +223,7 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
         }
     }
     
-    private func setupBanner() {
+    func setupBanner() {
         bannerView.adUnitID = "ca-app-pub-4750883229624981/1980065426"
         bannerView.rootViewController = self
         bannerView.load(GADRequest())

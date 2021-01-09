@@ -101,7 +101,6 @@ class TemplateMemoTableViewCell: UITableViewCell, UITextViewDelegate {
         if text == "\n" {
             memoTextView.resignFirstResponder()
             UserDefaults.standard.removeObject(forKey: EDIT_TEMP)
-            UserDefaults.standard.removeObject(forKey: CLOSE)
             createTemplateVC?.viewWillAppear(true)
             editTemplateVC?.viewWillAppear(true)
             return false

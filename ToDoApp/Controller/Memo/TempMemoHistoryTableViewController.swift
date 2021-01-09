@@ -35,7 +35,7 @@ class TempMemoHistoryTableViewController: UIViewController {
         setColor()
     }
     
-    private func fetchTemplate() {
+    func fetchTemplate() {
         
         Template.fetchSelectedTemplate { [self] (bool, template) in
             if bool == true {
@@ -44,7 +44,7 @@ class TempMemoHistoryTableViewController: UIViewController {
         }
     }
     
-    private func fetchTempHistory() {
+    func fetchTempHistory() {
         
         let realm = try! Realm()
         let tempMemos = realm.objects(TemplateMemo.self).filter("templateId == '\(templateId)'").filter("date > 0")
@@ -56,7 +56,7 @@ class TempMemoHistoryTableViewController: UIViewController {
         tableView.reloadData()
     }
     
-    private func setColor() {
+    func setColor() {
         if UserDefaults.standard.object(forKey: GREEN_COLOR) != nil {
             titleLabel.textColor = UIColor.white
             topView.backgroundColor = UIColor(named: EMERALD_GREEN_ALPHA)
@@ -68,7 +68,7 @@ class TempMemoHistoryTableViewController: UIViewController {
         }
     }
     
-    private func setupBanner() {
+    func setupBanner() {
         bannerView.adUnitID = "ca-app-pub-4750883229624981/1980065426"
         bannerView.rootViewController = self
         bannerView.load(GADRequest())

@@ -70,11 +70,8 @@ class CharacterSizeTableViewController: UITableViewController {
     }
     
     func setColor() {
-        if UserDefaults.standard.object(forKey: GREEN_COLOR) != nil {
-            backButton.tintColor = UIColor.white
-        } else {
-            backButton.tintColor = UIColor(named: O_BLACK)
-        }
+        let color: UIColor = UserDefaults.standard.object(forKey: GREEN_COLOR) != nil ? .white : UIColor(named: O_BLACK)!
+        backButton.tintColor = color
     }
     
     private func setChalacter1() {

@@ -37,7 +37,6 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
     
     @IBAction func closeButonnTapped(_ sender: Any) {
         UserDefaults.standard.set(true, forKey: BACK)
-        UserDefaults.standard.removeObject(forKey: CLOSE)
         navigationController?.popViewController(animated: false)
     }
     
@@ -46,8 +45,8 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
         
         Memo.createMemo(text: memoTextField.text!) { [self] in
             memoTextField.text = ""
-            UserDefaults.standard.removeObject(forKey: CLOSE)
             UserDefaults.standard.set(true, forKey: BACK)
+            UserDefaults.standard.set(true, forKey: PAN)
             navigationController?.popViewController(animated: false)
         }
     }
@@ -436,7 +435,6 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         UserDefaults.standard.set(true, forKey: BACK)
-        UserDefaults.standard.removeObject(forKey: CLOSE)
         navigationController?.popViewController(animated: false)
         return true
     }
@@ -464,7 +462,6 @@ extension ItemListViewController: UITableViewDelegate, UITableViewDataSource {
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { [self] in
             UserDefaults.standard.set(items[indexPath.row].name, forKey: ITEM_NAME)
             navigationController?.popViewController(animated: false)
-            UserDefaults.standard.removeObject(forKey: CLOSE)
             UserDefaults.standard.set(true, forKey: BACK)
         }
     }

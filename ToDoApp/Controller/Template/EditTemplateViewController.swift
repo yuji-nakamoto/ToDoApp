@@ -8,7 +8,6 @@
 import UIKit
 import PKHUD
 import GoogleMobileAds
-import EmptyDataSet_Swift
 import RealmSwift
 
 class EditTemplateViewController: UIViewController, UITextFieldDelegate, UITextViewDelegate {
@@ -21,7 +20,6 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate, UITextV
     @IBOutlet weak var topView: UIView!
     @IBOutlet weak var dismissButton: UIButton!
     @IBOutlet weak var closeButton: UIButton!
-    @IBOutlet weak var plusImageView: UIImageView!
     @IBOutlet weak var bannerView: GADBannerView!
     @IBOutlet weak var bannerHeight: NSLayoutConstraint!
     @IBOutlet weak var baseView: UIView!
@@ -30,6 +28,8 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate, UITextV
     @IBOutlet weak var viewHeight: NSLayoutConstraint!
     
     private var templateMemos = [TemplateMemo]()
+    private var allowMove = false
+    private var forbidden = false
     var id = UserDefaults.standard.object(forKey: ID) as! String
     
     override func viewDidLoad() {
@@ -45,17 +45,28 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate, UITextV
         super.viewWillAppear(animated)
         fetchTemplate()
         fetchTemplateMemo()
-        baseViewHidden()
         selectColor()
         setColor()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-        baseViewHidden()
+        if UserDefaults.standard.object(forKey: EDIT_TEMP) != nil {
+            baseViewIsHidden()
+        }
     }
     
     // MARK: - Actions
+    
+    @IBAction func plusButtonTapped(_ sender: Any) {
+        baseView.isHidden = false
+        memoTextField.becomeFirstResponder()
+        
+        if templateMemos.count != 0 {
+            let index = IndexPath(row: templateMemos.count - 1, section: 0)
+            tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
+        }
+    }
     
     @IBAction func backButtonTapped(_ sender: Any) {
         
@@ -87,7 +98,6 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate, UITextV
     
     @IBAction func closeButtonTapped(_ sender: Any) {
         memoTextField.resignFirstResponder()
-        UserDefaults.standard.removeObject(forKey: CLOSE)
     }
     
     @IBAction func createButtonTapped(_ sender: Any) {
@@ -99,17 +109,6 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate, UITextV
                 let index = IndexPath(row: templateMemos.count - 1, section: 0)
                 tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
             }
-        }
-    }
-    
-    @objc func tapPlusImageView() {
-        
-        UserDefaults.standard.set(true, forKey: CLOSE)
-        memoTextField.becomeFirstResponder()
-        
-        if templateMemos.count != 0 {
-            let index = IndexPath(row: templateMemos.count - 1, section: 0)
-            tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
         }
     }
     
@@ -132,12 +131,14 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate, UITextV
     
     // MARK: - Helpers
     
-    private func baseViewHidden() {
+    private func baseViewIsHidden() {
         
         if UserDefaults.standard.object(forKey: EDIT_TEMP) != nil {
             baseView.isHidden = true
+            viewHeight.constant = 0
         } else {
             baseView.isHidden = false
+            viewHeight.constant = 50
         }
     }
     
@@ -153,9 +154,6 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate, UITextV
             if #available(iOS 11.0, *) {
                 viewBottomConst.constant = view.safeAreaInsets.bottom - keyboardViewEndFrame.height
                 viewHeight.constant = 50
-                if UserDefaults.standard.object(forKey: CLOSE) == nil {
-                    viewHeight.constant = 0
-                }
             } else {
                 viewBottomConst.constant = keyboardViewEndFrame.height
             }
@@ -165,13 +163,9 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate, UITextV
     
     @objc func textFieldBeginEditing() {
         baseView.isHidden = true
-        plusImageView.isHidden = true
     }
     
     private func setup() {
-        
-        let tap = UITapGestureRecognizer(target: self, action: #selector(tapPlusImageView))
-        plusImageView.addGestureRecognizer(tap)
         UserDefaults.standard.removeObject(forKey: EDIT_TEMP)
         navigationItem.title = "ひな形の編集"
         navigationItem.rightBarButtonItem?.setTitleTextAttributes([NSAttributedString.Key.font : UIFont(name: "Helvetica Bold", size: 15) as Any], for: .normal)
@@ -181,8 +175,6 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate, UITextV
         tableView.tableFooterView = UIView()
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 10000
-        tableView.emptyDataSetSource = self
-        tableView.emptyDataSetDelegate = self
         templateTextField.delegate = self
         templateTextField.returnKeyType = .done
         templateTextField.addTarget(self, action: #selector(textFieldBeginEditing), for: .editingDidBegin)
@@ -191,7 +183,6 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate, UITextV
         notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
         notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
         
-        print(UIScreen.main.nativeBounds.height)
         switch UIScreen.main.nativeBounds.height {
         case 1334:
             bannerHeight.constant = 50
@@ -211,7 +202,7 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate, UITextV
         } else {
             titleLabel.textColor = UIColor(named: O_BLACK)
             topView.backgroundColor = UIColor(named: O_WHITE_ALPHA)
-            deleteButton.tintColor = UIColor.systemGray
+            deleteButton.tintColor = UIColor(named: EMERALD_GREEN)
             dismissButton.tintColor = UIColor(named: O_BLACK)
         }
     }
@@ -225,7 +216,6 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate, UITextV
         
         Template.updateTemplate(text: templateTextField.text!, id: id) { [self] in
             baseView.isHidden = false
-            plusImageView.isHidden = false
             templateTextField.resignFirstResponder()
         }
         return true
@@ -255,12 +245,31 @@ class EditTemplateViewController: UIViewController, UITextFieldDelegate, UITextV
 extension EditTemplateViewController: UITableViewDragDelegate, UITableViewDropDelegate {
     
     func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        guard indexPath.row != templateMemos.count else {
+            forbidden = true
+            return []
+        }
+        forbidden = false
         return [dragItem(for: indexPath)]
     }
     
     func tableView(_ tableView: UITableView, dropSessionDidUpdate session: UIDropSession,
                    withDestinationIndexPath destinationIndexPath: IndexPath?) -> UITableViewDropProposal {
-        return UITableViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
+        let realm = try! Realm()
+        let tempMemos = realm.objects(TemplateMemo.self)
+            .sorted(byKeyPath: "sourceRow", ascending: true).filter("templateId == '\(id)'")
+        
+        if forbidden {
+            return UITableViewDropProposal(operation: .forbidden, intent: .unspecified)
+        }
+        
+        tempMemos.forEach { (tm) in
+            let allow = destinationIndexPath?.row == nil || destinationIndexPath!.row >= tm.sourceRow + 1 ? false : true
+            allowMove = allow
+        }
+        
+        let operation: UIDropOperation = allowMove ? .move : .cancel
+        return UITableViewDropProposal(operation: operation, intent: .insertAtDestinationIndexPath)
     }
     
     func tableView(_ tableView: UITableView, performDropWith coordinator: UITableViewDropCoordinator) {
@@ -280,12 +289,16 @@ extension EditTemplateViewController: UITableViewDragDelegate, UITableViewDropDe
 
 extension EditTemplateViewController: UITableViewDelegate, UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return templateMemos.count
+        return templateMemos.count + 1
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! TemplateMemoTableViewCell
+        let cell2 = tableView.dequeueReusableCell(withIdentifier: "Cell2")
         
+        if indexPath.row == templateMemos.count {
+            return cell2!
+        }
         cell.editTemplateVC = self
         cell.memoTextView.delegate = self
         cell.templateMemo = templateMemos[indexPath.row]
@@ -370,15 +383,6 @@ extension EditTemplateViewController: UITableViewDelegate, UITableViewDataSource
                 }
             }
         }
-    }
-}
-
-extension EditTemplateViewController: EmptyDataSetSource, EmptyDataSetDelegate {
-    
-    func title(forEmptyDataSet scrollView: UIScrollView) -> NSAttributedString? {
-        
-        let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor(named: O_BLACK) as Any, .font: UIFont(name: "HiraMaruProN-W4", size: 15) as Any]
-        return NSAttributedString(string: "メモはありません", attributes: attributes)
     }
 }
 

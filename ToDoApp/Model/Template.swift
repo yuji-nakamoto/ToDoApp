@@ -29,7 +29,7 @@ class Template: Object {
     class func updateSelected(completion: @escaping(Results<Template>) -> Void) {
         
         let realm = try! Realm()
-        let templateArray = realm.objects(Template.self)
+        let templateArray = realm.objects(Template.self).sorted(byKeyPath: "sourceRow", ascending: true)
  
         templateArray.forEach { (t) in
             try! realm.write() {
@@ -59,9 +59,13 @@ class Template: Object {
         
         let realm = try! Realm()
         let template = Template()
+        let temps = realm.objects(Template.self)
         
         template.templateId = id
         template.name = text
+        template.sourceRow = temps.count
+        template.originRow = temps.count
+        
         try! realm.write() {
             realm.add(template)
             completion()
@@ -163,12 +167,21 @@ class TemplateMemo: Object {
     class func deleteTempMemo(id: String, completion: @escaping() -> Void) {
         let realm = try! Realm()
         let templates = realm.objects(Template.self).filter("templateId == '\(id)'")
+        let allTemplate = realm.objects(Template.self)
         let templateMemos = realm.objects(TemplateMemo.self).filter("templateId == '\(id)'")
         
-        try! realm.safeWrite {
-            realm.delete(templateMemos)
-            realm.delete(templates)
-            completion()
+        templates.forEach { (t) in
+            try! realm.safeWrite {
+                allTemplate.forEach { (at) in
+                    if t.sourceRow < at.sourceRow {
+                        at.sourceRow = at.sourceRow - 1
+                        at.originRow = at.originRow - 1
+                    }
+                }
+                realm.delete(templateMemos)
+                realm.delete(templates)
+                completion()
+            }
         }
     }
 }
