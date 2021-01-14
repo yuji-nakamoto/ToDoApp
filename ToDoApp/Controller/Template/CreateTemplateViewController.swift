@@ -14,7 +14,11 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var memoTextField: UITextField!
+    @IBOutlet weak var topBaseView: UIView!
     @IBOutlet weak var templateTextField: UITextField!
+    @IBOutlet weak var memoListView: UIView!
+    @IBOutlet weak var memoLabel: UILabel!
+    @IBOutlet weak var tempNameLabel: UILabel!
     @IBOutlet weak var backButton: UIBarButtonItem!
     @IBOutlet weak var closeButton: UIButton!
     @IBOutlet weak var saveButton: UIBarButtonItem!
@@ -23,6 +27,9 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
     @IBOutlet weak var createButton: UIButton!
     @IBOutlet weak var viewBottomConst: NSLayoutConstraint!
     @IBOutlet weak var viewHeight: NSLayoutConstraint!
+    @IBOutlet weak var noDataLabel: UILabel!
+    @IBOutlet weak var topLineView: UIView!
+    @IBOutlet weak var bottomLineView: UIView!
     
     private var templateMemos = [TemplateMemo]()
     private let id = UUID().uuidString
@@ -33,9 +40,7 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
         super.viewDidLoad()
         setup()
         setupBanner()
-        tableView.dragDelegate = self
-        tableView.dropDelegate = self
-        tableView.dragInteractionEnabled = true
+        setNeedsStatusBarAppearanceUpdate()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -49,17 +54,34 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
         super.viewDidAppear(animated)
         if UserDefaults.standard.object(forKey: EDIT_TEMP) != nil {
             baseViewIsHidden()
+            if let row = UserDefaults.standard.object(forKey: SELECT_ROW) as? Int {
+                let index = IndexPath(row: row, section: 0)
+                tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
+                UserDefaults.standard.removeObject(forKey: SELECT_ROW)
+            }
         }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
+        NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        let color: UIStatusBarStyle = userDefaults.object(forKey: WHITE_COLOR) != nil ? .darkContent : .lightContent
+        return color
     }
     
     // MARK: - Actions
     
     @IBAction func plusButtonTapped(_ sender: Any) {
-        baseView.isHidden = false
         memoTextField.becomeFirstResponder()
+        baseView.isHidden = false
+        viewHeight.constant = 50
         
         if templateMemos.count != 0 {
-            let index = IndexPath(row: templateMemos.count - 1, section: 0)
+            let index = IndexPath(row: templateMemos.count, section: 0)
             tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
         }
     }
@@ -96,11 +118,11 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
     
     @IBAction func createButtonTapped(_ sender: Any) {
         guard memoTextField.text != "" else { return }
-        if let text = memoTextField.text {
-            TemplateMemo.createTemplateMemo(text: text, id: id) { [self] in
+        if let memoName = memoTextField.text {
+            TemplateMemo.createTemplateMemo(name: memoName, id: id) { [self] in
                 memoTextField.text = ""
                 fetchTemplateMemo()
-                let index = IndexPath(row: templateMemos.count - 1, section: 0)
+                let index = IndexPath(row: templateMemos.count, section: 0)
                 tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
             }
         }
@@ -111,7 +133,15 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
     private func fetchTemplateMemo() {
         
         TemplateMemo.fetchTemplateMemo(id: id) { [self] (templateMemo) in
-            if templateMemo.count == 0 { saveButton.isEnabled = false }
+            if templateMemo.count == 0 {
+                saveButton.isEnabled = false
+                tableView.isScrollEnabled = false
+                noDataLabel.isHidden = false
+                noDataLabel.text = "ひな形の名前、メモ作成後に\n右上の保存をタップしてください"
+            } else {
+                tableView.isScrollEnabled = true
+                noDataLabel.isHidden = true
+            }
             templateMemo.forEach { (t) in
                 if t.templateId != "" {
                     saveButton.isEnabled = true
@@ -126,14 +156,8 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
     // MARK: - Helpers
     
     private func baseViewIsHidden() {
-        
-        if UserDefaults.standard.object(forKey: EDIT_TEMP) != nil {
-            baseView.isHidden = true
-            viewHeight.constant = 0
-        } else {
-            baseView.isHidden = false
-            viewHeight.constant = 50
-        }
+        baseView.isHidden = true
+        viewHeight.constant = 0
     }
     
     @objc func adjustForKeyboard(notification: Notification) {
@@ -143,11 +167,14 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
         
         if notification.name == UIResponder.keyboardWillHideNotification {
             viewBottomConst.constant = 0
-            viewHeight.constant = 0
+            viewHeight.constant = 50
         } else {
             if #available(iOS 11.0, *) {
                 viewBottomConst.constant = view.safeAreaInsets.bottom - keyboardViewEndFrame.height
-                viewHeight.constant = 50
+                if UserDefaults.standard.object(forKey: EDIT_TEMP) == nil {
+                    baseView.isHidden = false
+                    viewHeight.constant = 50
+                }
             } else {
                 viewBottomConst.constant = keyboardViewEndFrame.height
             }
@@ -156,20 +183,27 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
     }
     
     @objc func textFieldBeginEditing() {
-        baseView.isHidden = true
+        UserDefaults.standard.set(true, forKey: EDIT_TEMP)
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [self] in
+            baseViewIsHidden()
+        }
     }
     
     private func setup() {
         navigationItem.title = "ひな形の作成"
         navigationItem.rightBarButtonItem?.setTitleTextAttributes([NSAttributedString.Key.font : UIFont(name: "Helvetica Bold", size: 15) as Any], for: .normal)
-        UserDefaults.standard.set(true, forKey: EDIT_TEMP)
+        UserDefaults.standard.removeObject(forKey: EDIT_TEMP)
         tableView.tableFooterView = UIView()
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 10000
+        tableView.dragDelegate = self
+        tableView.dropDelegate = self
+        tableView.dragInteractionEnabled = true
+        
         createButton.layer.cornerRadius = 5
         closeButton.layer.cornerRadius = 5
-        viewHeight.constant = 0
         saveButton.isEnabled = false
+        baseView.isHidden = true
         
         templateTextField.delegate = self
         templateTextField.returnKeyType = .done
@@ -182,12 +216,64 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
     }
     
     private func setColor() {
+        let placeholderColor: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .systemGray : .systemGray4
+        let separatorColor: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray3
+        let bannerColor: UIColor = userDefaults.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
+        bannerView.backgroundColor = bannerColor
+        tableView.separatorColor = separatorColor
+        
         if UserDefaults.standard.object(forKey: GREEN_COLOR) != nil {
             saveButton.tintColor = UIColor.white
             backButton.tintColor = UIColor.white
-        } else {
-            saveButton.tintColor = UIColor(named: EMERALD_GREEN)
+            templateTextField.backgroundColor = UIColor.systemBackground
+            templateTextField.textColor = UIColor(named: O_BLACK)
+            templateTextField.attributedPlaceholder = NSAttributedString(string: "例）カレーライスの食材",attributes: [NSAttributedString.Key.foregroundColor: placeholderColor])
+            tempNameLabel.textColor = UIColor(named: O_BLACK)
+            topBaseView.backgroundColor = .systemBackground
+            tableView.backgroundColor = .systemBackground
+            memoListView.backgroundColor = UIColor(named: O_WHITE)
+            memoLabel.textColor = UIColor(named: O_BLACK)
+            topLineView.backgroundColor = .systemGray5
+            bottomLineView.backgroundColor = .systemGray5
+        } else if UserDefaults.standard.object(forKey: WHITE_COLOR) != nil {
+            saveButton.tintColor = UIColor.systemBlue
             backButton.tintColor = UIColor(named: O_BLACK)
+            templateTextField.backgroundColor = UIColor.systemBackground
+            templateTextField.textColor = UIColor(named: O_BLACK)
+            templateTextField.attributedPlaceholder = NSAttributedString(string: "例）カレーライスの食材",attributes: [NSAttributedString.Key.foregroundColor: placeholderColor])
+            tempNameLabel.textColor = UIColor(named: O_BLACK)
+            topBaseView.backgroundColor = .systemBackground
+            tableView.backgroundColor = .systemBackground
+            memoListView.backgroundColor = UIColor(named: O_WHITE)
+            memoLabel.textColor = UIColor(named: O_BLACK)
+            topLineView.backgroundColor = .systemGray5
+            bottomLineView.backgroundColor = .systemGray5
+        } else if UserDefaults.standard.object(forKey: PINK_COLOR) != nil {
+            saveButton.tintColor = UIColor.white
+            backButton.tintColor = UIColor.white
+            templateTextField.backgroundColor = UIColor.systemBackground
+            templateTextField.textColor = UIColor(named: O_BLACK)
+            templateTextField.attributedPlaceholder = NSAttributedString(string: "例）カレーライスの食材",attributes: [NSAttributedString.Key.foregroundColor: placeholderColor])
+            tempNameLabel.textColor = UIColor(named: O_BLACK)
+            topBaseView.backgroundColor = .systemBackground
+            tableView.backgroundColor = .systemBackground
+            memoListView.backgroundColor = UIColor(named: O_WHITE)
+            memoLabel.textColor = UIColor(named: O_BLACK)
+            topLineView.backgroundColor = .systemGray5
+            bottomLineView.backgroundColor = .systemGray5
+        } else {
+            saveButton.tintColor = UIColor.systemBlue
+            backButton.tintColor = UIColor.systemBlue
+            templateTextField.backgroundColor = UIColor(named: O_DARK1)
+            templateTextField.textColor = .white
+            templateTextField.attributedPlaceholder = NSAttributedString(string: "例）カレーライスの食材",attributes: [NSAttributedString.Key.foregroundColor: placeholderColor])
+            tempNameLabel.textColor = .white
+            topBaseView.backgroundColor = UIColor(named: O_DARK1)
+            tableView.backgroundColor = UIColor(named: O_DARK1)
+            memoListView.backgroundColor = UIColor(named: O_DARK2_ALPHA)
+            memoLabel.textColor = .white
+            topLineView.backgroundColor = .darkGray
+            bottomLineView.backgroundColor = .darkGray
         }
     }
     
@@ -280,10 +366,10 @@ extension CreateTemplateViewController: UITableViewDelegate, UITableViewDataSour
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! TemplateMemoTableViewCell
-        let cell2 = tableView.dequeueReusableCell(withIdentifier: "Cell2")
+        let cell2 = tableView.dequeueReusableCell(withIdentifier: "Cell2") as! PlusBtnTableViewCell
         
         if indexPath.row == templateMemos.count {
-            return cell2!
+            return cell2
         }
         
         cell.createTemplateVC = self

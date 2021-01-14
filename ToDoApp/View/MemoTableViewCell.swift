@@ -51,6 +51,18 @@ class MemoTableViewCell: UITableViewCell, UITextViewDelegate {
         } else if UserDefaults.standard.object(forKey: BIG2) != nil {
             memoTextView.font = UIFont.systemFont(ofSize: 19, weight: .medium)
         }
+        
+        if UserDefaults.standard.object(forKey: DARK_COLOR) != nil {
+            backgroundColor = UIColor(named: O_DARK1)
+            memoTextView.backgroundColor = UIColor(named: O_DARK1)
+            memoTextView.textColor = .white
+            memoImageView.tintColor = .systemBlue
+        } else {
+            backgroundColor = UIColor.systemBackground
+            memoTextView.backgroundColor = UIColor.systemBackground
+            memoTextView.textColor = .darkGray
+            memoImageView.tintColor = UIColor(named: O_BLACK)
+        }
     }
     
     override func prepareForReuse() {
@@ -72,6 +84,16 @@ class MemoTableViewCell: UITableViewCell, UITextViewDelegate {
         } else if UserDefaults.standard.object(forKey: BIG2) != nil {
             memoTextView.font = UIFont.systemFont(ofSize: 19, weight: .medium)
         }
+        
+        if UserDefaults.standard.object(forKey: DARK_COLOR) != nil {
+            backgroundColor = UIColor(named: O_DARK1)
+            memoTextView.backgroundColor = UIColor(named: O_DARK1)
+            memoImageView.tintColor = .systemBlue
+        } else {
+            backgroundColor = UIColor.systemBackground
+            memoTextView.backgroundColor = UIColor.systemBackground
+            memoImageView.tintColor = UIColor(named: O_BLACK)
+        }
     }
     
     func configureCell(_ memo: Memo) {
@@ -87,10 +109,12 @@ class MemoTableViewCell: UITableViewCell, UITextViewDelegate {
         memos.forEach { (memo) in
             if memo.isCheck == true {
                 memoImageView.image = UIImage(systemName: "square.slash")
-                memoTextView.textColor = .systemGray3
+                let color: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray3
+                memoTextView.textColor = color
             } else {
                 memoImageView.image = UIImage(systemName: "square")
-                memoTextView.textColor = UIColor(named: O_BLACK)
+                let color: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .white : UIColor(named: O_BLACK)!
+                memoTextView.textColor = color
             }
             
             if memo.name == watchData {
@@ -168,7 +192,8 @@ class MemoTableViewCell: UITableViewCell, UITextViewDelegate {
         memos.forEach { (memo) in
             if memoImageView.image == UIImage(systemName: "square") {
                 memoImageView.image = UIImage(systemName: "square.slash")
-                memoTextView.textColor = .systemGray3
+                let color: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray3
+                memoTextView.textColor = color
                 generator.notificationOccurred(.success)
                 
                 let history = History()
@@ -191,7 +216,8 @@ class MemoTableViewCell: UITableViewCell, UITextViewDelegate {
                 }
             } else {
                 memoImageView.image = UIImage(systemName: "square")
-                memoTextView.textColor = UIColor(named: O_BLACK)
+                let color: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .white : UIColor(named: O_BLACK)!
+                memoTextView.textColor = color
                 try! realm.write() {
                     realm.delete(historeis)
                     memo.isCheck = false
@@ -208,6 +234,7 @@ class MemoTableViewCell: UITableViewCell, UITextViewDelegate {
     
     func textViewDidBeginEditing(_ textView: UITextView) {
         UserDefaults.standard.set(true, forKey: EDIT_MEMO)
+        UserDefaults.standard.set(memo.sourceRow, forKey: SELECT_ROW)
         memoVC?.viewDidAppear(true)
     }
     

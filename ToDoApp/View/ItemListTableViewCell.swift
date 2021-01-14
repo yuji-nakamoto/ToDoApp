@@ -49,6 +49,14 @@ class ItemListTableViewCell: UITableViewCell {
         } else if UserDefaults.standard.object(forKey: BIG2) != nil {
             itemNameLabel.font = UIFont.systemFont(ofSize: 19, weight: .medium)
         }
+        
+        if UserDefaults.standard.object(forKey: DARK_COLOR) != nil {
+            backgroundColor = UIColor(named: O_DARK1)
+            itemNameLabel.textColor = .white
+        } else {
+            backgroundColor = UIColor.systemBackground
+            itemNameLabel.textColor = UIColor(named: O_BLACK)
+        }
     }
     
     override func prepareForReuse() {
@@ -69,6 +77,14 @@ class ItemListTableViewCell: UITableViewCell {
             itemNameLabel.font = UIFont.systemFont(ofSize: 19)
         } else if UserDefaults.standard.object(forKey: BIG2) != nil {
             itemNameLabel.font = UIFont.systemFont(ofSize: 19, weight: .medium)
+        }
+        
+        if UserDefaults.standard.object(forKey: DARK_COLOR) != nil {
+            backgroundColor = UIColor(named: O_DARK1)
+            itemNameLabel.textColor = .white
+        } else {
+            backgroundColor = UIColor.systemBackground
+            itemNameLabel.textColor = UIColor(named: O_BLACK)
         }
     }
 }

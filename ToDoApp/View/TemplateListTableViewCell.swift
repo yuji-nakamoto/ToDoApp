@@ -13,6 +13,7 @@ class TemplateListTableViewCell: UITableViewCell {
     @IBOutlet weak var checkMarkImageView: UIImageView!
     @IBOutlet weak var templateLabel: UILabel!
     @IBOutlet weak var frontView: UIView!
+    @IBOutlet weak var arrowImageView: UIImageView!
     
     var templateListVC: TemplateListViewController?
     var template = Template()
@@ -39,6 +40,18 @@ class TemplateListTableViewCell: UITableViewCell {
         } else if UserDefaults.standard.object(forKey: BIG2) != nil {
             templateLabel.font = UIFont.systemFont(ofSize: 19, weight: .medium)
         }
+        
+        if UserDefaults.standard.object(forKey: DARK_COLOR) != nil {
+            backgroundColor = UIColor(named: O_DARK1)
+            templateLabel.textColor = .white
+            checkMarkImageView.tintColor = .systemBlue
+            arrowImageView.tintColor = .white
+        } else {
+            backgroundColor = UIColor.systemBackground
+            templateLabel.textColor = UIColor(named: O_BLACK)
+            checkMarkImageView.tintColor = UIColor(named: O_BLACK)
+            arrowImageView.tintColor = .systemGray3
+        }
     }
     
     override func prepareForReuse() {
@@ -59,6 +72,18 @@ class TemplateListTableViewCell: UITableViewCell {
             templateLabel.font = UIFont.systemFont(ofSize: 19)
         } else if UserDefaults.standard.object(forKey: BIG2) != nil {
             templateLabel.font = UIFont.systemFont(ofSize: 19, weight: .medium)
+        }
+        
+        if UserDefaults.standard.object(forKey: DARK_COLOR) != nil {
+            backgroundColor = UIColor(named: O_DARK1)
+            templateLabel.textColor = .white
+            checkMarkImageView.tintColor = .systemBlue
+            arrowImageView.tintColor = .white
+        } else {
+            backgroundColor = UIColor.systemBackground
+            templateLabel.textColor = UIColor(named: O_BLACK)
+            checkMarkImageView.tintColor = UIColor(named: O_BLACK)
+            arrowImageView.tintColor = .systemGray3
         }
     }
     

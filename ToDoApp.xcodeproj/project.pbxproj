@@ -48,8 +48,12 @@
 		6E7782512573827000D2C696 /* Tutorial2ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7782502573827000D2C696 /* Tutorial2ViewController.swift */; };
 		6E7782562573827D00D2C696 /* Tutorial3ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7782552573827D00D2C696 /* Tutorial3ViewController.swift */; };
 		6E77825B2573828A00D2C696 /* Tutorial4ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E77825A2573828A00D2C696 /* Tutorial4ViewController.swift */; };
+		6E7A0A2425AD42B4004404F2 /* SortTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7A0A2325AD42B4004404F2 /* SortTableViewController.swift */; };
+		6E7A0A2B25AE093F004404F2 /* ColorTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7A0A2A25AE093F004404F2 /* ColorTableViewController.swift */; };
+		6E7A0A3225AE3D76004404F2 /* PlusBtnTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7A0A3125AE3D76004404F2 /* PlusBtnTableViewCell.swift */; };
+		6E7A0A4D25AEB365004404F2 /* SettingTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7A0A4C25AEB365004404F2 /* SettingTableViewCell.swift */; };
 		6E7A58E6257263F600987214 /* StartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7A58E5257263F600987214 /* StartViewController.swift */; };
-		6E88353125A75CA300B6522D /* CharacterSizeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E88353025A75CA300B6522D /* CharacterSizeTableViewController.swift */; };
+		6E88353125A75CA300B6522D /* FontSizeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E88353025A75CA300B6522D /* FontSizeTableViewController.swift */; };
 		6EC4286E256DD5530082BED8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EC4286D256DD5530082BED8 /* AppDelegate.swift */; };
 		6EC42870256DD5530082BED8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EC4286F256DD5530082BED8 /* SceneDelegate.swift */; };
 		6EC42875256DD5530082BED8 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6EC42873256DD5530082BED8 /* Main.storyboard */; };
@@ -169,8 +173,12 @@
 		6E7782502573827000D2C696 /* Tutorial2ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tutorial2ViewController.swift; sourceTree = "<group>"; };
 		6E7782552573827D00D2C696 /* Tutorial3ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tutorial3ViewController.swift; sourceTree = "<group>"; };
 		6E77825A2573828A00D2C696 /* Tutorial4ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tutorial4ViewController.swift; sourceTree = "<group>"; };
+		6E7A0A2325AD42B4004404F2 /* SortTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortTableViewController.swift; sourceTree = "<group>"; };
+		6E7A0A2A25AE093F004404F2 /* ColorTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorTableViewController.swift; sourceTree = "<group>"; };
+		6E7A0A3125AE3D76004404F2 /* PlusBtnTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlusBtnTableViewCell.swift; sourceTree = "<group>"; };
+		6E7A0A4C25AEB365004404F2 /* SettingTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingTableViewCell.swift; sourceTree = "<group>"; };
 		6E7A58E5257263F600987214 /* StartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartViewController.swift; sourceTree = "<group>"; };
-		6E88353025A75CA300B6522D /* CharacterSizeTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CharacterSizeTableViewController.swift; sourceTree = "<group>"; };
+		6E88353025A75CA300B6522D /* FontSizeTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontSizeTableViewController.swift; sourceTree = "<group>"; };
 		6EC4286A256DD5530082BED8 /* ToDoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToDoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6EC4286D256DD5530082BED8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6EC4286F256DD5530082BED8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -285,7 +293,8 @@
 				6E7782552573827D00D2C696 /* Tutorial3ViewController.swift */,
 				6E77825A2573828A00D2C696 /* Tutorial4ViewController.swift */,
 				6E5B273C257CD4C400FAE7E9 /* Turorial5ViewController.swift */,
-				6E88353025A75CA300B6522D /* CharacterSizeTableViewController.swift */,
+				6E88353025A75CA300B6522D /* FontSizeTableViewController.swift */,
+				6E7A0A2A25AE093F004404F2 /* ColorTableViewController.swift */,
 			);
 			path = Setting;
 			sourceTree = "<group>";
@@ -297,6 +306,7 @@
 				6EC42909256E4E0F0082BED8 /* ItemListViewController.swift */,
 				6E743FF22575058400EECC74 /* HistoryTableViewController.swift */,
 				6E7440052575234600EECC74 /* TempMemoHistoryTableViewController.swift */,
+				6E7A0A2325AD42B4004404F2 /* SortTableViewController.swift */,
 			);
 			path = Memo;
 			sourceTree = "<group>";
@@ -408,6 +418,8 @@
 				6E576BD2256F29190072E829 /* TemplateMemoTableViewCell.swift */,
 				6E77823B2573415500D2C696 /* CustomSlider.swift */,
 				6E743FF72575059700EECC74 /* HistoryTableViewCell.swift */,
+				6E7A0A3125AE3D76004404F2 /* PlusBtnTableViewCell.swift */,
+				6E7A0A4C25AEB365004404F2 /* SettingTableViewCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -757,13 +769,16 @@
 				6E576C00256F780C0072E829 /* MyNavigationController.swift in Sources */,
 				6E743FF82575059700EECC74 /* HistoryTableViewCell.swift in Sources */,
 				6E576BC1256F07390072E829 /* TemplateListTableViewCell.swift in Sources */,
+				6E7A0A3225AE3D76004404F2 /* PlusBtnTableViewCell.swift in Sources */,
 				6E576BC9256F24380072E829 /* Template.swift in Sources */,
 				6EC4286E256DD5530082BED8 /* AppDelegate.swift in Sources */,
 				6E743FF32575058400EECC74 /* HistoryTableViewController.swift in Sources */,
+				6E7A0A2425AD42B4004404F2 /* SortTableViewController.swift in Sources */,
+				6E7A0A2B25AE093F004404F2 /* ColorTableViewController.swift in Sources */,
 				6E576BB9256F070D0072E829 /* TemplateListViewController.swift in Sources */,
 				6E53B2EA2570EDFB00A875CE /* SettingTableViewController.swift in Sources */,
 				6E157A4B2579DD6100593247 /* MyTabBarController.swift in Sources */,
-				6E88353125A75CA300B6522D /* CharacterSizeTableViewController.swift in Sources */,
+				6E88353125A75CA300B6522D /* FontSizeTableViewController.swift in Sources */,
 				6E7782562573827D00D2C696 /* Tutorial3ViewController.swift in Sources */,
 				6E53B2F72571083400A875CE /* TutorialListTableViewController.swift in Sources */,
 				6E5B273D257CD4C400FAE7E9 /* Turorial5ViewController.swift in Sources */,
@@ -785,6 +800,7 @@
 				6E576BCE256F28F70072E829 /* CreateTemplateViewController.swift in Sources */,
 				6EC428E1256DE0B70082BED8 /* MemoTableViewCell.swift in Sources */,
 				6EC428E6256DE73D0082BED8 /* Memo.swift in Sources */,
+				6E7A0A4D25AEB365004404F2 /* SettingTableViewCell.swift in Sources */,
 				6EC42905256E03CF0082BED8 /* Constant.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -864,7 +880,7 @@
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
 				CODE_SIGN_ENTITLEMENTS = "ToDoAppWatch Extension/ToDoAppWatch Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2FZHPQ299M;
 				INFOPLIST_FILE = "ToDoAppWatch Extension/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -872,7 +888,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.4;
+				MARKETING_VERSION = 1.2.6;
 				PRODUCT_BUNDLE_IDENTIFIER = xmlApp.ToDoApp.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = watchos;
@@ -889,7 +905,7 @@
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
 				CODE_SIGN_ENTITLEMENTS = "ToDoAppWatch Extension/ToDoAppWatch Extension.entitlements";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2FZHPQ299M;
 				INFOPLIST_FILE = "ToDoAppWatch Extension/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -897,7 +913,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.4;
+				MARKETING_VERSION = 1.2.6;
 				PRODUCT_BUNDLE_IDENTIFIER = xmlApp.ToDoApp.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = watchos;
@@ -915,11 +931,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2FZHPQ299M;
 				IBSC_MODULE = ToDoAppWatch_Extension;
 				INFOPLIST_FILE = ToDoAppWatch/Info.plist;
-				MARKETING_VERSION = 1.2.4;
+				MARKETING_VERSION = 1.2.6;
 				PRODUCT_BUNDLE_IDENTIFIER = xmlApp.ToDoApp.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -937,11 +953,11 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2FZHPQ299M;
 				IBSC_MODULE = ToDoAppWatch_Extension;
 				INFOPLIST_FILE = ToDoAppWatch/Info.plist;
-				MARKETING_VERSION = 1.2.4;
+				MARKETING_VERSION = 1.2.6;
 				PRODUCT_BUNDLE_IDENTIFIER = xmlApp.ToDoApp.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -1076,7 +1092,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ToDoApp/ToDoApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2FZHPQ299M;
 				INFOPLIST_FILE = ToDoApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -1084,7 +1100,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.4;
+				MARKETING_VERSION = 1.2.6;
 				PRODUCT_BUNDLE_IDENTIFIER = xmlApp.ToDoApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -1100,7 +1116,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = ToDoApp/ToDoApp.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 2FZHPQ299M;
 				INFOPLIST_FILE = ToDoApp/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -1108,7 +1124,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.4;
+				MARKETING_VERSION = 1.2.6;
 				PRODUCT_BUNDLE_IDENTIFIER = xmlApp.ToDoApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

@@ -21,4 +21,12 @@ class MyNavigationController: UINavigationController {
                 = [.foregroundColor: UIColor(named: O_BLACK) as Any,]
         }
     }
+    
+    override open var childForStatusBarStyle: UIViewController? {
+        return self.visibleViewController
+    }
+
+    override open var childForStatusBarHidden: UIViewController? {
+        return self.visibleViewController
+    }
 }

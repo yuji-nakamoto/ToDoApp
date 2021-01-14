@@ -9,6 +9,10 @@ import Foundation
 import RealmSwift
 import UIKit
 
+public let userDefaults = UserDefaults.standard
+public let generator = UINotificationFeedbackGenerator()
+public let dispatchQ = DispatchQueue.main
+
 extension Realm {
     public func safeWrite(_ block: (() throws -> Void)) throws {
         if isInWriteTransaction {
@@ -20,7 +24,7 @@ extension Realm {
 }
 
 extension UIViewController {
-
+    
     func setSwipeBack() {
         let target = self.navigationController?.value(forKey: "_cachedInteractionController")
         let recognizer = UIPanGestureRecognizer(target: target, action: Selector(("handleNavigationTransition:")))
@@ -30,8 +34,14 @@ extension UIViewController {
     func selectColor() {
         if UserDefaults.standard.object(forKey: GREEN_COLOR) != nil {
             greenColor()
-        } else {
+        } else if UserDefaults.standard.object(forKey: WHITE_COLOR) != nil {
             whiteColor()
+        } else if UserDefaults.standard.object(forKey: PINK_COLOR) != nil {
+            pinkColor()
+        } else if UserDefaults.standard.object(forKey: SETTING_VC) != nil{
+            darkColor2()
+        } else {
+            darkColor()
         }
     }
     
@@ -49,12 +59,37 @@ extension UIViewController {
         navigationController?.navigationBar.titleTextAttributes
             = [.foregroundColor: UIColor(named: O_BLACK) as Any,]
         tabBarController?.tabBar.barTintColor = UIColor(named: O_WHITE)
-        tabBarController?.tabBar.tintColor = UIColor(named: EMERALD_GREEN)
+        tabBarController?.tabBar.tintColor = UIColor.systemBlue
         tabBarController?.tabBar.unselectedItemTintColor = UIColor.systemGray
     }
+    
+    func pinkColor() {
+        navigationController?.navigationBar.barTintColor = UIColor(named: O_PINK)
+        navigationController?.navigationBar.titleTextAttributes
+            = [.foregroundColor: UIColor.white as Any,]
+        tabBarController?.tabBar.barTintColor = UIColor(named: O_PINK)
+        tabBarController?.tabBar.tintColor = UIColor.white
+        tabBarController?.tabBar.unselectedItemTintColor = UIColor.systemGray
+    }
+    
+    func darkColor() {
+        navigationController?.navigationBar.barTintColor = UIColor(named: O_DARK2)
+        navigationController?.navigationBar.titleTextAttributes
+            = [.foregroundColor: UIColor.white as Any,]
+        tabBarController?.tabBar.barTintColor = UIColor(named: O_DARK2)
+        tabBarController?.tabBar.tintColor = UIColor.systemBlue
+        tabBarController?.tabBar.unselectedItemTintColor = UIColor.systemGray5
+    }
+    
+    func darkColor2() {
+        navigationController?.navigationBar.barTintColor = UIColor(named: O_DARK4)
+        navigationController?.navigationBar.titleTextAttributes
+            = [.foregroundColor: UIColor.white as Any,]
+        tabBarController?.tabBar.barTintColor = UIColor(named: O_DARK4)
+        tabBarController?.tabBar.tintColor = UIColor.systemBlue
+        tabBarController?.tabBar.unselectedItemTintColor = UIColor.systemGray5
+    }
 }
-
-public let generator = UINotificationFeedbackGenerator()
 
 public var itemArray = ["アイスクリーム","アルミホイル","アクエリアス","アップルパイ","甘酒","揚げ出し豆腐","甘エビ","アボガド","揚げ玉","揚げ物","甘口醤油","あさり","鯵","穴子","いちご","インスタントラーメン","いちごジャム","鰯","芋","いくら","胃薬","痛み止め","糸こんにゃく","いんげん豆","いなり寿司","ウインナー","ウェットティッシュ","ウイスキー","ウォッカ","烏龍茶","うどん","梅酒サワー","海老","えびフィレオ","エクレア","エナジードリンク","エリンギ","枝豆","エスプレッソ","オロナミンC","オリーブオイル","おにぎり","お菓子","お米","オレンジ","オクラ","オレンジジュース","温泉たまご","お好み焼きソース","かぼちゃ","カルピス","カレールー","カップヌードル","カイワレ大根","カレーうどん","海鮮サラダ","唐揚げ","数の子","片栗粉","かぜ薬","かゆみ止め","辛子明太子","キャベツ","キムチ","きゅうり","キクラゲ","絹ごし豆腐","クッキー","クリーム","クミン","クレープ","クロワッサン","クリームコロッケ","ケチャップ","ケーキ","消しゴム","ケンタッキー","化粧水","ゴミ袋","コカ・コーラ","コンソメ","コーヒー","コショウ","こんにゃく","コリアンダー","コシヒカリ","コーンフレーク","コーンポタージュ","小麦粉","濃口醤油","高野豆腐","サーモン","さくらんぼ","サバ缶","刺身","サーターアンダギー","さつま揚げ","皿うどん","さつまいも","鮭フレーク","しらたき","シャープペン","砂糖","サラダオイル","サランラップ","サイコロステーキ","サンドイッチ","シュークリーム","椎茸","シャンプー","ししゃも","上白糖","シュウマイ","シリアル","消臭剤","柔軟剤","C.C.レモン","ショートケーキ","生姜","食パン","醤油","塩コショウ","焼酎","スポンジ","スパゲティー","スパイス","スナック菓子","接着剤","せんべい","洗剤","ソース","素麺","ソーセージ","ソフトクリーム","惣菜","惣菜パン","蕎麦","玉ねぎ","卵","たこわさび","タバスコ","たこ焼き","タピオカミルクティー","たこ焼きソース","タン塩","タオル","たくあん","タンドリーチキン","チョコレート","ティッシュペーパー","チーズ","チキンナゲット","チキンラーメン","チキンクリスプ","チューハイ","ちりめんじゃこ","中華スープ","ツナ缶","漬物","爪楊枝","つぶあん","テキーラ","ティラミス","てりやきマックバーガー","天然水","天かす","天ぷら","手羽先","トマト","とうもろこし","トリュフ","トイレットペーパー","鶏肉","唐辛子","豆板醤","豆腐","豚汁","鶏がらスープ","豆乳","茄子","生クリーム","ナンプラー","生ハム","納豆","ナタデココ","生ビール","にんじん","ニンニク","煮干し","乳液","人参","熱さまシート","海苔","ノンアルコールビール","野沢菜","ハイボール","春巻き","歯磨き粉","歯ブラシ","はちみつ","ハンバーグ","ハーブ","ハンバーガー","ハーゲンダッツ","ハンドソープ","ハーブティー","冷奴","漂白剤","ひき肉","ビニール袋","ひじき","ピーマン","冷やし中華","フランクフルト","フランスパン","フォアグラ","フルーツ","フカヒレ","フレーク","フライドポテト","フライドチキン","フィレオフィッシュ","フライドオニオン","ヘアワックス","ヘアスプレー","芳香剤","ほうれん草","ほうじ茶","ほんだし","ホイップクリーム","ホットケーキミックス","ホワイトソース","ホットック","ホルモン","マーマレード","マシュマロ","マカロニ","マッシュルーム","マヨネーズ","マスカット","抹茶","まぐろ","松茸","マスタード","舞茸","マックシェイク","マジックリン","饅頭","マンゴー","三ツ矢サイダー","ミートボール","みりん","味噌汁","みたらし団子","ミートスパゲティ","ミルクティー","ミネラルウォーター","味噌","無洗米","麦茶","麦飯","鶏むね肉","メープルシロップ","綿棒","明太子","メロン","メロンパン","メガマフィン","めんつゆ","メロンソーダ","鶏もも肉","木綿豆腐","モッツァレラ","モンブラン","もやし","モスコミュール","モンスターエナジー","野菜","油淋鶏","U.F.O.","やきそば","ユッケ","ゆずサワー","雪見だいふく","柚子はちみつ","ヨーグルト","吉野家","洋食","ラー油","ラーメン","ライチ","ライム","リンゴ","リンス","緑茶","ルッコラ","レーズン","レトルトカレー","レタス","レンコン","冷麺","レアチーズケーキ","レモン","練乳","レッドブル","冷凍食品","ロールパン","ローレル","ローストビーフ","ローストチキン","ロコモコ","ロマネコンティ","ローズヒップティー","わさび","割り箸","わかめ","ワッフル","ワンタン","ワイン","ワックス","ガーリック","ガレット","ガラムマサラ","ガトーショコラ","ガナッシュ","牛肉","牛もも肉","牛乳","餃子","餃子タレ","魚肉ソーセージ","銀杏","牛タン","牛丼","魚介類","グラノーラ","グラタン","グレープフルーツ","グリンピース","グレープ","グリーンカレー","グアバ","玄米","玄米フレーク","玄米パン","激辛カレー","激辛ソース","げそフライ","ゴーヤー","ごまラー油","ごはん","ゴボウ","ごま塩","ゴーフレット","ゴディバ","ゴマだれ","ザーサイ","ざる蕎麦","ざるうどん","雑穀米","柘榴","ザンギ","ざらめ砂糖","ジュース","ジャーキー","ジャム","ジンジャエール","じゃがいも","ジャスミン茶","ゼリー","ぜんざい","全粒粉","雑炊","ダージリン","大根","大豆","大福","だし昆布","ダブルチーズバーガー","ダイエットコーラ","デミグラスソース","デザート","電池","ドーナツ","ドライイースト","ドリンク","ドライフルーツ","ドレッシング","ドンタコス","どら焼き","ドンペリ","バームクーヘン","バーボン","バニラアイス","バジル","バナナ","ババロア","バーニャカウダ","バター","バルサミコ酢","ビーフカレー","ビッグマック","ビスケット","ブイヨン","ブランデー","ブロッコリー","ブルーベリー","ブラックペッパー","ブルーチーズ","豚肉","豚バラ","豚キムチ","ベーコン","ベーコンレタスバーガー","ベーグル","ベイクド","ボディソープ","ボールペン","パイナップル","パンケーキ","パルメザンチーズ","パプリカ","パパイヤ","パンナコッタ","パスタ","パスタソース","パン粉","パイタンスープ","ピーナッツ","ピスタチオ","ピーマン","ピザソース","プリン","プチトマト","プロテイン","プレミアムビール","ペペロンチーノ","ペヤング","ポタージュ","ポテトチップス","ポカリスエット","ポン酢","ポップコーン","ポン・デ・リング"]
 

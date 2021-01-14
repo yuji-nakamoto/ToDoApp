@@ -26,18 +26,18 @@ class Template: Object {
         }
     }
     
-    class func updateSelected(completion: @escaping(Results<Template>) -> Void) {
+    class func fetchTemplates(completion: @escaping(Results<Template>) -> Void) {
         
         let realm = try! Realm()
-        let templateArray = realm.objects(Template.self).sorted(byKeyPath: "sourceRow", ascending: true)
+        let templates = realm.objects(Template.self).sorted(byKeyPath: "sourceRow", ascending: true)
  
-        templateArray.forEach { (t) in
+        templates.forEach { (t) in
             try! realm.write() {
                 t.selected = false
-                completion(templateArray)
+                completion(templates)
             }
         }
-        completion(templateArray)
+        completion(templates)
     }
     
     class func fetchSelectedTemplate(completion: @escaping(Bool, Template) -> Void) {
@@ -101,7 +101,29 @@ class TemplateMemo: Object {
         completion(templateMemo)
     }
     
-    class func createTemplateMemo(text: String, id: String, completion: @escaping() -> Void) {
+    class func createMemoToTemplateMemo(name: String, uid: String, date: Double, id: String, completion: @escaping() -> Void) {
+        
+        let realm = try! Realm()
+        let tempMemo = TemplateMemo()
+        let tempMemos = realm.objects(TemplateMemo.self).filter("templateId == '\(id)'")
+        
+        tempMemo.templateId = id
+        tempMemo.uid = uid
+        tempMemo.name = name
+        tempMemo.date = date
+        
+        if tempMemos.count != 0 {
+            tempMemo.sourceRow = tempMemos.count
+            tempMemo.originRow = tempMemos.count
+        }
+        
+        try! realm.write() {
+            realm.add(tempMemo)
+            completion()
+        }
+    }
+    
+    class func createTemplateMemo(name: String, id: String, completion: @escaping() -> Void) {
         
         let realm = try! Realm()
         let tempMemo = TemplateMemo()
@@ -110,7 +132,7 @@ class TemplateMemo: Object {
         
         tempMemo.templateId = id
         tempMemo.uid = uid
-        tempMemo.name = text
+        tempMemo.name = name
         
         if tempMemos.count != 0 {
             tempMemo.sourceRow = tempMemos.count

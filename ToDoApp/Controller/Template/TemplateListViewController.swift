@@ -9,6 +9,7 @@ import UIKit
 import RealmSwift
 import AVFoundation
 import GoogleMobileAds
+import EmptyDataSet_Swift
 
 class TemplateListViewController: UIViewController, UITextFieldDelegate {
 
@@ -28,6 +29,7 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var bannerHeight: NSLayoutConstraint!
     @IBOutlet weak var createButton: UIButton!
     @IBOutlet weak var editButton: UIButton!
+    @IBOutlet weak var topLineView: UIView!
     
     private var edit = false
     private var templates = [Template]()
@@ -40,11 +42,13 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
         setup()
         showHintView()
         setupBanner()
+        setNeedsStatusBarAppearanceUpdate()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        updateSelected()
+        userDefaults.removeObject(forKey: SETTING_VC)
+        fetchTemplates()
         selectColor()
         setColor()
         UserDefaults.standard.removeObject(forKey: ID)
@@ -63,6 +67,11 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         navigationController?.navigationBar.isHidden = false
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        let color: UIStatusBarStyle = userDefaults.object(forKey: WHITE_COLOR) != nil ? .darkContent : .lightContent
+        return color
     }
     
     // MARK: - Actions
@@ -152,18 +161,17 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
         videoPlayer.play()
     }
     
-    func updateSelected() {
+    func fetchTemplates() {
         
-        Template.updateSelected { [self] (templateArray) in
+        Template.fetchTemplates { [self] (t) in
             templates.removeAll()
-            templates.append(contentsOf: templateArray)
+            templates.append(contentsOf: t)
             tableView.reloadData()
         }
     }
     
     func setupVideoViewHeight() {
         
-        print(UIScreen.main.nativeBounds.height)
         switch (UIScreen.main.nativeBounds.height) {
         case 1334:
             videoHeight.constant = 380
@@ -196,6 +204,10 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
         createButton.layer.shadowColor = UIColor.black.cgColor
         createButton.layer.shadowOpacity = 0.3
         createButton.layer.shadowRadius = 4
+        
+        tableView.tableFooterView = UIView()
+        tableView.emptyDataSetSource = self
+        tableView.emptyDataSetDelegate = self
 
         switch (UIScreen.main.nativeBounds.height) {
         case 1334:
@@ -208,18 +220,43 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
     }
     
     func setColor() {
+        let separatorColor: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray3
+        let bannerColor: UIColor = userDefaults.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
+        bannerView.backgroundColor = bannerColor
+        tableView.separatorColor = separatorColor
+        
         if UserDefaults.standard.object(forKey: GREEN_COLOR) != nil {
             titleLabel.textColor = .white
             editButton.tintColor = .white
             topView.backgroundColor = UIColor(named: EMERALD_GREEN_ALPHA)
             createButton.backgroundColor = UIColor(named: EMERALD_GREEN)
             createButton.tintColor = UIColor.white
-        } else {
+            tableView.backgroundColor = .systemBackground
+            topLineView.backgroundColor = .systemGray5
+        } else if UserDefaults.standard.object(forKey: WHITE_COLOR) != nil {
             titleLabel.textColor = UIColor(named: O_BLACK)
-            editButton.tintColor = UIColor(named: O_BLACK)
+            editButton.tintColor = UIColor.systemBlue
             topView.backgroundColor = UIColor(named: O_WHITE_ALPHA)
             createButton.backgroundColor = UIColor(named: O_WHITE)
             createButton.tintColor = UIColor(named: O_BLACK)
+            tableView.backgroundColor = .systemBackground
+            topLineView.backgroundColor = .systemGray5
+        } else if UserDefaults.standard.object(forKey: PINK_COLOR) != nil {
+            titleLabel.textColor = .white
+            editButton.tintColor = .white
+            topView.backgroundColor = UIColor(named: O_PINK)
+            createButton.backgroundColor = UIColor(named: O_PINK)
+            createButton.tintColor = UIColor.white
+            tableView.backgroundColor = .systemBackground
+            topLineView.backgroundColor = .systemGray5
+        } else {
+            titleLabel.textColor = .white
+            editButton.tintColor = .systemBlue
+            topView.backgroundColor = UIColor(named: O_DARK2_ALPHA)
+            createButton.backgroundColor = UIColor.systemBlue
+            createButton.tintColor = UIColor.white
+            tableView.backgroundColor = UIColor(named: O_DARK1)
+            topLineView.backgroundColor = .darkGray
         }
     }
     
@@ -350,8 +387,36 @@ extension TemplateListViewController: UITableViewDataSource, UITableViewDelegate
     }
 }
 
+extension TemplateListViewController: EmptyDataSetSource, EmptyDataSetDelegate {
+    
+    func title(forEmptyDataSet scrollView: UIScrollView) -> NSAttributedString? {
+        
+        let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.systemGray as Any, .font: UIFont(name: "HiraMaruProN-W4", size: 13) as Any]
+        return NSAttributedString(string: "ひな形はありません", attributes: attributes)
+    }
+    
+    func description(forEmptyDataSet scrollView: UIScrollView) -> NSAttributedString? {
+        let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.systemGray as Any, .font: UIFont(name: "HiraMaruProN-W4", size: 13) as Any]
+        return NSAttributedString(string: "画面下の'ひな形を作成する'から作成できます", attributes: attributes)
+    }
+}
+
+extension TemplateListViewController {
+    override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+        super.dismiss(animated: flag, completion: completion)
+        guard let presentationController = presentationController else {
+            return
+        }
+        presentationController.delegate?.presentationControllerDidDismiss?(presentationController)
+    }
+}
+
 extension TemplateListViewController: UIAdaptivePresentationControllerDelegate {
   func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-    updateSelected()
+    fetchTemplates()
+    setNeedsStatusBarAppearanceUpdate()
+    dispatchQ.asyncAfter(deadline: .now() + 0.6) {
+        self.setNeedsStatusBarAppearanceUpdate()
+    }
   }
 }

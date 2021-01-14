@@ -125,3 +125,13 @@ class Tutorial3ViewController: UIViewController {
         dismiss(animated: true, completion: nil)
     }
 }
+
+extension Tutorial3ViewController {
+    override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+        super.dismiss(animated: flag, completion: completion)
+        guard let presentationController = presentationController else {
+            return
+        }
+        presentationController.delegate?.presentationControllerDidDismiss?(presentationController)
+    }
+}

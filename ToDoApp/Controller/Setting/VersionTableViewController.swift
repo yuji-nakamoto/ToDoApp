@@ -17,7 +17,9 @@ class VersionTableViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setSwipeBack()
+        logoImageView.layer.cornerRadius = 10
         navigationItem.title = "バージョンについて"
+        setNeedsStatusBarAppearanceUpdate()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -27,9 +29,33 @@ class VersionTableViewController: UITableViewController {
         setCharacterSize()
     }
     
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        let color: UIStatusBarStyle = userDefaults.object(forKey: WHITE_COLOR) != nil ? .darkContent : .lightContent
+        return color
+    }
+    
+    @IBAction func backButtonTapped(_ sender: Any) {
+        navigationController?.popViewController(animated: true)
+    }
+    
     func setColor() {
-        let color: UIColor = UserDefaults.standard.object(forKey: GREEN_COLOR) != nil ? .white : UIColor(named: O_BLACK)!
-        backButton.tintColor = color
+        
+        let color: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .white : UIColor(named: O_BLACK)!
+        let tableViewColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK3)! : UIColor(named: O_WHITE)
+        let separatorColor: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray3
+        tableView.separatorColor = separatorColor
+        
+        label1.textColor = color
+        label2.textColor = color
+        tableView.backgroundColor = tableViewColor
+        
+        if UserDefaults.standard.object(forKey: WHITE_COLOR) != nil {
+            backButton.tintColor = UIColor(named: O_BLACK)
+        } else if UserDefaults.standard.object(forKey: DARK_COLOR) != nil {
+            backButton.tintColor = .systemBlue
+        } else {
+            backButton.tintColor = .white
+        }
     }
     
     func setCharacterSize() {
@@ -67,8 +93,9 @@ class VersionTableViewController: UITableViewController {
             label2.font = UIFont.systemFont(ofSize: 19, weight: .medium)
         }
     }
-
-    @IBAction func backButtonTapped(_ sender: Any) {
-        navigationController?.popViewController(animated: true)
+    
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        let color: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
+        cell.backgroundColor = color
     }
 }

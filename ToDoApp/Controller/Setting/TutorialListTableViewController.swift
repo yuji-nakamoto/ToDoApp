@@ -15,10 +15,20 @@ class TutorialListTableViewController: UITableViewController {
     @IBOutlet weak var label3: UILabel!
     @IBOutlet weak var label4: UILabel!
     @IBOutlet weak var label5: UILabel!
+    @IBOutlet weak var arrow1: UIImageView!
+    @IBOutlet weak var arrow2: UIImageView!
+    @IBOutlet weak var arrow3: UIImageView!
+    @IBOutlet weak var arrow4: UIImageView!
+    @IBOutlet weak var arrow5: UIImageView!
+    
+    lazy var labels = [label1,label2,label3,label4,label5]
+    lazy var arrows = [arrow1,arrow2,arrow3,arrow4,arrow5]
     
     override func viewDidLoad() {
         super.viewDidLoad()
         navigationItem.title = "使い方ガイド"
+        setSwipeBack()
+        setNeedsStatusBarAppearanceUpdate()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -28,76 +38,53 @@ class TutorialListTableViewController: UITableViewController {
         setCharacterSize()
     }
     
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        let color: UIStatusBarStyle = userDefaults.object(forKey: WHITE_COLOR) != nil ? .darkContent : .lightContent
+        return color
+    }
+    
+    @IBAction func dismissButtonTapped(_ sender: Any) {
+        navigationController?.popViewController(animated: true)
+    }
+    
     func setColor() {
-        if UserDefaults.standard.object(forKey: GREEN_COLOR) != nil {
-            dismissButton.tintColor = UIColor.white
-        } else {
+        let color: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .white : UIColor(named: O_BLACK)!
+        let arrowColor: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .white : .systemGray3
+        let tableViewColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK3)! : UIColor(named: O_WHITE)
+        let separatorColor: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray3
+        
+        tableView.separatorColor = separatorColor
+        labels.forEach({$0?.textColor = color})
+        arrows.forEach({$0?.tintColor = arrowColor})
+        tableView.backgroundColor = tableViewColor
+        
+        if UserDefaults.standard.object(forKey: WHITE_COLOR) != nil {
             dismissButton.tintColor = UIColor(named: O_BLACK)
+        } else if UserDefaults.standard.object(forKey: DARK_COLOR) != nil {
+            dismissButton.tintColor = .systemBlue
+        } else {
+            dismissButton.tintColor = .white
         }
     }
     
     func setCharacterSize() {
         if UserDefaults.standard.object(forKey: SMALL1) != nil {
-            
-            label1.font = UIFont.systemFont(ofSize: 13)
-            label2.font = UIFont.systemFont(ofSize: 13)
-            label3.font = UIFont.systemFont(ofSize: 13)
-            label4.font = UIFont.systemFont(ofSize: 13)
-            label5.font = UIFont.systemFont(ofSize: 13)
+            labels.forEach({$0?.font = UIFont.systemFont(ofSize: 13)})
         } else if UserDefaults.standard.object(forKey: SMALL2) != nil {
-            
-            label1.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-            label2.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-            label3.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-            label4.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-            label5.font = UIFont.systemFont(ofSize: 13, weight: .medium)
+            labels.forEach({$0?.font = UIFont.systemFont(ofSize: 13, weight: .medium)})
         } else if UserDefaults.standard.object(forKey: MIDIUM1) != nil {
-            
-            label1.font = UIFont.systemFont(ofSize: 15)
-            label2.font = UIFont.systemFont(ofSize: 15)
-            label3.font = UIFont.systemFont(ofSize: 15)
-            label4.font = UIFont.systemFont(ofSize: 15)
-            label5.font = UIFont.systemFont(ofSize: 15)
+            labels.forEach({$0?.font = UIFont.systemFont(ofSize: 15)})
         } else if UserDefaults.standard.object(forKey: MIDIUM2) != nil {
-            
-            label1.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-            label2.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-            label3.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-            label4.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-            label5.font = UIFont.systemFont(ofSize: 15, weight: .medium)
+            labels.forEach({$0?.font = UIFont.systemFont(ofSize: 15, weight: .medium)})
         } else if UserDefaults.standard.object(forKey: MIDIUM3) != nil {
-            
-            label1.font = UIFont.systemFont(ofSize: 17)
-            label2.font = UIFont.systemFont(ofSize: 17)
-            label3.font = UIFont.systemFont(ofSize: 17)
-            label4.font = UIFont.systemFont(ofSize: 17)
-            label5.font = UIFont.systemFont(ofSize: 17)
+            labels.forEach({$0?.font = UIFont.systemFont(ofSize: 17)})
         } else if UserDefaults.standard.object(forKey: MIDIUM4) != nil {
-            
-            label1.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-            label2.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-            label3.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-            label4.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-            label5.font = UIFont.systemFont(ofSize: 17, weight: .medium)
+            labels.forEach({$0?.font = UIFont.systemFont(ofSize: 17, weight: .medium)})
         } else if UserDefaults.standard.object(forKey: BIG1) != nil {
-            
-            label1.font = UIFont.systemFont(ofSize: 19)
-            label2.font = UIFont.systemFont(ofSize: 19)
-            label3.font = UIFont.systemFont(ofSize: 19)
-            label4.font = UIFont.systemFont(ofSize: 19)
-            label5.font = UIFont.systemFont(ofSize: 19)
+            labels.forEach({$0?.font = UIFont.systemFont(ofSize: 19)})
         } else if UserDefaults.standard.object(forKey: BIG2) != nil {
-            
-            label1.font = UIFont.systemFont(ofSize: 19, weight: .medium)
-            label2.font = UIFont.systemFont(ofSize: 19, weight: .medium)
-            label3.font = UIFont.systemFont(ofSize: 19, weight: .medium)
-            label4.font = UIFont.systemFont(ofSize: 19, weight: .medium)
-            label5.font = UIFont.systemFont(ofSize: 19, weight: .medium)
+            labels.forEach({$0?.font = UIFont.systemFont(ofSize: 19, weight: .medium)})
         }
-    }
-
-    @IBAction func dismissButtonTapped(_ sender: Any) {
-        dismiss(animated: true, completion: nil)
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -107,23 +94,52 @@ class TutorialListTableViewController: UITableViewController {
         if indexPath.row == 0 {
             let tutorial1VC = storyboard.instantiateViewController(withIdentifier: "Tutorial1VC")
             tutorial1VC.modalPresentationStyle = .automatic
+            tutorial1VC.presentationController?.delegate = self
             self.present(tutorial1VC, animated: true, completion: nil)
         } else if indexPath.row == 1 {
             let tutorial2VC = storyboard.instantiateViewController(withIdentifier: "Tutorial2VC")
+            tutorial2VC.presentationController?.delegate = self
             tutorial2VC.modalPresentationStyle = .automatic
             self.present(tutorial2VC, animated: true, completion: nil)
         } else if indexPath.row == 2 {
             let tutorial3VC = storyboard.instantiateViewController(withIdentifier: "Tutorial3VC")
             tutorial3VC.modalPresentationStyle = .automatic
+            tutorial3VC.presentationController?.delegate = self
             self.present(tutorial3VC, animated: true, completion: nil)
         } else if indexPath.row == 3 {
             let tutorial4VC = storyboard.instantiateViewController(withIdentifier: "Tutorial4VC")
             tutorial4VC.modalPresentationStyle = .automatic
+            tutorial4VC.presentationController?.delegate = self
             self.present(tutorial4VC, animated: true, completion: nil)
         } else if indexPath.row == 4 {
             let tutorial5VC = storyboard.instantiateViewController(withIdentifier: "Tutorial5VC")
             tutorial5VC.modalPresentationStyle = .automatic
+            tutorial5VC.presentationController?.delegate = self
             self.present(tutorial5VC, animated: true, completion: nil)
         }
     }
+    
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        let color: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
+        cell.backgroundColor = color
+    }
+}
+
+extension TutorialListTableViewController {
+    override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+        super.dismiss(animated: flag, completion: completion)
+        guard let presentationController = presentationController else {
+            return
+        }
+        presentationController.delegate?.presentationControllerDidDismiss?(presentationController)
+    }
+}
+
+extension TutorialListTableViewController: UIAdaptivePresentationControllerDelegate {
+  func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+    setNeedsStatusBarAppearanceUpdate()
+    dispatchQ.asyncAfter(deadline: .now() + 0.6) {
+        self.setNeedsStatusBarAppearanceUpdate()
+    }
+  }
 }

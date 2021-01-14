@@ -13,9 +13,9 @@ class SettingTableViewController: UITableViewController, SKStoreProductViewContr
     @IBOutlet weak var inputLabel: UILabel!
     @IBOutlet weak var pushLabel: UILabel!
     @IBOutlet weak var themeLabel: UILabel!
+    @IBOutlet weak var colorLabel: UILabel!
     @IBOutlet weak var inputSwitch: UISwitch!
     @IBOutlet weak var pushSwitch: UISwitch!
-    @IBOutlet weak var themeSwitch: UISwitch!
     @IBOutlet weak var goosminLogo: UIImageView!
     @IBOutlet weak var memoryLogo: UIImageView!
     @IBOutlet weak var manageLogo: UIImageView!
@@ -25,16 +25,42 @@ class SettingTableViewController: UITableViewController, SKStoreProductViewContr
     @IBOutlet weak var versionLabel: UILabel!
     @IBOutlet weak var appstoreLabel: UILabel!
     @IBOutlet weak var friendLabel: UILabel!
+    @IBOutlet weak var babyLabel: UILabel!
+    @IBOutlet weak var memoLabel: UILabel!
+    @IBOutlet weak var moneyLabel: UILabel!
+    @IBOutlet weak var arrow1: UIImageView!
+    @IBOutlet weak var arrow2: UIImageView!
+    @IBOutlet weak var arrow3: UIImageView!
+    @IBOutlet weak var arrow4: UIImageView!
+    @IBOutlet weak var arrow5: UIImageView!
+    @IBOutlet weak var arrow6: UIImageView!
+    @IBOutlet weak var arrow7: UIImageView!
+    @IBOutlet weak var arrow8: UIImageView!
+    @IBOutlet weak var arrow9: UIImageView!
+    
+    lazy var labels = [inputLabel,pushLabel,themeLabel,colorLabel,sizeLabel,characterLabel,useLabel,versionLabel,appstoreLabel,friendLabel,babyLabel,memoLabel,moneyLabel]
+    lazy var arrows = [arrow1,arrow2,arrow3,arrow4,arrow5,arrow6,arrow7,arrow8,arrow9]
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
+        setNeedsStatusBarAppearanceUpdate()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        userDefaults.set(true, forKey: SETTING_VC)
+        setupThemeLabel()
         selectColor()
+        setupColor()
         setCharacterSize()
+        tableView.reloadData()
+        
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        let color: UIStatusBarStyle = userDefaults.object(forKey: WHITE_COLOR) != nil ? .darkContent : .lightContent
+        return color
     }
     
     // MARK: - Actions
@@ -61,110 +87,26 @@ class SettingTableViewController: UITableViewController, SKStoreProductViewContr
         }
     }
     
-    @IBAction func onThemeSwitch(_ sender: UISwitch) {
-        
-        if sender.isOn {
-            themeLabel.text = "テーマカラー: グリーン"
-            UserDefaults.standard.set(true, forKey: GREEN_COLOR)
-            greenColor()
-        } else {
-            themeLabel.text = "テーマカラー: ホワイト"
-            UserDefaults.standard.removeObject(forKey: GREEN_COLOR)
-            whiteColor()
-        }
-    }
-    
     // MARK: - Helpers
     
     func setCharacterSize() {
+        
         if UserDefaults.standard.object(forKey: SMALL1) != nil {
-            
-            inputLabel.font = UIFont.systemFont(ofSize: 13)
-            pushLabel.font = UIFont.systemFont(ofSize: 13)
-            themeLabel.font = UIFont.systemFont(ofSize: 13)
-            sizeLabel.font = UIFont.systemFont(ofSize: 13)
-            characterLabel.font = UIFont.systemFont(ofSize: 13)
-            useLabel.font = UIFont.systemFont(ofSize: 13)
-            versionLabel.font = UIFont.systemFont(ofSize: 13)
-            appstoreLabel.font = UIFont.systemFont(ofSize: 13)
-            friendLabel.font = UIFont.systemFont(ofSize: 13)
+            labels.forEach({$0?.font = UIFont.systemFont(ofSize: 13)})
         } else if UserDefaults.standard.object(forKey: SMALL2) != nil {
-            
-            inputLabel.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-            pushLabel.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-            themeLabel.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-            sizeLabel.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-            characterLabel.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-            useLabel.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-            versionLabel.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-            appstoreLabel.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-            friendLabel.font = UIFont.systemFont(ofSize: 13, weight: .medium)
+            labels.forEach({$0?.font = UIFont.systemFont(ofSize: 13, weight: .medium)})
         } else if UserDefaults.standard.object(forKey: MIDIUM1) != nil {
-            
-            inputLabel.font = UIFont.systemFont(ofSize: 15)
-            pushLabel.font = UIFont.systemFont(ofSize: 15)
-            themeLabel.font = UIFont.systemFont(ofSize: 15)
-            sizeLabel.font = UIFont.systemFont(ofSize: 15)
-            characterLabel.font = UIFont.systemFont(ofSize: 15)
-            useLabel.font = UIFont.systemFont(ofSize: 15)
-            versionLabel.font = UIFont.systemFont(ofSize: 15)
-            appstoreLabel.font = UIFont.systemFont(ofSize: 15)
-            friendLabel.font = UIFont.systemFont(ofSize: 15)
+            labels.forEach({$0?.font = UIFont.systemFont(ofSize: 15)})
         } else if UserDefaults.standard.object(forKey: MIDIUM2) != nil {
-            
-            inputLabel.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-            pushLabel.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-            themeLabel.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-            sizeLabel.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-            characterLabel.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-            useLabel.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-            versionLabel.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-            appstoreLabel.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-            friendLabel.font = UIFont.systemFont(ofSize: 15, weight: .medium)
+            labels.forEach({$0?.font = UIFont.systemFont(ofSize: 15, weight: .medium)})
         } else if UserDefaults.standard.object(forKey: MIDIUM3) != nil {
-            
-            inputLabel.font = UIFont.systemFont(ofSize: 17)
-            pushLabel.font = UIFont.systemFont(ofSize: 17)
-            themeLabel.font = UIFont.systemFont(ofSize: 17)
-            sizeLabel.font = UIFont.systemFont(ofSize: 17)
-            characterLabel.font = UIFont.systemFont(ofSize: 17)
-            useLabel.font = UIFont.systemFont(ofSize: 17)
-            versionLabel.font = UIFont.systemFont(ofSize: 17)
-            appstoreLabel.font = UIFont.systemFont(ofSize: 17)
-            friendLabel.font = UIFont.systemFont(ofSize: 17)
+            labels.forEach({$0?.font = UIFont.systemFont(ofSize: 17)})
         } else if UserDefaults.standard.object(forKey: MIDIUM4) != nil {
-            
-            inputLabel.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-            pushLabel.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-            themeLabel.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-            sizeLabel.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-            characterLabel.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-            useLabel.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-            versionLabel.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-            appstoreLabel.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-            friendLabel.font = UIFont.systemFont(ofSize: 17, weight: .medium)
+            labels.forEach({$0?.font = UIFont.systemFont(ofSize: 17, weight: .medium)})
         } else if UserDefaults.standard.object(forKey: BIG1) != nil {
-            
-            inputLabel.font = UIFont.systemFont(ofSize: 19)
-            pushLabel.font = UIFont.systemFont(ofSize: 19)
-            themeLabel.font = UIFont.systemFont(ofSize: 19)
-            sizeLabel.font = UIFont.systemFont(ofSize: 19)
-            characterLabel.font = UIFont.systemFont(ofSize: 19)
-            useLabel.font = UIFont.systemFont(ofSize: 19)
-            versionLabel.font = UIFont.systemFont(ofSize: 19)
-            appstoreLabel.font = UIFont.systemFont(ofSize: 19)
-            friendLabel.font = UIFont.systemFont(ofSize: 19)
+            labels.forEach({$0?.font = UIFont.systemFont(ofSize: 19)})
         } else if UserDefaults.standard.object(forKey: BIG2) != nil {
-            
-            inputLabel.font = UIFont.systemFont(ofSize: 19, weight: .medium)
-            pushLabel.font = UIFont.systemFont(ofSize: 19, weight: .medium)
-            themeLabel.font = UIFont.systemFont(ofSize: 19, weight: .medium)
-            sizeLabel.font = UIFont.systemFont(ofSize: 19, weight: .medium)
-            characterLabel.font = UIFont.systemFont(ofSize: 19, weight: .medium)
-            useLabel.font = UIFont.systemFont(ofSize: 19, weight: .medium)
-            versionLabel.font = UIFont.systemFont(ofSize: 19, weight: .medium)
-            appstoreLabel.font = UIFont.systemFont(ofSize: 19, weight: .medium)
-            friendLabel.font = UIFont.systemFont(ofSize: 19, weight: .medium)
+            labels.forEach({$0?.font = UIFont.systemFont(ofSize: 19, weight: .medium)})
         }
         
         sizeLabel.text = ""
@@ -187,6 +129,40 @@ class SettingTableViewController: UITableViewController, SKStoreProductViewContr
         }
     }
     
+    func setupColor() {
+        
+        let color: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .white : UIColor(named: O_BLACK)!
+        let arrowColor: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .white : .systemGray3
+        let tableColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK3)! : UIColor(named: O_WHITE)!
+        let separatorColor: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray3
+        tableView.separatorColor = separatorColor
+
+        labels.forEach({$0?.textColor = color})
+        arrows.forEach({$0?.tintColor = arrowColor})
+        tableView.backgroundColor = tableColor
+    }
+    
+    func setupThemeLabel() {
+        
+        if UserDefaults.standard.object(forKey: GREEN_COLOR) != nil {
+            colorLabel.text = "グリーン"
+            inputSwitch.onTintColor = UIColor(named: EMERALD_GREEN)
+            pushSwitch.onTintColor = UIColor(named: EMERALD_GREEN)
+        } else if UserDefaults.standard.object(forKey: WHITE_COLOR) != nil {
+            colorLabel.text = "ホワイト"
+            inputSwitch.onTintColor = UIColor.systemBlue
+            pushSwitch.onTintColor = UIColor.systemBlue
+        } else if UserDefaults.standard.object(forKey: PINK_COLOR) != nil {
+            colorLabel.text = "ピンク"
+            inputSwitch.onTintColor = UIColor(named: O_PINK)
+            pushSwitch.onTintColor = UIColor(named: O_PINK)
+        } else {
+            colorLabel.text = "ダーク"
+            inputSwitch.onTintColor = UIColor.systemBlue
+            pushSwitch.onTintColor = UIColor.systemBlue
+        }
+    }
+    
     func setup() {
         
         if UserDefaults.standard.object(forKey: ON_INPUT) != nil {
@@ -203,14 +179,6 @@ class SettingTableViewController: UITableViewController, SKStoreProductViewContr
         } else {
             pushLabel.text = "カート履歴の通知を行わない"
             pushSwitch.isOn = false
-        }
-        
-        if UserDefaults.standard.object(forKey: GREEN_COLOR) != nil {
-            themeLabel.text = "テーマカラー: グリーン"
-            themeSwitch.isOn = true
-        } else {
-            themeLabel.text = "テーマカラー: ホワイト"
-            themeSwitch.isOn = false
         }
         
         navigationItem.title = "設定"
@@ -268,6 +236,11 @@ class SettingTableViewController: UITableViewController, SKStoreProductViewContr
     
     // MARK: - Table view
     
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        let color: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
+        cell.backgroundColor = color
+    }
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         
@@ -283,4 +256,10 @@ class SettingTableViewController: UITableViewController, SKStoreProductViewContr
             showManageStore()
         }
     }
+}
+
+extension SettingTableViewController: UIAdaptivePresentationControllerDelegate {
+  func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+    setNeedsStatusBarAppearanceUpdate()
+  }
 }

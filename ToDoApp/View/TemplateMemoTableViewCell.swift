@@ -37,6 +37,16 @@ class TemplateMemoTableViewCell: UITableViewCell, UITextViewDelegate {
         } else if UserDefaults.standard.object(forKey: BIG2) != nil {
             memoTextView.font = UIFont.systemFont(ofSize: 19, weight: .medium)
         }
+        
+        if UserDefaults.standard.object(forKey: DARK_COLOR) != nil {
+            backgroundColor = UIColor(named: O_DARK1)
+            memoTextView.backgroundColor = UIColor(named: O_DARK1)
+            memoTextView.textColor = .white
+        } else {
+            backgroundColor = .systemBackground
+            memoTextView.backgroundColor = .systemBackground
+            memoTextView.textColor = UIColor(named: O_BLACK)
+        }
     }
     
     override func prepareForReuse() {
@@ -58,6 +68,16 @@ class TemplateMemoTableViewCell: UITableViewCell, UITextViewDelegate {
         } else if UserDefaults.standard.object(forKey: BIG2) != nil {
             memoTextView.font = UIFont.systemFont(ofSize: 19, weight: .medium)
         }
+        
+        if UserDefaults.standard.object(forKey: DARK_COLOR) != nil {
+            backgroundColor = UIColor(named: O_DARK1)
+            memoTextView.backgroundColor = UIColor(named: O_DARK1)
+            memoTextView.textColor = .white
+        } else {
+            backgroundColor = .systemBackground
+            memoTextView.backgroundColor = .systemBackground
+            memoTextView.textColor = UIColor(named: O_BLACK)
+        }
     }
     
     func configureCell(_ templateMemo: TemplateMemo) {
@@ -67,6 +87,7 @@ class TemplateMemoTableViewCell: UITableViewCell, UITextViewDelegate {
     
     func textViewDidBeginEditing(_ textView: UITextView) {
         UserDefaults.standard.set(true, forKey: EDIT_TEMP)
+        UserDefaults.standard.set(templateMemo.sourceRow, forKey: SELECT_ROW)
         createTemplateVC?.viewDidAppear(true)
         editTemplateVC?.viewDidAppear(true)
     }

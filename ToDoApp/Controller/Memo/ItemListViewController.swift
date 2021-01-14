@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import GoogleMobileAds
 import EmptyDataSet_Swift
 import RealmSwift
 
@@ -25,12 +24,19 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
         super.viewDidLoad()
         setup()
         setupTextField()
+        setNeedsStatusBarAppearanceUpdate()
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         fetchItem()
         selectColor()
+        setupColor()
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        let color: UIStatusBarStyle = userDefaults.object(forKey: WHITE_COLOR) != nil ? .darkContent : .lightContent
+        return color
     }
     
     // MARK: - Actions
@@ -53,13 +59,14 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
     
     // MARK: - Fetch
     
-    private func fetchItem() {
-        
+    func fetchItem() {
+        let text = memoTextField.text?.prefix(1)
         let realm = try! Realm()
         let toKatakana = memoTextField.text!.applyingTransform(.hiraganaToKatakana, reverse: false)
         let toHiragana = memoTextField.text!.applyingTransform(.hiraganaToKatakana, reverse: true)
         let itemArray1 = realm.objects(Item.self).filter("name BEGINSWITH '\(toKatakana ?? "")'")
         let itemArray2 = realm.objects(Item.self).filter("name BEGINSWITH '\(toHiragana ?? "")'")
+        let itemArray3 = realm.objects(Item.self).filter("name BEGINSWITH '\(memoTextField.text ?? "")'")
         items.removeAll()
 
         if memoTextField.text?.prefix(1) == "あ"{
@@ -381,6 +388,12 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
 
             items.append(contentsOf: bu1)
         }
+        
+        if text == "a" || text == "b" || text == "c" || text == "d" || text == "e" || text == "f" || text == "g" || text == "h" || text == "i" || text == "j" || text == "k" || text == "l" || text == "m" || text == "n" || text == "o" || text == "p" || text == "q" || text == "r" || text == "s" || text == "t" || text == "u" || text == "v" || text == "w" || text == "x" || text == "y" || text == "z" || text == "A" || text == "B" || text == "C" || text == "D" || text == "E" || text == "F" || text == "G" || text == "H" || text == "I" || text == "J" || text == "K" || text == "L" || text == "M" || text == "N" || text == "O" || text == "P" || text == "Q" || text == "R" || text == "S" || text == "T" || text == "U" || text == "V" || text == "W" || text == "X" || text == "Y" || text == "Z" {
+            items.append(contentsOf: itemArray3)
+            tableView.reloadData()
+            return
+        }
         items.append(contentsOf: itemArray1)
         items.append(contentsOf: itemArray2)
         tableView.reloadData()
@@ -392,7 +405,17 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
         fetchItem()
     }
     
-    private func setup() {
+    func setupColor() {
+        let separatorColor: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray3
+        tableView.separatorColor = separatorColor
+        if UserDefaults.standard.object(forKey: DARK_COLOR) != nil {
+            tableView.backgroundColor = UIColor(named: O_DARK1)
+        } else {
+            tableView.backgroundColor = UIColor.systemBackground
+        }
+    }
+    
+    func setup() {
         navigationItem.title = "買い物メモ"
         tableView.tableFooterView = UIView()
         createButton.layer.cornerRadius = 5
@@ -404,7 +427,7 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
         memoTextField.becomeFirstResponder()
     }
     
-    private func setupTextField() {
+    func setupTextField() {
         
         switch (UIScreen.main.nativeBounds.height) {
         //iPhone8
@@ -470,13 +493,12 @@ extension ItemListViewController: UITableViewDelegate, UITableViewDataSource {
 extension ItemListViewController: EmptyDataSetSource, EmptyDataSetDelegate {
     
     func title(forEmptyDataSet scrollView: UIScrollView) -> NSAttributedString? {
-        
-        let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor(named: O_BLACK) as Any, .font: UIFont(name: "HiraMaruProN-W4", size: 15) as Any]
+        let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.systemGray as Any, .font: UIFont(name: "HiraMaruProN-W4", size: 13) as Any]
         return NSAttributedString(string: "入力候補はありません", attributes: attributes)
     }
     
     func description(forEmptyDataSet scrollView: UIScrollView) -> NSAttributedString? {
-        let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.systemGray2 as Any, .font: UIFont(name: "HiraMaruProN-W4", size: 13) as Any]
+        let attributes: [NSAttributedString.Key: Any] = [.foregroundColor: UIColor.systemGray as Any, .font: UIFont(name: "HiraMaruProN-W4", size: 13) as Any]
         return NSAttributedString(string: "文字を入力することで、入力候補が表示されます", attributes: attributes)
     }
 }

@@ -23,7 +23,7 @@ class StartViewController: UIViewController {
         UserDefaults.standard.set(true, forKey: ON_PUSH)
         let threeWeek =  calendar.date(byAdding: .day, value: 21, to: date)
         UserDefaults.standard.set(threeWeek, forKey: REVIEW)
-        UserDefaults.standard.set(true, forKey: MIDIUM1)
+        UserDefaults.standard.set(true, forKey: MIDIUM2)
 //        UserDefaults.standard.removeObject(forKey: SET_ITEM)
     }
     

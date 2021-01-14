@@ -1,5 +1,5 @@
 //
-//  CharacterSizeTableViewController.swift
+//  FontSizeTableViewController.swift
 //  ToDoApp
 //
 //  Created by yuji nakamoto on 2021/01/08.
@@ -7,16 +7,16 @@
 
 import UIKit
 
-class CharacterSizeTableViewController: UITableViewController {
+class FontSizeTableViewController: UITableViewController {
 
-    @IBOutlet weak var character1Label: UILabel!
-    @IBOutlet weak var character2Label: UILabel!
-    @IBOutlet weak var character3Label: UILabel!
-    @IBOutlet weak var character4Label: UILabel!
-    @IBOutlet weak var character5Label: UILabel!
-    @IBOutlet weak var character6Label: UILabel!
-    @IBOutlet weak var character7Label: UILabel!
-    @IBOutlet weak var character8Label: UILabel!
+    @IBOutlet weak var font1Label: UILabel!
+    @IBOutlet weak var font2Label: UILabel!
+    @IBOutlet weak var font3Label: UILabel!
+    @IBOutlet weak var font4Label: UILabel!
+    @IBOutlet weak var font5Label: UILabel!
+    @IBOutlet weak var font6Label: UILabel!
+    @IBOutlet weak var font7Label: UILabel!
+    @IBOutlet weak var font8Label: UILabel!
     @IBOutlet weak var checkmark1: UIImageView!
     @IBOutlet weak var checkmark2: UIImageView!
     @IBOutlet weak var checkmark3: UIImageView!
@@ -27,13 +27,22 @@ class CharacterSizeTableViewController: UITableViewController {
     @IBOutlet weak var checkmark8: UIImageView!
     @IBOutlet weak var backButton: UIBarButtonItem!
     
+    lazy var labels = [font1Label,font2Label,font3Label,font4Label,font5Label,font6Label,font7Label,font8Label]
+    lazy var checkmarks = [checkmark1,checkmark2,checkmark3,checkmark4,checkmark5,checkmark6,checkmark7,checkmark8]
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-        setColor()
+        setupColor()
         setSwipeBack()
         setCharacterSize()
         tableView.tableFooterView = UIView()
         navigationItem.title = "文字の大きさ"
+        setNeedsStatusBarAppearanceUpdate()
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        let color: UIStatusBarStyle = userDefaults.object(forKey: WHITE_COLOR) != nil ? .darkContent : .lightContent
+        return color
     }
     
     @IBAction func backButtonTapped(_ sender: Any) {
@@ -42,14 +51,6 @@ class CharacterSizeTableViewController: UITableViewController {
     
     func setCharacterSize() {
         
-        checkmark1.isHidden = true
-        checkmark2.isHidden = true
-        checkmark3.isHidden = true
-        checkmark4.isHidden = true
-        checkmark5.isHidden = true
-        checkmark6.isHidden = true
-        checkmark7.isHidden = true
-        checkmark8.isHidden = true
         if UserDefaults.standard.object(forKey: SMALL1) != nil {
             setChalacter1()
         } else if UserDefaults.standard.object(forKey: SMALL2) != nil {
@@ -69,9 +70,22 @@ class CharacterSizeTableViewController: UITableViewController {
         }
     }
     
-    func setColor() {
-        let color: UIColor = UserDefaults.standard.object(forKey: GREEN_COLOR) != nil ? .white : UIColor(named: O_BLACK)!
-        backButton.tintColor = color
+    func setupColor() {
+        let color: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .white : UIColor(named: O_BLACK)!
+        let tableViewColor: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
+        let separatorColor: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray3
+        
+        if UserDefaults.standard.object(forKey: WHITE_COLOR) != nil {
+            backButton.tintColor = UIColor(named: O_BLACK)
+        } else if UserDefaults.standard.object(forKey: DARK_COLOR) != nil {
+            backButton.tintColor = .systemBlue
+        } else {
+            backButton.tintColor = .white
+        }
+        checkmarks.forEach({$0?.tintColor = color})
+        labels.forEach({$0?.textColor = color})
+        tableView.backgroundColor = tableViewColor
+        tableView.separatorColor = separatorColor
     }
     
     private func setChalacter1() {
@@ -83,14 +97,7 @@ class CharacterSizeTableViewController: UITableViewController {
         checkmark6.isHidden = true
         checkmark7.isHidden = true
         checkmark8.isHidden = true
-        character1Label.font = UIFont.systemFont(ofSize: 13)
-        character2Label.font = UIFont.systemFont(ofSize: 13)
-        character3Label.font = UIFont.systemFont(ofSize: 13)
-        character4Label.font = UIFont.systemFont(ofSize: 13)
-        character5Label.font = UIFont.systemFont(ofSize: 13)
-        character6Label.font = UIFont.systemFont(ofSize: 13)
-        character7Label.font = UIFont.systemFont(ofSize: 13)
-        character8Label.font = UIFont.systemFont(ofSize: 13)
+        labels.forEach({$0?.font = UIFont.systemFont(ofSize: 13)})
     }
     
     private func setChalacter2() {
@@ -102,14 +109,7 @@ class CharacterSizeTableViewController: UITableViewController {
         checkmark6.isHidden = true
         checkmark7.isHidden = true
         checkmark8.isHidden = true
-        character1Label.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-        character2Label.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-        character3Label.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-        character4Label.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-        character5Label.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-        character6Label.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-        character7Label.font = UIFont.systemFont(ofSize: 13, weight: .medium)
-        character8Label.font = UIFont.systemFont(ofSize: 13, weight: .medium)
+        labels.forEach({$0?.font = UIFont.systemFont(ofSize: 13, weight: .medium)})
     }
     
     private func setChalacter3() {
@@ -121,14 +121,7 @@ class CharacterSizeTableViewController: UITableViewController {
         checkmark6.isHidden = true
         checkmark7.isHidden = true
         checkmark8.isHidden = true
-        character1Label.font = UIFont.systemFont(ofSize: 15)
-        character2Label.font = UIFont.systemFont(ofSize: 15)
-        character3Label.font = UIFont.systemFont(ofSize: 15)
-        character4Label.font = UIFont.systemFont(ofSize: 15)
-        character5Label.font = UIFont.systemFont(ofSize: 15)
-        character6Label.font = UIFont.systemFont(ofSize: 15)
-        character7Label.font = UIFont.systemFont(ofSize: 15)
-        character8Label.font = UIFont.systemFont(ofSize: 15)
+        labels.forEach({$0?.font = UIFont.systemFont(ofSize: 15)})
     }
     
     private func setChalacter4() {
@@ -140,14 +133,7 @@ class CharacterSizeTableViewController: UITableViewController {
         checkmark6.isHidden = true
         checkmark7.isHidden = true
         checkmark8.isHidden = true
-        character1Label.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-        character2Label.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-        character3Label.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-        character4Label.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-        character5Label.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-        character6Label.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-        character7Label.font = UIFont.systemFont(ofSize: 15, weight: .medium)
-        character8Label.font = UIFont.systemFont(ofSize: 15, weight: .medium)
+        labels.forEach({$0?.font = UIFont.systemFont(ofSize: 15, weight: .medium)})
     }
     
     private func setChalacter5() {
@@ -159,14 +145,7 @@ class CharacterSizeTableViewController: UITableViewController {
         checkmark6.isHidden = true
         checkmark7.isHidden = true
         checkmark8.isHidden = true
-        character1Label.font = UIFont.systemFont(ofSize: 17)
-        character2Label.font = UIFont.systemFont(ofSize: 17)
-        character3Label.font = UIFont.systemFont(ofSize: 17)
-        character4Label.font = UIFont.systemFont(ofSize: 17)
-        character5Label.font = UIFont.systemFont(ofSize: 17)
-        character6Label.font = UIFont.systemFont(ofSize: 17)
-        character7Label.font = UIFont.systemFont(ofSize: 17)
-        character8Label.font = UIFont.systemFont(ofSize: 17)
+        labels.forEach({$0?.font = UIFont.systemFont(ofSize: 17)})
     }
     
     private func setChalacter6() {
@@ -178,14 +157,7 @@ class CharacterSizeTableViewController: UITableViewController {
         checkmark6.isHidden = false
         checkmark7.isHidden = true
         checkmark8.isHidden = true
-        character1Label.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-        character2Label.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-        character3Label.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-        character4Label.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-        character5Label.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-        character6Label.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-        character7Label.font = UIFont.systemFont(ofSize: 17, weight: .medium)
-        character8Label.font = UIFont.systemFont(ofSize: 17, weight: .medium)
+        labels.forEach({$0?.font = UIFont.systemFont(ofSize: 17, weight: .medium)})
     }
     
     private func setChalacter7() {
@@ -197,14 +169,7 @@ class CharacterSizeTableViewController: UITableViewController {
         checkmark6.isHidden = true
         checkmark7.isHidden = false
         checkmark8.isHidden = true
-        character1Label.font = UIFont.systemFont(ofSize: 19)
-        character2Label.font = UIFont.systemFont(ofSize: 19)
-        character3Label.font = UIFont.systemFont(ofSize: 19)
-        character4Label.font = UIFont.systemFont(ofSize: 19)
-        character5Label.font = UIFont.systemFont(ofSize: 19)
-        character6Label.font = UIFont.systemFont(ofSize: 19)
-        character7Label.font = UIFont.systemFont(ofSize: 19)
-        character8Label.font = UIFont.systemFont(ofSize: 19)
+        labels.forEach({$0?.font = UIFont.systemFont(ofSize: 19)})
     }
     
     private func setChalacter8() {
@@ -216,14 +181,7 @@ class CharacterSizeTableViewController: UITableViewController {
         checkmark6.isHidden = true
         checkmark7.isHidden = true
         checkmark8.isHidden = false
-        character1Label.font = UIFont.systemFont(ofSize: 19, weight: .medium)
-        character2Label.font = UIFont.systemFont(ofSize: 19, weight: .medium)
-        character3Label.font = UIFont.systemFont(ofSize: 19, weight: .medium)
-        character4Label.font = UIFont.systemFont(ofSize: 19, weight: .medium)
-        character5Label.font = UIFont.systemFont(ofSize: 19, weight: .medium)
-        character6Label.font = UIFont.systemFont(ofSize: 19, weight: .medium)
-        character7Label.font = UIFont.systemFont(ofSize: 19, weight: .medium)
-        character8Label.font = UIFont.systemFont(ofSize: 19, weight: .medium)
+        labels.forEach({$0?.font = UIFont.systemFont(ofSize: 19, weight: .medium)})
     }
     
     
@@ -311,5 +269,10 @@ class CharacterSizeTableViewController: UITableViewController {
             UserDefaults.standard.removeObject(forKey: BIG1)
             setChalacter8()
         }
+    }
+    
+    override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        let color: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
+        cell.backgroundColor = color
     }
 }
