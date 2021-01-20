@@ -7,6 +7,7 @@
 
 import UIKit
 import RealmSwift
+import WatchConnectivity
 
 class MemoTableViewCell: UITableViewCell, UITextViewDelegate {
     
@@ -17,12 +18,15 @@ class MemoTableViewCell: UITableViewCell, UITextViewDelegate {
     
     var memo = Memo()
     var memoVC: MemoTableViewController?
+    let realm = try! Realm()
+    lazy var historeis2 = realm.objects(History.self)
     var watchData = String()
     let date = Date()
     let dateFormatter = DateFormatter()
+    let session = WCSession.default
     var timestamp: String {
         dateFormatter.locale = Locale(identifier: "ja_JP")
-        dateFormatter.dateFormat = "yyyy年M月d日 (EEEEE)"
+        dateFormatter.dateFormat = "yyyy年MM月dd日 (EEEEE)"
         return dateFormatter.string(from: date)
     }
     
@@ -96,6 +100,8 @@ class MemoTableViewCell: UITableViewCell, UITextViewDelegate {
         }
     }
     
+    // MARK: - Cell
+    
     func configureCell(_ memo: Memo) {
         memoTextView.text = memo.name
         memoTextView.delegate = self
@@ -160,6 +166,8 @@ class MemoTableViewCell: UITableViewCell, UITextViewDelegate {
         }
     }
     
+    // MARK: - Actions
+    
     @IBAction func deleteButtonTapped(_ sender: Any) {
         
         let realm = try! Realm()
@@ -176,7 +184,8 @@ class MemoTableViewCell: UITableViewCell, UITextViewDelegate {
                 }
             }
             realm.delete(memos)
-            UserDefaults.standard.removeObject(forKey: EDIT_MEMO)
+            defaults.set(true, forKey: "delete")
+            defaults.removeObject(forKey: EDIT_MEMO)
             memoVC?.viewWillAppear(true)
         }
     }
@@ -186,13 +195,18 @@ class MemoTableViewCell: UITableViewCell, UITextViewDelegate {
         let realm = try! Realm()
         let memos = realm.objects(Memo.self).filter("uid == '\(memo.uid)'")
         let historeis = realm.objects(History.self).filter("uid == '\(memo.uid)'")
+
+        historeis.forEach { (h) in
+            historeis2 = realm.objects(History.self).filter("uid == '\(h.uid)'").filter("timestamp == '\(h.timestamp)'")
+        }
+        
         let templateMemos = realm.objects(TemplateMemo.self).filter("uid == '\(memo.uid)'")
         let date: Double = Date().timeIntervalSince1970
+        let color: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray3
         
         memos.forEach { (memo) in
             if memoImageView.image == UIImage(systemName: "square") {
                 memoImageView.image = UIImage(systemName: "square.slash")
-                let color: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray3
                 memoTextView.textColor = color
                 generator.notificationOccurred(.success)
                 
@@ -202,33 +216,55 @@ class MemoTableViewCell: UITableViewCell, UITextViewDelegate {
                 history.date = date
                 history.timestamp = timestamp
                 try! realm.write() {
-                    realm.add(history)
-                }
-                
-                try! realm.write() {
+                    if historeis2.count != 0 {
+                        realm.add(history)
+                    } else if historeis.count == 0 {
+                        realm.add(history)
+                    }
                     memo.isCheck = true
                     memo.date = date
-                }
-                templateMemos.forEach { (tm) in
-                    try! realm.write() {
+                    templateMemos.forEach { (tm) in
                         tm.date = date
                     }
                 }
+                wcSessionUpdate()
             } else {
-                memoImageView.image = UIImage(systemName: "square")
                 let color: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .white : UIColor(named: O_BLACK)!
+                memoImageView.image = UIImage(systemName: "square")
                 memoTextView.textColor = color
+                
                 try! realm.write() {
-                    realm.delete(historeis)
-                    memo.isCheck = false
-                    memo.date = 0
-                }
-                templateMemos.forEach { (tm) in
-                    try! realm.write() {
+                    templateMemos.forEach { (tm) in
                         tm.date = 0
                     }
+                    memo.isCheck = false
+                    memo.date = 0
+                    if historeis2.count != 0 {
+                        realm.delete(historeis2)
+                    }
                 }
+                wcSessionUpdate()
             }
+        }
+    }
+    
+    // MARK: - Helpers
+    
+    private func wcSessionUpdate() {
+        let realm = try! Realm()
+        let memoArray = realm.objects(Memo.self).sorted(byKeyPath: "sourceRow", ascending: true)
+        var tableData = [String]()
+        var tableData2 = [Bool]()
+        memoArray.forEach { (m) in
+            tableData.append(m.name)
+            tableData2.append(m.isCheck)
+        }
+        guard WCSession.isSupported() else { return }
+        do {
+            try WCSession.default.updateApplicationContext(["WatchTableData": tableData, "WatchTableData2": tableData2])
+        }
+        catch {
+            print(error.localizedDescription)
         }
     }
     
@@ -247,6 +283,7 @@ class MemoTableViewCell: UITableViewCell, UITextViewDelegate {
                 memo.name = memoTextView.text!
             }
         }
+        wcSessionUpdate()
         memoVC?.tableView.beginUpdates()
         memoVC?.tableView.endUpdates()
     }

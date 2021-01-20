@@ -1,14 +1,14 @@
 //
-//  Tutorial1ViewController.swift
+//  Tutorial7ViewController.swift
 //  ToDoApp
 //
-//  Created by yuji nakamoto on 2020/11/29.
+//  Created by yuji nakamoto on 2021/01/15.
 //
 
 import UIKit
 import AVFoundation
 
-class Tutorial1ViewController: UIViewController {
+class Tutorial7ViewController: UIViewController {
     
     @IBOutlet weak var videoView: UIView!
     @IBOutlet weak var seekBar: UISlider!
@@ -52,7 +52,7 @@ class Tutorial1ViewController: UIViewController {
         print(UIScreen.main.nativeBounds.height)
         switch (UIScreen.main.nativeBounds.height) {
         case 1334:
-            videoHeight.constant = 400
+            videoHeight.constant = 370
             stackTopConst.constant = 10
             videoTopConst.constant = 10
             break
@@ -60,15 +60,20 @@ class Tutorial1ViewController: UIViewController {
             videoHeight.constant = 530
             videoWidth.constant = 350
             break
+        case 2208:
+            videoHeight.constant = 440
+            stackTopConst.constant = 10
+            videoTopConst.constant = 10
+            break
         case 2532:
-            videoHeight.constant = 500
+            videoHeight.constant = 480
             break
         case 2688:
-            videoHeight.constant = 550
+            videoHeight.constant = 530
             videoWidth.constant = 350
             break
         case 2778:
-            videoHeight.constant = 580
+            videoHeight.constant = 560
             videoWidth.constant = 350
             break
         default:
@@ -78,7 +83,7 @@ class Tutorial1ViewController: UIViewController {
     
     private func setVideoPlayer() {
         
-        guard let path = Bundle.main.path(forResource: "tutorial1", ofType: "mp4") else {
+        guard let path = Bundle.main.path(forResource: "tutorial7", ofType: "mp4") else {
             fatalError("Movie file can not find.")
         }
         let fileURL = URL(fileURLWithPath: path)
@@ -125,7 +130,7 @@ class Tutorial1ViewController: UIViewController {
     }
 }
 
-extension Tutorial1ViewController {
+extension Tutorial7ViewController {
     override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
         super.dismiss(animated: flag, completion: completion)
         guard let presentationController = presentationController else {

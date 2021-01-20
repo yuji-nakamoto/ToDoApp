@@ -13,35 +13,37 @@ class PlusBtnTableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        if UserDefaults.standard.object(forKey: GREEN_COLOR) != nil {
+        let bgColor: UIColor = defaults.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
+        backgroundColor = bgColor
+        
+        if defaults.object(forKey: GREEN_COLOR) != nil {
             plusButton.tintColor = UIColor(named: EMERALD_GREEN)
-            backgroundColor = .systemBackground
-        } else if UserDefaults.standard.object(forKey: WHITE_COLOR) != nil {
+        } else if defaults.object(forKey: WHITE_COLOR) != nil {
             plusButton.tintColor = UIColor.systemBlue
-            backgroundColor = .systemBackground
-        } else if UserDefaults.standard.object(forKey: PINK_COLOR) != nil {
+        } else if defaults.object(forKey: PINK_COLOR) != nil {
             plusButton.tintColor = UIColor(named: O_PINK)
-            backgroundColor = .systemBackground
+        } else if defaults.object(forKey: ORANGE_COLOR) != nil {
+            plusButton.tintColor = UIColor(named: O_ORANGE)
         } else {
             plusButton.tintColor = UIColor.systemBlue
-            backgroundColor = UIColor(named: O_DARK1)
         }
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        if UserDefaults.standard.object(forKey: GREEN_COLOR) != nil {
+        let bgColor: UIColor = defaults.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
+        backgroundColor = bgColor
+        
+        if defaults.object(forKey: GREEN_COLOR) != nil {
             plusButton.tintColor = UIColor(named: EMERALD_GREEN)
-            backgroundColor = .systemBackground
-        } else if UserDefaults.standard.object(forKey: WHITE_COLOR) != nil {
+        } else if defaults.object(forKey: WHITE_COLOR) != nil {
             plusButton.tintColor = UIColor.systemBlue
-            backgroundColor = .systemBackground
-        } else if UserDefaults.standard.object(forKey: PINK_COLOR) != nil {
+        } else if defaults.object(forKey: PINK_COLOR) != nil {
             plusButton.tintColor = UIColor(named: O_PINK)
-            backgroundColor = .systemBackground
+        } else if defaults.object(forKey: ORANGE_COLOR) != nil {
+            plusButton.tintColor = UIColor(named: O_ORANGE)
         } else {
             plusButton.tintColor = UIColor.systemBlue
-            backgroundColor = UIColor(named: O_DARK1)
         }
     }
 }

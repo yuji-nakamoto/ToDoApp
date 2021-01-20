@@ -21,8 +21,8 @@ class StartViewController: UIViewController {
         UserDefaults.standard.set(true, forKey: GREEN_COLOR)
         UserDefaults.standard.set(true, forKey: ON_INPUT)
         UserDefaults.standard.set(true, forKey: ON_PUSH)
-        let threeWeek =  calendar.date(byAdding: .day, value: 21, to: date)
-        UserDefaults.standard.set(threeWeek, forKey: REVIEW)
+        let twoWeek =  calendar.date(byAdding: .day, value: 14, to: date)
+        UserDefaults.standard.set(twoWeek, forKey: REVIEW)
         UserDefaults.standard.set(true, forKey: MIDIUM2)
 //        UserDefaults.standard.removeObject(forKey: SET_ITEM)
     }

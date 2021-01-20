@@ -18,24 +18,24 @@ class RowController: NSObject {
     var tap = false
     
     @IBAction func tapBtn() {
-        if tap == false {
-            checkBtn.setBackgroundImage(UIImage(named: "square.slash"))
-            rowLabel.setTextColor(UIColor.darkGray)
-            tap = true
-            guard WCSession.isSupported() else { return }
-            do {
-                try WCSession.default.updateApplicationContext(["WatchTableData" : data])
-            }
-            catch {
-                print(error.localizedDescription)
-            }
-        } else {
+        if tap {
             checkBtn.setBackgroundImage(UIImage(named: "square"))
             rowLabel.setTextColor(UIColor.white)
             tap = false
             guard WCSession.isSupported() else { return }
             do {
                 try WCSession.default.updateApplicationContext(["WatchTableData" : data + ": false"])
+            }
+            catch {
+                print(error.localizedDescription)
+            }
+        } else {
+            checkBtn.setBackgroundImage(UIImage(named: "square.slash"))
+            rowLabel.setTextColor(UIColor.darkGray)
+            tap = true
+            guard WCSession.isSupported() else { return }
+            do {
+                try WCSession.default.updateApplicationContext(["WatchTableData" : data])
             }
             catch {
                 print(error.localizedDescription)

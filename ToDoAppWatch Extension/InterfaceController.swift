@@ -35,25 +35,36 @@ extension InterfaceController: WCSessionDelegate {
     
     func session(_ session: WCSession, didReceiveApplicationContext applicationContext: [String : Any]) {
         print(applicationContext)
-        if let tableData = applicationContext["WatchTableData"] as? [String] {
+        if let tableData = applicationContext["WatchTableData"] as? [String],
+           let tableData2 = applicationContext["WatchTableData2"] as? [Bool] {
             tableView.setNumberOfRows(tableData.count, withRowType: "RowController")
+            tableView.setNumberOfRows(tableData2.count, withRowType: "RowController")
+            
             self.tableData = tableData
-            if tableData == [] {
-                nodataLabel.setHidden(false)
-                descriptionLabel.setHidden(false)
-            } else {
-                nodataLabel.setHidden(true)
-                descriptionLabel.setHidden(true)
-            }
+            let bool = tableData == [] ? false : true
+            nodataLabel.setHidden(bool)
+            descriptionLabel.setHidden(bool)
+            
             for (index, rowModel) in tableData.enumerated() {
                 if let rowController = tableView.rowController(at: index) as? RowController {
                     rowController.rowLabel.setText(rowModel)
                     rowController.data = rowModel
                 }
             }
+            for (index, rowModel) in tableData2.enumerated() {
+                if let rowController = tableView.rowController(at: index) as? RowController {
+                    let setBtnImage: UIImage = rowModel ? UIImage(named: "square.slash")! : UIImage(named: "square")!
+                    let color: UIColor = rowModel ? .darkGray : .white
+                    let bool = rowModel ? true : false
+                    rowController.checkBtn.setBackgroundImage(setBtnImage)
+                    rowController.rowLabel.setTextColor(color)
+                    rowController.tap = bool
+                }
+            }
         }
     }
     
     func session(_ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState, error: Error?) {
+        print(error?.localizedDescription as Any)
     }
 }

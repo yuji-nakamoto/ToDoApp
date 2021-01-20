@@ -20,11 +20,11 @@ class Memo: Object {
     
     class func fetchMemo(sort: Bool, completion: @escaping(Results<Memo>) -> Void) {
         let realm = try! Realm()
-        if sort == false {
-            let memos = realm.objects(Memo.self).sorted(byKeyPath: "sourceRow", ascending: true)
+        if sort {
+            let memos = realm.objects(Memo.self).sorted(byKeyPath: "isCheck", ascending: true)
             completion(memos)
         } else {
-            let memos = realm.objects(Memo.self).sorted(byKeyPath: "isCheck", ascending: true)
+            let memos = realm.objects(Memo.self).sorted(byKeyPath: "sourceRow", ascending: true)
             completion(memos)
         }
     }
@@ -142,6 +142,15 @@ class Memo: Object {
         let memos = realm.objects(Memo.self).filter("uid == '\(id)'")
         
         try! realm.write() {
+            memos.forEach { (m) in
+                let memos2 = realm.objects(Memo.self).filter("uid != '\(m.uid)'")
+                memos2.forEach { (m2) in
+                    if m.originRow < m2.originRow {
+                        m2.sourceRow = m2.sourceRow - 1
+                        m2.originRow = m2.originRow - 1
+                    }
+                }
+            }
             realm.delete(memos)
             completion()
         }

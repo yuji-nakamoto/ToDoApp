@@ -10,7 +10,6 @@
 		280C3B2415D67EC6A80B6F80 /* Pods_ToDoApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 014D47EE9950DF5C153FD434 /* Pods_ToDoApp.framework */; };
 		509E00E024757CCF28FEDF1B /* Pods_ToDoAppTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0449AC1F3C877EB371380EBA /* Pods_ToDoAppTests.framework */; };
 		6484D7C1A446647BC421B355 /* Pods_ToDoApp_ToDoAppUITests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CAAECAD95D807E0A953E6BF0 /* Pods_ToDoApp_ToDoAppUITests.framework */; };
-		6E157A4B2579DD6100593247 /* MyTabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E157A4A2579DD6100593247 /* MyTabBarController.swift */; };
 		6E30ACD1257FB688006C02E0 /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6E30ACCF257FB688006C02E0 /* Interface.storyboard */; };
 		6E30ACD3257FB688006C02E0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6E30ACD2257FB688006C02E0 /* Assets.xcassets */; };
 		6E30ACDA257FB689006C02E0 /* ToDoAppWatch Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 6E30ACD9257FB688006C02E0 /* ToDoAppWatch Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -31,12 +30,9 @@
 		6E576BD3256F29190072E829 /* TemplateMemoTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E576BD2256F29190072E829 /* TemplateMemoTableViewCell.swift */; };
 		6E576BE3256F4BC90072E829 /* EditTemplateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E576BE2256F4BC90072E829 /* EditTemplateViewController.swift */; };
 		6E576C00256F780C0072E829 /* MyNavigationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E576BFF256F780C0072E829 /* MyNavigationController.swift */; };
-		6E592C2425A8DEEC003C2C6D /* tutorial4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6E592C2325A8DEEC003C2C6D /* tutorial4.mp4 */; };
-		6E5B2728257CD47800FAE7E9 /* tutorial1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6E5B2723257CD44300FAE7E9 /* tutorial1.mp4 */; };
-		6E5B272C257CD47B00FAE7E9 /* tutorial2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6E5B2724257CD45100FAE7E9 /* tutorial2.mp4 */; };
-		6E5B2730257CD48300FAE7E9 /* tutorial3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6E5B2725257CD45900FAE7E9 /* tutorial3.mp4 */; };
 		6E5B273D257CD4C400FAE7E9 /* Turorial5ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5B273C257CD4C400FAE7E9 /* Turorial5ViewController.swift */; };
-		6E5B2745257CD66300FAE7E9 /* tutorial5.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6E5B2744257CD65900FAE7E9 /* tutorial5.mp4 */; };
+		6E5B3D9525B0577100DFE2D8 /* Tutorial6ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E5B3D9425B0577100DFE2D8 /* Tutorial6ViewController.swift */; };
+		6E5B3DD725B0987300DFE2D8 /* tutorial7.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6E5B3DD625B0987300DFE2D8 /* tutorial7.mp4 */; };
 		6E69B886257E9C23007C3ABB /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6E69B885257E9C23007C3ABB /* StoreKit.framework */; };
 		6E743FF32575058400EECC74 /* HistoryTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E743FF22575058400EECC74 /* HistoryTableViewController.swift */; };
 		6E743FF82575059700EECC74 /* HistoryTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E743FF72575059700EECC74 /* HistoryTableViewCell.swift */; };
@@ -48,11 +44,16 @@
 		6E7782512573827000D2C696 /* Tutorial2ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7782502573827000D2C696 /* Tutorial2ViewController.swift */; };
 		6E7782562573827D00D2C696 /* Tutorial3ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7782552573827D00D2C696 /* Tutorial3ViewController.swift */; };
 		6E77825B2573828A00D2C696 /* Tutorial4ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E77825A2573828A00D2C696 /* Tutorial4ViewController.swift */; };
-		6E7A0A2425AD42B4004404F2 /* SortTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7A0A2325AD42B4004404F2 /* SortTableViewController.swift */; };
 		6E7A0A2B25AE093F004404F2 /* ColorTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7A0A2A25AE093F004404F2 /* ColorTableViewController.swift */; };
 		6E7A0A3225AE3D76004404F2 /* PlusBtnTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7A0A3125AE3D76004404F2 /* PlusBtnTableViewCell.swift */; };
-		6E7A0A4D25AEB365004404F2 /* SettingTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7A0A4C25AEB365004404F2 /* SettingTableViewCell.swift */; };
 		6E7A58E6257263F600987214 /* StartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7A58E5257263F600987214 /* StartViewController.swift */; };
+		6E7DD84825B1199900C59F72 /* tutorial1.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6E7DD84725B1199900C59F72 /* tutorial1.mp4 */; };
+		6E7DD86025B119D100C59F72 /* tutorial4.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6E7DD85F25B119D100C59F72 /* tutorial4.mp4 */; };
+		6E7DD87125B11ECF00C59F72 /* tutorial2.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6E7DD87025B11ECF00C59F72 /* tutorial2.mp4 */; };
+		6E7DD87825B11F0C00C59F72 /* tutorial3.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6E7DD87725B11F0C00C59F72 /* tutorial3.mp4 */; };
+		6E7DD87F25B11F6F00C59F72 /* Tutorial7ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E7DD87E25B11F6F00C59F72 /* Tutorial7ViewController.swift */; };
+		6E7DD89525B127FE00C59F72 /* tutorial6.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6E7DD89425B127FE00C59F72 /* tutorial6.mp4 */; };
+		6E7DD8A125B1281900C59F72 /* tutorial5.mp4 in Resources */ = {isa = PBXBuildFile; fileRef = 6E7DD8A025B1281900C59F72 /* tutorial5.mp4 */; };
 		6E88353125A75CA300B6522D /* FontSizeTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E88353025A75CA300B6522D /* FontSizeTableViewController.swift */; };
 		6EC4286E256DD5530082BED8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EC4286D256DD5530082BED8 /* AppDelegate.swift */; };
 		6EC42870256DD5530082BED8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EC4286F256DD5530082BED8 /* SceneDelegate.swift */; };
@@ -69,6 +70,7 @@
 		6EC4290F256E509F0082BED8 /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EC4290E256E509F0082BED8 /* Item.swift */; };
 		6EC42914256E55090082BED8 /* Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EC42913256E55090082BED8 /* Extension.swift */; };
 		6EC42919256E753A0082BED8 /* ItemListTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EC42918256E753A0082BED8 /* ItemListTableViewCell.swift */; };
+		6EDD1B5125B679570033F370 /* MemoVC+Helpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6EDD1B5025B679570033F370 /* MemoVC+Helpers.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -131,7 +133,6 @@
 		014D47EE9950DF5C153FD434 /* Pods_ToDoApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ToDoApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0449AC1F3C877EB371380EBA /* Pods_ToDoAppTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ToDoAppTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CE8AE1566A09FE5436D1156 /* Pods-ToDoAppTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ToDoAppTests.debug.xcconfig"; path = "Target Support Files/Pods-ToDoAppTests/Pods-ToDoAppTests.debug.xcconfig"; sourceTree = "<group>"; };
-		6E157A4A2579DD6100593247 /* MyTabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyTabBarController.swift; sourceTree = "<group>"; };
 		6E30ACCD257FB688006C02E0 /* ToDoAppWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToDoAppWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6E30ACD0257FB688006C02E0 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
 		6E30ACD2257FB688006C02E0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -156,12 +157,9 @@
 		6E576BD2256F29190072E829 /* TemplateMemoTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TemplateMemoTableViewCell.swift; sourceTree = "<group>"; };
 		6E576BE2256F4BC90072E829 /* EditTemplateViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditTemplateViewController.swift; sourceTree = "<group>"; };
 		6E576BFF256F780C0072E829 /* MyNavigationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyNavigationController.swift; sourceTree = "<group>"; };
-		6E592C2325A8DEEC003C2C6D /* tutorial4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = tutorial4.mp4; sourceTree = "<group>"; };
-		6E5B2723257CD44300FAE7E9 /* tutorial1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = tutorial1.mp4; sourceTree = "<group>"; };
-		6E5B2724257CD45100FAE7E9 /* tutorial2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = tutorial2.mp4; sourceTree = "<group>"; };
-		6E5B2725257CD45900FAE7E9 /* tutorial3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = tutorial3.mp4; sourceTree = "<group>"; };
 		6E5B273C257CD4C400FAE7E9 /* Turorial5ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Turorial5ViewController.swift; sourceTree = "<group>"; };
-		6E5B2744257CD65900FAE7E9 /* tutorial5.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = tutorial5.mp4; sourceTree = "<group>"; };
+		6E5B3D9425B0577100DFE2D8 /* Tutorial6ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tutorial6ViewController.swift; sourceTree = "<group>"; };
+		6E5B3DD625B0987300DFE2D8 /* tutorial7.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = tutorial7.mp4; sourceTree = "<group>"; };
 		6E69B885257E9C23007C3ABB /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		6E743FF22575058400EECC74 /* HistoryTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTableViewController.swift; sourceTree = "<group>"; };
 		6E743FF72575059700EECC74 /* HistoryTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryTableViewCell.swift; sourceTree = "<group>"; };
@@ -173,11 +171,16 @@
 		6E7782502573827000D2C696 /* Tutorial2ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tutorial2ViewController.swift; sourceTree = "<group>"; };
 		6E7782552573827D00D2C696 /* Tutorial3ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tutorial3ViewController.swift; sourceTree = "<group>"; };
 		6E77825A2573828A00D2C696 /* Tutorial4ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tutorial4ViewController.swift; sourceTree = "<group>"; };
-		6E7A0A2325AD42B4004404F2 /* SortTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SortTableViewController.swift; sourceTree = "<group>"; };
 		6E7A0A2A25AE093F004404F2 /* ColorTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorTableViewController.swift; sourceTree = "<group>"; };
 		6E7A0A3125AE3D76004404F2 /* PlusBtnTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlusBtnTableViewCell.swift; sourceTree = "<group>"; };
-		6E7A0A4C25AEB365004404F2 /* SettingTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingTableViewCell.swift; sourceTree = "<group>"; };
 		6E7A58E5257263F600987214 /* StartViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartViewController.swift; sourceTree = "<group>"; };
+		6E7DD84725B1199900C59F72 /* tutorial1.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = tutorial1.mp4; sourceTree = "<group>"; };
+		6E7DD85F25B119D100C59F72 /* tutorial4.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = tutorial4.mp4; sourceTree = "<group>"; };
+		6E7DD87025B11ECF00C59F72 /* tutorial2.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = tutorial2.mp4; sourceTree = "<group>"; };
+		6E7DD87725B11F0C00C59F72 /* tutorial3.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = tutorial3.mp4; sourceTree = "<group>"; };
+		6E7DD87E25B11F6F00C59F72 /* Tutorial7ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tutorial7ViewController.swift; sourceTree = "<group>"; };
+		6E7DD89425B127FE00C59F72 /* tutorial6.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = tutorial6.mp4; sourceTree = "<group>"; };
+		6E7DD8A025B1281900C59F72 /* tutorial5.mp4 */ = {isa = PBXFileReference; lastKnownFileType = file; path = tutorial5.mp4; sourceTree = "<group>"; };
 		6E88353025A75CA300B6522D /* FontSizeTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FontSizeTableViewController.swift; sourceTree = "<group>"; };
 		6EC4286A256DD5530082BED8 /* ToDoApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ToDoApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6EC4286D256DD5530082BED8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -200,6 +203,7 @@
 		6EC4290E256E509F0082BED8 /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
 		6EC42913256E55090082BED8 /* Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extension.swift; sourceTree = "<group>"; };
 		6EC42918256E753A0082BED8 /* ItemListTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemListTableViewCell.swift; sourceTree = "<group>"; };
+		6EDD1B5025B679570033F370 /* MemoVC+Helpers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "MemoVC+Helpers.swift"; sourceTree = "<group>"; };
 		89500350DA911DFC382055DF /* Pods-ToDoApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ToDoApp.debug.xcconfig"; path = "Target Support Files/Pods-ToDoApp/Pods-ToDoApp.debug.xcconfig"; sourceTree = "<group>"; };
 		AA9E52E735889C905B6F3719 /* Pods-ToDoAppTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ToDoAppTests.release.xcconfig"; path = "Target Support Files/Pods-ToDoAppTests/Pods-ToDoAppTests.release.xcconfig"; sourceTree = "<group>"; };
 		AECBD7090B51B16EBE2D3B77 /* Pods-ToDoApp-ToDoAppUITests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ToDoApp-ToDoAppUITests.release.xcconfig"; path = "Target Support Files/Pods-ToDoApp-ToDoAppUITests/Pods-ToDoApp-ToDoAppUITests.release.xcconfig"; sourceTree = "<group>"; };
@@ -238,6 +242,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				6484D7C1A446647BC421B355 /* Pods_ToDoApp_ToDoAppUITests.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BF4007BE074ED045765874C8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -293,6 +304,8 @@
 				6E7782552573827D00D2C696 /* Tutorial3ViewController.swift */,
 				6E77825A2573828A00D2C696 /* Tutorial4ViewController.swift */,
 				6E5B273C257CD4C400FAE7E9 /* Turorial5ViewController.swift */,
+				6E5B3D9425B0577100DFE2D8 /* Tutorial6ViewController.swift */,
+				6E7DD87E25B11F6F00C59F72 /* Tutorial7ViewController.swift */,
 				6E88353025A75CA300B6522D /* FontSizeTableViewController.swift */,
 				6E7A0A2A25AE093F004404F2 /* ColorTableViewController.swift */,
 			);
@@ -303,10 +316,10 @@
 			isa = PBXGroup;
 			children = (
 				6EC428D8256DE0A20082BED8 /* MemoTableViewController.swift */,
+				6EDD1B5025B679570033F370 /* MemoVC+Helpers.swift */,
 				6EC42909256E4E0F0082BED8 /* ItemListViewController.swift */,
 				6E743FF22575058400EECC74 /* HistoryTableViewController.swift */,
 				6E7440052575234600EECC74 /* TempMemoHistoryTableViewController.swift */,
-				6E7A0A2325AD42B4004404F2 /* SortTableViewController.swift */,
 			);
 			path = Memo;
 			sourceTree = "<group>";
@@ -324,11 +337,13 @@
 		6E7A58C2257220B300987214 /* Video */ = {
 			isa = PBXGroup;
 			children = (
-				6E5B2723257CD44300FAE7E9 /* tutorial1.mp4 */,
-				6E5B2724257CD45100FAE7E9 /* tutorial2.mp4 */,
-				6E5B2725257CD45900FAE7E9 /* tutorial3.mp4 */,
-				6E592C2325A8DEEC003C2C6D /* tutorial4.mp4 */,
-				6E5B2744257CD65900FAE7E9 /* tutorial5.mp4 */,
+				6E7DD84725B1199900C59F72 /* tutorial1.mp4 */,
+				6E7DD87025B11ECF00C59F72 /* tutorial2.mp4 */,
+				6E7DD87725B11F0C00C59F72 /* tutorial3.mp4 */,
+				6E7DD85F25B119D100C59F72 /* tutorial4.mp4 */,
+				6E7DD8A025B1281900C59F72 /* tutorial5.mp4 */,
+				6E7DD89425B127FE00C59F72 /* tutorial6.mp4 */,
+				6E5B3DD625B0987300DFE2D8 /* tutorial7.mp4 */,
 			);
 			path = Video;
 			sourceTree = "<group>";
@@ -419,7 +434,6 @@
 				6E77823B2573415500D2C696 /* CustomSlider.swift */,
 				6E743FF72575059700EECC74 /* HistoryTableViewCell.swift */,
 				6E7A0A3125AE3D76004404F2 /* PlusBtnTableViewCell.swift */,
-				6E7A0A4C25AEB365004404F2 /* SettingTableViewCell.swift */,
 			);
 			path = View;
 			sourceTree = "<group>";
@@ -428,7 +442,6 @@
 			isa = PBXGroup;
 			children = (
 				6E576BFF256F780C0072E829 /* MyNavigationController.swift */,
-				6E157A4A2579DD6100593247 /* MyTabBarController.swift */,
 				6E7A58E5257263F600987214 /* StartViewController.swift */,
 				6E576BB6256F06D70072E829 /* Memo */,
 				6E576BB7256F06EE0072E829 /* Template */,
@@ -457,6 +470,7 @@
 			buildPhases = (
 				6E30ACCB257FB688006C02E0 /* Resources */,
 				6E30ACED257FB689006C02E0 /* Embed App Extensions */,
+				BF4007BE074ED045765874C8 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -493,8 +507,8 @@
 				6EC42866256DD5530082BED8 /* Sources */,
 				6EC42867256DD5530082BED8 /* Frameworks */,
 				6EC42868256DD5530082BED8 /* Resources */,
-				55BC1BACCB6BC2A08749708E /* [CP] Embed Pods Frameworks */,
 				6E30ACF1257FB689006C02E0 /* Embed Watch Content */,
+				6E25BB145A0C0BB3E90B48BE /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -533,7 +547,7 @@
 				6EC42887256DD5540082BED8 /* Sources */,
 				6EC42888256DD5540082BED8 /* Frameworks */,
 				6EC42889256DD5540082BED8 /* Resources */,
-				48E5C519B7508DE618C166B4 /* [CP] Embed Pods Frameworks */,
+				7160CE205C33ACDF0940D82B /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -617,15 +631,17 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6E5B3DD725B0987300DFE2D8 /* tutorial7.mp4 in Resources */,
+				6E7DD84825B1199900C59F72 /* tutorial1.mp4 in Resources */,
 				6EC4287A256DD5530082BED8 /* LaunchScreen.storyboard in Resources */,
-				6E5B2730257CD48300FAE7E9 /* tutorial3.mp4 in Resources */,
 				6E74401325753A6D00EECC74 /* button01.mp3 in Resources */,
-				6E592C2425A8DEEC003C2C6D /* tutorial4.mp4 in Resources */,
 				6EC42877256DD5530082BED8 /* Assets.xcassets in Resources */,
+				6E7DD87825B11F0C00C59F72 /* tutorial3.mp4 in Resources */,
+				6E7DD89525B127FE00C59F72 /* tutorial6.mp4 in Resources */,
+				6E7DD8A125B1281900C59F72 /* tutorial5.mp4 in Resources */,
 				6EC42875256DD5530082BED8 /* Main.storyboard in Resources */,
-				6E5B2745257CD66300FAE7E9 /* tutorial5.mp4 in Resources */,
-				6E5B272C257CD47B00FAE7E9 /* tutorial2.mp4 in Resources */,
-				6E5B2728257CD47800FAE7E9 /* tutorial1.mp4 in Resources */,
+				6E7DD87125B11ECF00C59F72 /* tutorial2.mp4 in Resources */,
+				6E7DD86025B119D100C59F72 /* tutorial4.mp4 in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -712,24 +728,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		48E5C519B7508DE618C166B4 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ToDoApp-ToDoAppUITests/Pods-ToDoApp-ToDoAppUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-ToDoApp-ToDoAppUITests/Pods-ToDoApp-ToDoAppUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ToDoApp-ToDoAppUITests/Pods-ToDoApp-ToDoAppUITests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		55BC1BACCB6BC2A08749708E /* [CP] Embed Pods Frameworks */ = {
+		6E25BB145A0C0BB3E90B48BE /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -744,6 +743,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ToDoApp/Pods-ToDoApp-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		7160CE205C33ACDF0940D82B /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ToDoApp-ToDoAppUITests/Pods-ToDoApp-ToDoAppUITests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-ToDoApp-ToDoAppUITests/Pods-ToDoApp-ToDoAppUITests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ToDoApp-ToDoAppUITests/Pods-ToDoApp-ToDoAppUITests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -769,15 +785,15 @@
 				6E576C00256F780C0072E829 /* MyNavigationController.swift in Sources */,
 				6E743FF82575059700EECC74 /* HistoryTableViewCell.swift in Sources */,
 				6E576BC1256F07390072E829 /* TemplateListTableViewCell.swift in Sources */,
+				6EDD1B5125B679570033F370 /* MemoVC+Helpers.swift in Sources */,
 				6E7A0A3225AE3D76004404F2 /* PlusBtnTableViewCell.swift in Sources */,
 				6E576BC9256F24380072E829 /* Template.swift in Sources */,
 				6EC4286E256DD5530082BED8 /* AppDelegate.swift in Sources */,
+				6E5B3D9525B0577100DFE2D8 /* Tutorial6ViewController.swift in Sources */,
 				6E743FF32575058400EECC74 /* HistoryTableViewController.swift in Sources */,
-				6E7A0A2425AD42B4004404F2 /* SortTableViewController.swift in Sources */,
 				6E7A0A2B25AE093F004404F2 /* ColorTableViewController.swift in Sources */,
 				6E576BB9256F070D0072E829 /* TemplateListViewController.swift in Sources */,
 				6E53B2EA2570EDFB00A875CE /* SettingTableViewController.swift in Sources */,
-				6E157A4B2579DD6100593247 /* MyTabBarController.swift in Sources */,
 				6E88353125A75CA300B6522D /* FontSizeTableViewController.swift in Sources */,
 				6E7782562573827D00D2C696 /* Tutorial3ViewController.swift in Sources */,
 				6E53B2F72571083400A875CE /* TutorialListTableViewController.swift in Sources */,
@@ -800,8 +816,8 @@
 				6E576BCE256F28F70072E829 /* CreateTemplateViewController.swift in Sources */,
 				6EC428E1256DE0B70082BED8 /* MemoTableViewCell.swift in Sources */,
 				6EC428E6256DE73D0082BED8 /* Memo.swift in Sources */,
-				6E7A0A4D25AEB365004404F2 /* SettingTableViewCell.swift in Sources */,
 				6EC42905256E03CF0082BED8 /* Constant.swift in Sources */,
+				6E7DD87F25B11F6F00C59F72 /* Tutorial7ViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -888,7 +904,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.6;
+				MARKETING_VERSION = 1.2.7;
 				PRODUCT_BUNDLE_IDENTIFIER = xmlApp.ToDoApp.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = watchos;
@@ -913,7 +929,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.2.6;
+				MARKETING_VERSION = 1.2.7;
 				PRODUCT_BUNDLE_IDENTIFIER = xmlApp.ToDoApp.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = watchos;
@@ -935,7 +951,7 @@
 				DEVELOPMENT_TEAM = 2FZHPQ299M;
 				IBSC_MODULE = ToDoAppWatch_Extension;
 				INFOPLIST_FILE = ToDoAppWatch/Info.plist;
-				MARKETING_VERSION = 1.2.6;
+				MARKETING_VERSION = 1.2.7;
 				PRODUCT_BUNDLE_IDENTIFIER = xmlApp.ToDoApp.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -957,7 +973,7 @@
 				DEVELOPMENT_TEAM = 2FZHPQ299M;
 				IBSC_MODULE = ToDoAppWatch_Extension;
 				INFOPLIST_FILE = ToDoAppWatch/Info.plist;
-				MARKETING_VERSION = 1.2.6;
+				MARKETING_VERSION = 1.2.7;
 				PRODUCT_BUNDLE_IDENTIFIER = xmlApp.ToDoApp.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -1100,7 +1116,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.6;
+				MARKETING_VERSION = 1.2.7;
 				PRODUCT_BUNDLE_IDENTIFIER = xmlApp.ToDoApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
@@ -1124,7 +1140,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.2.6;
+				MARKETING_VERSION = 1.2.7;
 				PRODUCT_BUNDLE_IDENTIFIER = xmlApp.ToDoApp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;

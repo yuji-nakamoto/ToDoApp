@@ -28,10 +28,10 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var stackTopConst: NSLayoutConstraint!
     @IBOutlet weak var bannerHeight: NSLayoutConstraint!
     @IBOutlet weak var createButton: UIButton!
-    @IBOutlet weak var editButton: UIButton!
     @IBOutlet weak var topLineView: UIView!
     
-    private var edit = false
+    private var allowMove = false
+    private var dismiss = false
     private var templates = [Template]()
     private var id = ""
     private var videoPlayer: AVPlayer!
@@ -47,11 +47,14 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        userDefaults.removeObject(forKey: SETTING_VC)
         fetchTemplates()
         selectColor()
         setColor()
-        UserDefaults.standard.removeObject(forKey: ID)
+        bannerViewIsHidden()
+        defaults.removeObject(forKey: ID)
+        defaults.removeObject(forKey: SETTING_VC)
+        defaults.removeObject(forKey: "cart")
+
         if UserDefaults.standard.object(forKey: END_TUTORIAL2) == nil {
             navigationController?.navigationBar.isHidden = true
         }
@@ -70,17 +73,11 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        let color: UIStatusBarStyle = userDefaults.object(forKey: WHITE_COLOR) != nil ? .darkContent : .lightContent
+        let color: UIStatusBarStyle = defaults.object(forKey: WHITE_COLOR) != nil ? .darkContent : .lightContent
         return color
     }
     
     // MARK: - Actions
-    
-    @IBAction func editButtonTapped(_ sender: Any) {
-        let bool = edit ? false : true
-        tableView.isEditing = bool
-        edit = bool
-    }
     
     @IBAction func onSlider(_ sender: UISlider) {
         videoPlayer.seek(to: CMTimeMakeWithSeconds(Float64(seekBar.value), preferredTimescale: Int32(NSEC_PER_SEC)))
@@ -98,11 +95,15 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
         }) { [self] (_) in
             self.visualEffectView.removeFromSuperview()
             UserDefaults.standard.set(true, forKey: END_TUTORIAL2)
-            bannerHeight.constant = 50
         }
     }
     
     // MARK: - Helpers
+    
+    func bannerViewIsHidden() {
+        let constant: CGFloat = defaults.object(forKey: PURCHASED) != nil ? 0 : 50
+        bannerHeight.constant = constant
+    }
     
     func showHintView() {
         
@@ -121,8 +122,6 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
                     hintView.alpha = 1
                 }, completion: nil)
             }
-        } else {
-            bannerHeight.constant = 50
         }
     }
     
@@ -196,7 +195,6 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
     
     func setup() {
         hintView.alpha = 0
-        bannerHeight.constant = 0
         startButton.layer.cornerRadius = 35 / 2
         skipButton.layer.cornerRadius = 35 / 2
         createButton.layer.cornerRadius = 35 / 2
@@ -208,6 +206,9 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
         tableView.tableFooterView = UIView()
         tableView.emptyDataSetSource = self
         tableView.emptyDataSetDelegate = self
+        tableView.dragDelegate = self
+        tableView.dropDelegate = self
+        tableView.dragInteractionEnabled = true
 
         switch (UIScreen.main.nativeBounds.height) {
         case 1334:
@@ -221,42 +222,32 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
     
     func setColor() {
         let separatorColor: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray3
-        let bannerColor: UIColor = userDefaults.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
+        let bannerColor: UIColor = defaults.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
+        let lineColor: UIColor = defaults.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray4
+        let labelColor: UIColor = defaults.object(forKey: WHITE_COLOR) != nil ? UIColor(named: O_BLACK)! : .white
+        
+        createButton.tintColor = labelColor
+        titleLabel.textColor = labelColor
+        topLineView.backgroundColor = lineColor
         bannerView.backgroundColor = bannerColor
         tableView.separatorColor = separatorColor
+        tableView.backgroundColor = bannerColor
         
         if UserDefaults.standard.object(forKey: GREEN_COLOR) != nil {
-            titleLabel.textColor = .white
-            editButton.tintColor = .white
             topView.backgroundColor = UIColor(named: EMERALD_GREEN_ALPHA)
             createButton.backgroundColor = UIColor(named: EMERALD_GREEN)
-            createButton.tintColor = UIColor.white
-            tableView.backgroundColor = .systemBackground
-            topLineView.backgroundColor = .systemGray5
         } else if UserDefaults.standard.object(forKey: WHITE_COLOR) != nil {
-            titleLabel.textColor = UIColor(named: O_BLACK)
-            editButton.tintColor = UIColor.systemBlue
             topView.backgroundColor = UIColor(named: O_WHITE_ALPHA)
             createButton.backgroundColor = UIColor(named: O_WHITE)
-            createButton.tintColor = UIColor(named: O_BLACK)
-            tableView.backgroundColor = .systemBackground
-            topLineView.backgroundColor = .systemGray5
         } else if UserDefaults.standard.object(forKey: PINK_COLOR) != nil {
-            titleLabel.textColor = .white
-            editButton.tintColor = .white
             topView.backgroundColor = UIColor(named: O_PINK)
             createButton.backgroundColor = UIColor(named: O_PINK)
-            createButton.tintColor = UIColor.white
-            tableView.backgroundColor = .systemBackground
-            topLineView.backgroundColor = .systemGray5
+        } else if UserDefaults.standard.object(forKey: ORANGE_COLOR) != nil {
+            topView.backgroundColor = UIColor(named: O_ORANGE_ALPHA)
+            createButton.backgroundColor = UIColor(named: O_ORANGE)
         } else {
-            titleLabel.textColor = .white
-            editButton.tintColor = .systemBlue
             topView.backgroundColor = UIColor(named: O_DARK2_ALPHA)
             createButton.backgroundColor = UIColor.systemBlue
-            createButton.tintColor = UIColor.white
-            tableView.backgroundColor = UIColor(named: O_DARK1)
-            topLineView.backgroundColor = .darkGray
         }
     }
     
@@ -265,9 +256,47 @@ class TemplateListViewController: UIViewController, UITextFieldDelegate {
         bannerView.rootViewController = self
         bannerView.load(GADRequest())
     }
+    
+    func dragItem(for indexPath: IndexPath) -> UIDragItem {
+        let tempName = templates[indexPath.row].name
+        let itemProvider = NSItemProvider(object: tempName as NSString)
+        
+        return UIDragItem(itemProvider: itemProvider)
+    }
+    
+    func moveItem(sourcePath: Int, destinationPath: Int) {
+        let temps = templates.remove(at: sourcePath)
+        templates.insert(temps, at: destinationPath)
+    }
 }
 
 // MARK: - Table view
+
+extension TemplateListViewController: UITableViewDragDelegate, UITableViewDropDelegate {
+    
+    func tableView(_ tableView: UITableView, itemsForBeginning session: UIDragSession, at indexPath: IndexPath) -> [UIDragItem] {
+        return [dragItem(for: indexPath)]
+    }
+    
+    func tableView(_ tableView: UITableView, dropSessionDidUpdate session: UIDropSession,
+                   withDestinationIndexPath destinationIndexPath: IndexPath?) -> UITableViewDropProposal {
+        return UITableViewDropProposal(operation: .move, intent: .insertAtDestinationIndexPath)
+    }
+    
+    func tableView(_ tableView: UITableView, performDropWith coordinator: UITableViewDropCoordinator) {
+        guard let item = coordinator.items.first,
+              let destinationIndexPath = coordinator.destinationIndexPath,
+              let sourceIndexPath = item.sourceIndexPath else { return }
+        
+        tableView.performBatchUpdates({ [weak self] in
+            guard let strongSelf = self else { return }
+            strongSelf.moveItem(sourcePath: sourceIndexPath.row, destinationPath: destinationIndexPath.row)
+            tableView.deleteRows(at: [sourceIndexPath], with: .automatic)
+            tableView.insertRows(at: [destinationIndexPath], with: .automatic)
+        }, completion: nil)
+        coordinator.drop(item.dragItem, toRowAt: destinationIndexPath)
+    }
+}
 
 extension TemplateListViewController: UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -284,7 +313,6 @@ extension TemplateListViewController: UITableViewDataSource, UITableViewDelegate
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.deselectRow(at: indexPath, animated: true)
         
         id = templates[indexPath.row].templateId
         UserDefaults.standard.set(id, forKey: ID)
@@ -310,15 +338,14 @@ extension TemplateListViewController: UITableViewDataSource, UITableViewDelegate
     }
     
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        guard sourceIndexPath.row != destinationIndexPath.row else { return }
+
+        let realm = try! Realm()
         let temp = templates[sourceIndexPath.row]
+        let temps = realm.objects(Template.self).filter("sourceRow == \(sourceIndexPath.row)")
         templates.remove(at: sourceIndexPath.row)
         templates.insert(temp, at: destinationIndexPath.row)
         
-        if sourceIndexPath.row == destinationIndexPath.row { return }
-
-        print("-------start-------")
-        let realm = try! Realm()
-        let temps = realm.objects(Template.self).filter("sourceRow == \(sourceIndexPath.row)")
         temps.forEach { (t) in
 
             try! realm.write() {

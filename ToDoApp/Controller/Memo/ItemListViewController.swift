@@ -35,7 +35,7 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        let color: UIStatusBarStyle = userDefaults.object(forKey: WHITE_COLOR) != nil ? .darkContent : .lightContent
+        let color: UIStatusBarStyle = defaults.object(forKey: WHITE_COLOR) != nil ? .darkContent : .lightContent
         return color
     }
     
@@ -258,11 +258,13 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
             let ma2 = realm.objects(Item.self).filter("name BEGINSWITH '松'")
             let ma3 = realm.objects(Item.self).filter("name BEGINSWITH '舞'")
             let ma4 = realm.objects(Item.self).filter("name BEGINSWITH '饅頭'")
+            let ma5 = realm.objects(Item.self).filter("name BEGINSWITH '麻婆'")
 
             items.append(contentsOf: ma1)
             items.append(contentsOf: ma2)
             items.append(contentsOf: ma3)
             items.append(contentsOf: ma4)
+            items.append(contentsOf: ma5)
         }
         if memoTextField.text?.prefix(1) == "み"{
             let mi1 = realm.objects(Item.self).filter("name BEGINSWITH '味'")
@@ -391,11 +393,17 @@ class ItemListViewController: UIViewController, UITextFieldDelegate {
         
         if text == "a" || text == "b" || text == "c" || text == "d" || text == "e" || text == "f" || text == "g" || text == "h" || text == "i" || text == "j" || text == "k" || text == "l" || text == "m" || text == "n" || text == "o" || text == "p" || text == "q" || text == "r" || text == "s" || text == "t" || text == "u" || text == "v" || text == "w" || text == "x" || text == "y" || text == "z" || text == "A" || text == "B" || text == "C" || text == "D" || text == "E" || text == "F" || text == "G" || text == "H" || text == "I" || text == "J" || text == "K" || text == "L" || text == "M" || text == "N" || text == "O" || text == "P" || text == "Q" || text == "R" || text == "S" || text == "T" || text == "U" || text == "V" || text == "W" || text == "X" || text == "Y" || text == "Z" {
             items.append(contentsOf: itemArray3)
+            items = items.sorted(by: { (a, b) -> Bool in
+                return a.name < b.name
+            })
             tableView.reloadData()
             return
         }
         items.append(contentsOf: itemArray1)
         items.append(contentsOf: itemArray2)
+        items = items.sorted(by: { (a, b) -> Bool in
+            return a.name < b.name
+        })
         tableView.reloadData()
     }
     

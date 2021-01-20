@@ -39,38 +39,46 @@ class MemoTableViewController: UIViewController, UITextViewDelegate, UITextField
     @IBOutlet weak var videoWidth: NSLayoutConstraint!
     @IBOutlet weak var stackTopConst: NSLayoutConstraint!
     @IBOutlet weak var templateButton: UIButton!
+    @IBOutlet weak var cartButton: UIButton!
     @IBOutlet weak var historyButton: UIButton!
     @IBOutlet weak var sortWidth: NSLayoutConstraint!
     @IBOutlet weak var noDataLabel: UILabel!
     @IBOutlet weak var titleBottomConst: NSLayoutConstraint!
     @IBOutlet weak var deleteBtnBottomConst: NSLayoutConstraint!
     @IBOutlet weak var topLineView: UIView!
+    @IBOutlet weak var statusView: UIView!
+    @IBOutlet weak var statusViewHeight: NSLayoutConstraint!
+    @IBOutlet weak var topLineView2: UIView!
+    @IBOutlet weak var bannerHeight: NSLayoutConstraint!
     
-    private var session = WCSession.default
-    private var watchData = ""
-    private var allowMove = false
-    private var forbidden = false
-    private var panGesture = false
-    private var on_sort = false
-    private var date = Date()
-    private let calendar = Calendar.current
-    private var memoArray = [Memo]()
-    private var videoPlayer: AVPlayer!
-    private let visualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
-    private var templateId = ""
-    private var player = AVAudioPlayer()
-    private let soundFile = Bundle.main.path(forResource: "button01", ofType: "mp3")
-    private var panInitialLocation: CGFloat!
-
+    var session = WCSession.default
+    var watchData = ""
+    var allowMove = false
+    var forbidden = false
+    var panGesture = false
+    var onSort = false
+    var date = Date()
+    let calendar = Calendar.current
+    var memoArray = [Memo]()
+    var videoPlayer: AVPlayer!
+    let visualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
+    var templateId = ""
+    var player = AVAudioPlayer()
+    let soundFile = Bundle.main.path(forResource: "button01", ofType: "mp3")
+    var panInitialLocation: CGFloat!
+    lazy var topViews = [topView,topView,topView,topView,topView,topView,topView,topView,topView,topView,]
+    var scrollBeginPoint: CGFloat = 0.0
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
+        reWrite()
         setupSound()
         showHintView()
         setupBanner()
         setNeedsStatusBarAppearanceUpdate()
+        
         print(Realm.Configuration.defaultConfiguration.fileURL as Any)
-
         if WCSession.isSupported() {
             self.session.delegate = self
             self.session.activate()
@@ -79,39 +87,37 @@ class MemoTableViewController: UIViewController, UITextViewDelegate, UITextField
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        userDefaults.removeObject(forKey: SETTING_VC)
-
+        defaults.removeObject(forKey: SETTING_VC)
+        
         navigationController?.navigationBar.isHidden = true
-        if userDefaults.object(forKey: ON_PUSH) != nil {
+        if defaults.object(forKey: ON_PUSH) != nil {
             checkTempMemoHistory()
         }
-        
+        if defaults.object(forKey: "cart") == nil {
+            templateButton.setTitle("ひな形に登録", for: .normal)
+        }
         fetchMemo()
         setColor()
         selectColor()
-        fetchTemplate()
+        fetchTemplateTitle()
         setBackAction()
         setupKeyboard()
         showRequestReview()
         fetchSelectedItemName()
+        bannerViewIsHidden()
     }
     
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
-        if userDefaults.object(forKey: EDIT_MEMO) != nil {
+        
+        if defaults.object(forKey: EDIT_MEMO) != nil {
             baseViewIsHidden()
-            if let row = userDefaults.object(forKey: SELECT_ROW) as? Int {
+            if let row = defaults.object(forKey: SELECT_ROW) as? Int {
                 let index = IndexPath(row: row, section: 0)
                 tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
-                userDefaults.removeObject(forKey: SELECT_ROW)
+                defaults.removeObject(forKey: SELECT_ROW)
             }
         }
-    }
-    
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        let color: UIStatusBarStyle = userDefaults.object(forKey: WHITE_COLOR) != nil ? .darkContent : .lightContent
-        return color
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -119,6 +125,11 @@ class MemoTableViewController: UIViewController, UITextViewDelegate, UITextField
         navigationController?.navigationBar.isHidden = false
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
         NotificationCenter.default.removeObserver(self, name: UIResponder.keyboardWillHideNotification, object: nil)
+    }
+    
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        let color: UIStatusBarStyle = defaults.object(forKey: WHITE_COLOR) != nil ? .darkContent : .lightContent
+        return color
     }
     
     // MARK: - Actions
@@ -151,9 +162,33 @@ class MemoTableViewController: UIViewController, UITextViewDelegate, UITextField
                 UIView.animate(withDuration: 0.3, delay: 0, usingSpringWithDamping: 0.6, initialSpringVelocity: 0.6, options: .curveEaseInOut, animations: { [self] in
                     sender.view!.center.y = panInitialLocation
                 }, completion: nil)
+            } else {
+                tempBtnDownAnimation2()
             }
-         default:
+        default:
             break
+        }
+    }
+    
+    @IBAction func tapTemplabel(_ sender: Any) {
+        dispatchQ.async {
+            UIView.animate(withDuration: 0.3) { [self] in
+                topView.isHidden = true
+                dispatchQ.asyncAfter(deadline: .now() + 0.2) {
+                    if topView.isHidden {
+                        topLineView2.isHidden = false
+                    }
+                }
+            }
+        }
+    }
+    
+    @IBAction func tapStatusView(_ sender: Any) {
+        dispatchQ.async {
+            UIView.animate(withDuration: 0.3) { [self] in
+                topViews.forEach({$0?.isHidden = false})
+                topLineView2.isHidden = true
+            }
         }
     }
     
@@ -162,13 +197,13 @@ class MemoTableViewController: UIViewController, UITextViewDelegate, UITextField
         memoTextField.becomeFirstResponder()
         baseView.isHidden = false
         viewHeight.constant = 50
-            
+        
         if memoArray.count != 0 {
             let index = IndexPath(row: memoArray.count, section: 0)
             tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
         }
-            
-        if userDefaults.object(forKey: ON_INPUT) != nil {
+        
+        if defaults.object(forKey: ON_INPUT) != nil {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                 self.performSegue(withIdentifier: "ItemListVC", sender: nil)
             }
@@ -176,22 +211,29 @@ class MemoTableViewController: UIViewController, UITextViewDelegate, UITextField
     }
     
     @IBAction func templateButtonTapped(_ sender: Any) {
-        
-        let id = UUID().uuidString
-        let dateformater = DateFormatter()
-        dateformater.dateFormat = "yyyy年M月d日"
-        dateformater.locale = Locale(identifier: "ja_JP")
-        let tempName = "メモ: " + dateformater.string(from: Date())
-        
-        Memo.fetchMemo(sort: on_sort) { (memos) in
-            Template.createTemplate(text: tempName, id: id) {}
-            memos.forEach { (m) in
-                TemplateMemo.createMemoToTemplateMemo(name: m.name, uid: m.uid, date: m.date, id: id) {
-                    HUD.flash(.labeledSuccess(title: "", subtitle: "登録しました"), delay: 1)
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-                        UIView.animate(withDuration: 0.5) { [self] in
-                            tempBtnDownAnimation()
-                            panGesture = true
+        if defaults.object(forKey: "cart") != nil {
+            defaults.set(templateId, forKey: ID)
+            let storyboard = UIStoryboard.init(name: "Main", bundle: nil)
+            let tempHVC = storyboard.instantiateViewController(withIdentifier: "TempHVC")
+            tempHVC.presentationController?.delegate = self
+            self.present(tempHVC, animated: true, completion: nil)
+        } else {
+            let id = UUID().uuidString
+            let dateformater = DateFormatter()
+            dateformater.dateFormat = "yyyy年M月d日"
+            dateformater.locale = Locale(identifier: "ja_JP")
+            let tempName = "メモ: " + dateformater.string(from: Date())
+            
+            Memo.fetchMemo(sort: onSort) { (memos) in
+                Template.createTemplate(text: tempName, id: id) {}
+                memos.forEach { (m) in
+                    TemplateMemo.createMemoToTemplateMemo(name: m.name, uid: m.uid, date: m.date, id: id) {
+                        HUD.flash(.labeledSuccess(title: "", subtitle: "登録しました"), delay: 1)
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                            UIView.animate(withDuration: 0.5) { [self] in
+                                tempBtnDownAnimation()
+                                panGesture = true
+                            }
                         }
                     }
                 }
@@ -214,13 +256,12 @@ class MemoTableViewController: UIViewController, UITextViewDelegate, UITextField
             self.hintView.alpha = 0
         }) { (_) in
             self.visualEffectView.removeFromSuperview()
-            userDefaults.set(true, forKey: END_TUTORIAL1)
+            defaults.set(true, forKey: END_TUTORIAL1)
         }
     }
     
     @IBAction func closeButtonTapped(_ sender: Any) {
         memoTextField.resignFirstResponder()
-        fetchMemo()
     }
     
     @IBAction func deleteButtonTapped(_ sender: Any) {
@@ -229,37 +270,44 @@ class MemoTableViewController: UIViewController, UITextViewDelegate, UITextField
         let delete = UIAlertAction(title: "削除する", style: UIAlertAction.Style.default) { [self] (alert) in
             
             Template.fetchTemplates { _ in
-                fetchTemplate()
+                fetchTemplateTitle()
             }
             Memo.deleteMemos {
                 memoArray.removeAll()
                 tableView.reloadData()
                 memoTextField.resignFirstResponder()
                 fetchMemo()
+                dispatchQ.async {
+                    self.setNeedsStatusBarAppearanceUpdate()
+                }
             }
         }
-        let cancel = UIAlertAction(title: "キャンセル", style: .cancel)
+        let cancel = UIAlertAction(title: "キャンセル", style: .cancel) { (_) in
+            dispatchQ.async {
+                self.setNeedsStatusBarAppearanceUpdate()
+            }
+        }
         
         Memo.checkMemosCount { [self] (bool) in
             if bool {
                 memoTextField.resignFirstResponder()
                 alert.addAction(delete)
                 alert.addAction(cancel)
-                self.present(alert, animated: true, completion: nil)
+                self.present(alert, animated: true)
             }
         }
     }
     
     @IBAction func sortButtonTapped(_ sender: Any) {
-        if on_sort {
-            on_sort = false
+        if onSort {
+            onSort = false
             fetchMemo()
             sortButton.setImage(UIImage(named: "sort_off"), for: .normal)
             
-            let color: UIColor = userDefaults.object(forKey: GREEN_COLOR) != nil ? .systemGray4 : .systemGray
+            let color: UIColor = defaults.object(forKey: GREEN_COLOR) != nil ? .systemGray4 : .systemGray
             sortButton.tintColor = color
         } else {
-            on_sort = true
+            onSort = true
             fetchMemo()
             sortButton.setImage(UIImage(named: "sort_on"), for: .normal)
             
@@ -268,6 +316,8 @@ class MemoTableViewController: UIViewController, UITextViewDelegate, UITextField
             } else if UserDefaults.standard.object(forKey: WHITE_COLOR) != nil {
                 sortButton.tintColor = UIColor.systemBlue
             } else if UserDefaults.standard.object(forKey: PINK_COLOR) != nil {
+                sortButton.tintColor = UIColor.white
+            } else if UserDefaults.standard.object(forKey: ORANGE_COLOR) != nil {
                 sortButton.tintColor = UIColor.white
             } else {
                 sortButton.tintColor = UIColor.systemBlue
@@ -282,7 +332,7 @@ class MemoTableViewController: UIViewController, UITextViewDelegate, UITextField
             memoTextField.text = ""
             panGesture = false
             fetchMemo()
-            let index = IndexPath(row: memoArray.count, section: 0)
+            let index = IndexPath(row: memoArray.count - 1, section: 0)
             tableView.scrollToRow(at: index, at: UITableView.ScrollPosition.bottom, animated: true)
         }
     }
@@ -290,8 +340,7 @@ class MemoTableViewController: UIViewController, UITextViewDelegate, UITextField
     // MARK: - Fetch
     
     func fetchMemo() {
-        
-        Memo.fetchMemo(sort: on_sort) { [self] (memos) in
+        Memo.fetchMemo(sort: onSort) { [self] (memos) in
             if memos.count == 0 {
                 noDataLabel.isHidden = false
                 noDataLabel.text = "メモはありません\n左上のプラスボタンから作成できます"
@@ -303,17 +352,21 @@ class MemoTableViewController: UIViewController, UITextViewDelegate, UITextField
             
             memoArray.removeAll()
             memoArray.append(contentsOf: memos)
-            tableView.reloadData()
+            dispatchQ.async {
+                tableView.reloadData()
+            }
             
-            if userDefaults.object(forKey: PAN) != nil {
+            if defaults.object(forKey: PAN) != nil {
                 panGesture = false
-                userDefaults.removeObject(forKey: PAN)
+                defaults.removeObject(forKey: PAN)
             }
             
             if memoArray.count >= 5 {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
                     UIView.animate(withDuration: 0.5) {
                         if !panGesture {
+                            templateButton.setTitle("ひな形に登録", for: .normal)
+                            defaults.removeObject(forKey: "cart")
                             tempBtnUpAnimation()
                         }
                     }
@@ -325,19 +378,7 @@ class MemoTableViewController: UIViewController, UITextViewDelegate, UITextField
                     }
                 }
             }
-            
-            var tableData = [String]()
-            memoArray.forEach { (m) in
-                tableData.append(m.name)
-            }
-            
-            guard WCSession.isSupported() else { return }
-            do {
-                try WCSession.default.updateApplicationContext(["WatchTableData" : tableData])
-            }
-            catch {
-                print(error.localizedDescription)
-            }
+            wcSessionUpdate()
             createTempToMemo()
         }
     }
@@ -349,44 +390,69 @@ class MemoTableViewController: UIViewController, UITextViewDelegate, UITextField
                 noDataLabel.isHidden = true
                 tableView.isScrollEnabled = true
             }
-            fetchTemplate()
+            fetchTemplateTitle()
             panGesture = true
             tempBtnDownAnimation()
             memoArray = memo
             memoArray = memoArray.sorted(by: { (a, b) -> Bool in
                 return a.sourceRow < b.sourceRow
             })
-            tableView.reloadData()
-
-            var tableData = [String]()
-            memoArray.forEach { (m) in
-                tableData.append(m.name)
+            dispatchQ.async {
+                tableView.reloadData()
             }
-            
-            guard WCSession.isSupported() else { return }
-            do {
-                try WCSession.default.updateApplicationContext(["WatchTableData" : tableData])
-            }
-            catch {
-                print(error.localizedDescription)
-            }
+            wcSessionUpdate()
         }
     }
     
-    func fetchTemplate() {
+    func wcSessionUpdate() {
+        var tableData = [String]()
+        var tableData2 = [Bool]()
+        memoArray.forEach { (m) in
+            tableData.append(m.name)
+            tableData2.append(m.isCheck)
+        }
+        guard WCSession.isSupported() else { return }
+        do {
+            try WCSession.default.updateApplicationContext(["WatchTableData": tableData, "WatchTableData2": tableData2])
+        }
+        catch {
+            print(error.localizedDescription)
+        }
+    }
+    
+    func fetchTemplateTitle() {
         
         Template.fetchSelectedTemplate { [self] (bool, template) in
             if bool {
-                titleBottomConst.constant = 7
-                deleteBtnBottomConst.constant = 20
+                topViewHeight.constant = 120
+                titleBottomConst.constant = 15
+                deleteBtnBottomConst.constant = 35
                 templateLabel.isHidden = false
                 templateLabel.text = "\(template.name)を選択中"
-                let color: UIColor = userDefaults.object(forKey: WHITE_COLOR) != nil ? UIColor(named: O_BLACK)! : .white
+                let color: UIColor = defaults.object(forKey: WHITE_COLOR) != nil ? UIColor(named: O_BLACK)! : .white
                 templateLabel.textColor = color
+                templateLabel.font = UIFont.systemFont(ofSize: 15, weight: .medium)
+                switch (UIScreen.main.nativeBounds.height) {
+                case 1334:
+                    topViewHeight.constant = 100
+                case 2208:
+                    topViewHeight.constant = 100
+                default:
+                    break
+                }
             } else {
+                topViewHeight.constant = 100
                 titleBottomConst.constant = -5
                 deleteBtnBottomConst.constant = 10
                 templateLabel.isHidden = true
+                switch (UIScreen.main.nativeBounds.height) {
+                case 1334:
+                    topViewHeight.constant = 80
+                case 2208:
+                    topViewHeight.constant = 80
+                default:
+                    break
+                }
             }
         }
     }
@@ -418,334 +484,6 @@ class MemoTableViewController: UIViewController, UITextViewDelegate, UITextField
                 }
             }
         }
-    }
-    
-    // MARK: - Helpers
-    
-    func showRequestReview() {
-        if let threeWeek = userDefaults.object(forKey: REVIEW) as? Date {
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1) { [self] in
-                if date >= threeWeek {
-                    SKStoreReviewController.requestReview()
-                    let newThreeWeek = calendar.date(byAdding: .day, value: 21, to: date)
-                    userDefaults.set(newThreeWeek, forKey: REVIEW)
-                } else {
-                    print(threeWeek)
-                }
-            }
-        }
-    }
-    
-    func historyPopup() {
-        
-        var attributes = EKAttributes.bottomFloat
-        attributes.displayDuration = .infinity
-        attributes.screenBackground = .visualEffect(style: .prominent)
-
-        if userDefaults.object(forKey: GREEN_COLOR) != nil {
-            attributes.entryBackground =
-                .gradient(gradient: .init(colors: [EKColor(UIColor(named: FOREST_GREEN)!), EKColor(UIColor(named: EMERALD_GREEN)!)], startPoint: .zero, endPoint: CGPoint(x: 1, y: 1)))
-        } else if userDefaults.object(forKey: WHITE_COLOR) != nil {
-            attributes.entryBackground =
-                .gradient(gradient: .init(colors: [EKColor(UIColor.systemBlue), EKColor(UIColor.systemBlue)], startPoint: .zero, endPoint: CGPoint(x: 1, y: 1)))
-        } else if userDefaults.object(forKey: PINK_COLOR) != nil {
-            attributes.entryBackground =
-                .gradient(gradient: .init(colors: [EKColor(UIColor(named: O_PINK)!), EKColor(UIColor(named: O_PINK)!)], startPoint: .zero, endPoint: CGPoint(x: 1, y: 1)))
-        } else {
-            attributes.entryBackground =
-                .gradient(gradient: .init(colors: [EKColor(UIColor.systemBlue), EKColor(UIColor.systemBlue)], startPoint: .zero, endPoint: CGPoint(x: 1, y: 1)))
-            attributes.screenBackground = .visualEffect(style: .dark)
-        }
-        attributes.popBehavior = .animated(animation: .init(translate: .init(duration: 0.3), scale: .init(from: 1, to: 0.7, duration: 0.7)))
-        attributes.shadow = .active(with: .init(color: .black, opacity: 0.5, radius: 10, offset: .zero))
-        attributes.scroll = .enabled(swipeable: true, pullbackAnimation: .jolt)
-        attributes.positionConstraints.maxSize = .init(width: .constant(value: UIScreen.main.bounds.width), height: .intrinsic)
-        attributes.entryInteraction = .absorbTouches
-        let title = EKProperty.LabelContent(text: "前回のカート履歴", style: .init(font: UIFont(name: "HiraMaruProN-W4", size: 20)!, color: .white))
-        let description = EKProperty.LabelContent(text: "履歴を確認しますか？", style: .init(font: UIFont(name: "HiraMaruProN-W4", size: 15)!, color: .white))
-        
-        let label = EKProperty.LabelContent(text: "確認する", style: .init(font: UIFont(name: "HiraMaruProN-W4", size: 15)!, color: EKColor(UIColor(named: O_BLACK)!)))
-        let button = EKProperty.ButtonContent(label: label, backgroundColor: .white, highlightedBackgroundColor: .standardBackground)
-        let action: EKPopUpMessage.EKPopUpMessageAction = {
-            SwiftEntryKit.dismiss()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                self.performSegue(withIdentifier: "TempMemoHistoryVC", sender: nil)
-            }
-        }
-        let popupMessage = EKPopUpMessage(title: title, description: description, button: button, action: action)
-        let view = EKPopUpMessageView(with: popupMessage)
-        
-        SwiftEntryKit.display(entry: view, using: attributes)
-    }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        
-        if segue.identifier == "TempMemoHistoryVC" {
-            let tempMemoHistoryVC = segue.destination as! TempMemoHistoryTableViewController
-            tempMemoHistoryVC.templateId = templateId
-        }
-    }
-    
-    func setupSound() {
-        do {
-            try player = AVAudioPlayer(contentsOf: URL(fileURLWithPath: soundFile!))
-            player.prepareToPlay()
-        } catch  {
-            print("Error sound", error.localizedDescription)
-        }
-    }
-    
-    func showHintView() {
-        
-        if userDefaults.object(forKey: END_TUTORIAL1) == nil {
-            setupVideoViewHeight()
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [self] in
-                visualEffectView.frame = self.view.frame
-                visualEffectView.alpha = 0
-                view.addSubview(self.visualEffectView)
-                view.addSubview(hintView)
-                setVideoPlayer()
-                
-                UIView.animate(withDuration: 1, delay: 0, usingSpringWithDamping: 1, initialSpringVelocity: 1, options: .curveEaseOut, animations: {
-                    visualEffectView.alpha = 1
-                    hintView.alpha = 1
-                }, completion: nil)
-            }
-        }
-    }
-    
-    func setVideoPlayer() {
-        
-        guard let path = Bundle.main.path(forResource: "tutorial1", ofType: "mp4") else {
-            fatalError("Movie file can not find.")
-        }
-        let fileURL = URL(fileURLWithPath: path)
-        let avAsset = AVURLAsset(url: fileURL)
-        let playerItem: AVPlayerItem = AVPlayerItem(asset: avAsset)
-        
-        videoPlayer = AVPlayer(playerItem: playerItem)
-        
-        let layer = AVPlayerLayer()
-        layer.videoGravity = AVLayerVideoGravity.resizeAspect
-        layer.player = videoPlayer
-        layer.frame = videoView.bounds
-        videoView.layer.addSublayer(layer)
-        
-        seekBar.minimumValue = 0
-        seekBar.maximumValue = Float(CMTimeGetSeconds(avAsset.duration))
-        
-        let interval : Double = Double(0.5 * seekBar.maximumValue) / Double(seekBar.bounds.maxX)
-        
-        let time : CMTime = CMTimeMakeWithSeconds(interval, preferredTimescale: Int32(NSEC_PER_SEC))
-        
-        videoPlayer.addPeriodicTimeObserver(forInterval: time, queue: nil, using: {time in
-            
-            let duration = CMTimeGetSeconds(self.videoPlayer.currentItem!.duration)
-            let time = CMTimeGetSeconds(self.videoPlayer.currentTime())
-            let value = Float(self.seekBar.maximumValue - self.seekBar.minimumValue) * Float(time) / Float(duration) + Float(self.seekBar.minimumValue)
-            self.seekBar.value = value
-        })
-        videoPlayer.seek(to: CMTimeMakeWithSeconds(0, preferredTimescale: Int32(NSEC_PER_SEC)))
-        videoPlayer.play()
-    }
-    
-    func setupVideoViewHeight() {
-        
-        switch (UIScreen.main.nativeBounds.height) {
-        case 1334:
-            videoHeight.constant = 400
-            stackTopConst.constant = 10
-        case 1792:
-            videoHeight.constant = 530
-            videoWidth.constant = 350
-        case 2532:
-            videoHeight.constant = 500
-        case 2688:
-            videoHeight.constant = 550
-            videoWidth.constant = 350
-        case 2778:
-            videoHeight.constant = 580
-            videoWidth.constant = 350
-        default:
-            break
-        }
-    }
-    
-    func baseViewIsHidden() {
-        baseView.isHidden = true
-        viewHeight.constant = 0
-    }
-    
-    func setBackAction() {
-        if userDefaults.object(forKey: BACK) != nil {
-            memoTextField.resignFirstResponder()
-            userDefaults.removeObject(forKey: BACK)
-        }
-    }
-    
-    func setupKeyboard() {
-        let notificationCenter = NotificationCenter.default
-        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification, object: nil)
-        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
-    }
-    
-    @objc func adjustForKeyboard(notification: Notification) {
-        let userInfo = notification.userInfo!
-        let keyboardScreenEndFrame = (userInfo[UIResponder.keyboardFrameEndUserInfoKey] as! NSValue).cgRectValue
-        let keyboardViewEndFrame = view.convert(keyboardScreenEndFrame, to: view.window)
-        
-        if notification.name == UIResponder.keyboardWillHideNotification {
-            viewBottomConst.constant = 0
-            viewHeight.constant = 50
-        } else {
-            if #available(iOS 11.0, *) {
-                viewBottomConst.constant = view.safeAreaInsets.bottom - keyboardViewEndFrame.height
-                if userDefaults.object(forKey: EDIT_MEMO) == nil {
-                    baseView.isHidden = false
-                    viewHeight.constant = 50
-                }
-            } else {
-                viewBottomConst.constant = keyboardViewEndFrame.height
-            }
-            view.layoutIfNeeded()
-        }
-    }
-    
-    func tempBtnUpAnimation() {
-        UIView.animate(withDuration: 1) { [self] in
-            templateButton.transform = .identity
-        }
-    }
-    
-    func tempBtnDownAnimation() {
-        UIView.animate(withDuration: 1) { [self] in
-            templateButton.transform = CGAffineTransform(translationX: 0, y: 150)
-        }
-    }
-    
-    func tempBtnDownAnimation2() {
-        UIView.animate(withDuration: 0.3) { [self] in
-            panGesture = true
-            templateButton.transform = CGAffineTransform(translationX: 0, y: 150)
-        }
-    }
-    
-    func setup() {
-        navigationItem.title = "買い物メモ"
-        tableView.tableFooterView = UIView()
-        tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 10000
-        tableView.dragDelegate = self
-        tableView.dropDelegate = self
-        tableView.dragInteractionEnabled = true
-        
-        hintView.alpha = 0
-        baseView.isHidden = true
-        closeButton.layer.cornerRadius = 5
-        createButton.layer.cornerRadius = 5
-        startButton.layer.cornerRadius = 35 / 2
-        skipButton.layer.cornerRadius = 35 / 2
-        templateButton.layer.cornerRadius = 35 / 2
-        templateButton.layer.shadowOffset = CGSize(width: 2.0, height: 2.0)
-        templateButton.layer.shadowColor = UIColor.black.cgColor
-        templateButton.layer.shadowOpacity = 0.3
-        templateButton.layer.shadowRadius = 4
-        templateButton.transform = CGAffineTransform(translationX: 0, y: 150)
-        templateLabel.text = "ひな形未選択"
-        memoTextField.delegate = self
-        
-        switch (UIScreen.main.nativeBounds.height) {
-        case 1334:
-            topViewHeight.constant = 80
-        case 2208:
-            topViewHeight.constant = 80
-        default:
-            break
-        }
-    }
-    
-    func setColor() {
-        let separatorColor: UIColor = userDefaults.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray3
-        let bannerColor: UIColor = userDefaults.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
-        bannerView.backgroundColor = bannerColor
-        tableView.separatorColor = separatorColor
-        
-        if userDefaults.object(forKey: GREEN_COLOR) != nil {
-            titleLabel.textColor = UIColor.white
-            topView.backgroundColor = UIColor(named: EMERALD_GREEN_ALPHA)
-            deleteButton.tintColor = UIColor.white
-            templateLabel.textColor = UIColor.systemGray5
-            historyButton.tintColor = UIColor.white
-            templateButton.backgroundColor = UIColor(named: EMERALD_GREEN)
-            templateButton.tintColor = UIColor.white
-            tableView.backgroundColor = .systemBackground
-            let color = on_sort ? UIColor.white : UIColor.systemGray4
-            sortButton.tintColor = color
-            topLineView.backgroundColor = .systemGray5
-
-        } else if userDefaults.object(forKey: WHITE_COLOR) != nil {
-            titleLabel.textColor = UIColor(named: O_BLACK)
-            topView.backgroundColor = UIColor(named: O_WHITE_ALPHA)
-            deleteButton.tintColor = UIColor.systemBlue
-            templateLabel.textColor = UIColor.systemGray
-            historyButton.tintColor = UIColor.systemBlue
-            templateButton.backgroundColor = UIColor(named: O_WHITE)
-            templateButton.tintColor = UIColor(named: O_BLACK)
-            tableView.backgroundColor = .systemBackground
-            let color = on_sort ? UIColor.systemBlue : UIColor.systemGray
-            sortButton.tintColor = color
-            topLineView.backgroundColor = .systemGray5
-            
-        } else if userDefaults.object(forKey: PINK_COLOR) != nil {
-            titleLabel.textColor = UIColor.white
-            topView.backgroundColor = UIColor(named: O_PINK)
-            deleteButton.tintColor = UIColor.white
-            templateLabel.textColor = UIColor.systemGray5
-            historyButton.tintColor = UIColor.white
-            templateButton.backgroundColor = UIColor(named: O_PINK)
-            templateButton.tintColor = UIColor.white
-            tableView.backgroundColor = .systemBackground
-            let color = on_sort ? UIColor.white : UIColor.systemGray
-            sortButton.tintColor = color
-            topLineView.backgroundColor = .systemGray5
-            
-        } else {
-            titleLabel.textColor = UIColor.white
-            topView.backgroundColor = UIColor(named: O_DARK2_ALPHA)
-            deleteButton.tintColor = UIColor.systemBlue
-            templateLabel.textColor = UIColor.systemGray5
-            historyButton.tintColor = UIColor.systemBlue
-            templateButton.backgroundColor = UIColor.systemBlue
-            templateButton.tintColor = UIColor.white
-            tableView.backgroundColor = UIColor(named: O_DARK1)
-            let color = on_sort ? UIColor.systemBlue : UIColor.systemGray
-            sortButton.tintColor = color
-            topLineView.backgroundColor = .darkGray
-        }
-    }
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        memoTextField.resignFirstResponder()
-        fetchMemo()
-        return true
-    }
-    
-    func setupBanner() {
-        bannerView.adUnitID = "ca-app-pub-4750883229624981/1980065426"
-        bannerView.rootViewController = self
-        bannerView.load(GADRequest())
-    }
-    
-    func dragItem(for indexPath: IndexPath) -> UIDragItem {
-        let memoName = memoArray[indexPath.row].name
-        let itemProvider = NSItemProvider(object: memoName as NSString)
-
-        return UIDragItem(itemProvider: itemProvider)
-    }
-    
-    func moveItem(sourcePath: Int, destinationPath: Int) {
-        let memos = memoArray.remove(at: sourcePath)
-        memoArray.insert(memos, at: destinationPath)
     }
 }
 
@@ -809,7 +547,7 @@ extension MemoTableViewController: UITableViewDelegate, UITableViewDataSource {
         if indexPath.row == memoArray.count {
             return cell2
         }
-        
+        cell.session.delegate = self
         cell.watchData = self.watchData
         cell.memoVC = self
         cell.memoTextView.delegate = self
@@ -818,15 +556,40 @@ extension MemoTableViewController: UITableViewDelegate, UITableViewDataSource {
         return cell
     }
     
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        
+        if editingStyle == .delete {
+            Memo.deleteMemo(id: memoArray[indexPath.row].uid) { [self] in
+                memoArray.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .fade)
+                dispatchQ.async {
+                    tableView.reloadData()
+                }
+            }
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        if indexPath.row != memoArray.count {
+            return .delete
+        }
+        return .none
+    }
+    
+    func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
+        return "削除"
+    }
+    
     func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-            
+        guard sourceIndexPath.row != destinationIndexPath.row else { return }
+        
         let realm = try! Realm()
-        let memos = realm.objects(Memo.self).filter("sourceRow == \(sourceIndexPath.row)")
+        let memos = realm.objects(Memo.self).filter("sourceRow == %@", sourceIndexPath.row)
+        let memos2 = realm.objects(Memo.self).filter("sorted == false")
         let memo = memoArray[sourceIndexPath.row]
+        
         memoArray.remove(at: sourceIndexPath.row)
         memoArray.insert(memo, at: destinationIndexPath.row)
-        
-        if sourceIndexPath.row == destinationIndexPath.row { return }
         
         print("-------start-------")
         
@@ -835,13 +598,10 @@ extension MemoTableViewController: UITableViewDelegate, UITableViewDataSource {
             try! realm.write() {
                 m.sourceRow = destinationIndexPath.row
                 m.sorted = true
-                let memos2 = realm.objects(Memo.self).filter("sorted == false")
                 memos2.forEach { (m2) in
                     
                     if m.sourceRow > m2.sourceRow {
-                        if m.originRow > m2.sourceRow {
-                            print("stay1: ", m2.name)
-                        } else {
+                        if m.originRow < m2.sourceRow {
                             m2.sourceRow = m2.sourceRow - 1
                             m2.originRow = m2.sourceRow
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -850,12 +610,12 @@ extension MemoTableViewController: UITableViewDelegate, UITableViewDataSource {
                                 }
                             }
                             print("minus: ", m2.name)
+                        } else {
+                            print("stay1: ", m2.name)
                         }
                         
                     } else if m.sourceRow < m2.sourceRow {
-                        if m.originRow < m2.sourceRow {
-                            print("stay2: ", m2.name)
-                        } else {
+                        if m.originRow > m2.sourceRow {
                             m2.sourceRow = m2.sourceRow + 1
                             m2.originRow = m2.sourceRow
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -864,6 +624,8 @@ extension MemoTableViewController: UITableViewDelegate, UITableViewDataSource {
                                 }
                             }
                             print("plus: ", m2.name)
+                        } else {
+                            print("stay2: ", m2.name)
                         }
                     } else if m.sourceRow == m2.sourceRow {
                         if m.originRow < m2.sourceRow {
@@ -895,6 +657,7 @@ extension MemoTableViewController: UITableViewDelegate, UITableViewDataSource {
                 }
             }
         }
+        wcSessionUpdate()
     }
 }
 
@@ -906,7 +669,7 @@ extension MemoTableViewController: WCSessionDelegate {
         print(applicationContext)
         if let tableData = applicationContext["WatchTableData"] as? String {
             DispatchQueue.main.async { [self] in
-                userDefaults.removeObject(forKey: RELOAD)
+                defaults.removeObject(forKey: RELOAD)
                 self.watchData = tableData
                 self.tableView.reloadData()
             }
@@ -931,10 +694,17 @@ extension MemoTableViewController {
 }
 
 extension MemoTableViewController: UIAdaptivePresentationControllerDelegate {
-  func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
-    setNeedsStatusBarAppearanceUpdate()
-    dispatchQ.asyncAfter(deadline: .now() + 0.6) {
-        self.setNeedsStatusBarAppearanceUpdate()
+    func presentationControllerDidDismiss(_ presentationController: UIPresentationController) {
+        setNeedsStatusBarAppearanceUpdate()
+        fetchSelectedItemName()
+        dispatchQ.asyncAfter(deadline: .now() + 0.7) {
+            self.setNeedsStatusBarAppearanceUpdate()
+        }
+        if defaults.object(forKey: "cart") != nil {
+            dispatchQ.async { [self] in
+                templateButton.setTitle("カート履歴", for: .normal)
+                tempBtnUpAnimation()
+            }
+        }
     }
-  }
 }

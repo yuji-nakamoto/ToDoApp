@@ -17,6 +17,7 @@ class Tutorial2ViewController: UIViewController {
     @IBOutlet weak var videoHeight: NSLayoutConstraint!
     @IBOutlet weak var videoWidth: NSLayoutConstraint!
     @IBOutlet weak var stackTopConst: NSLayoutConstraint!
+    @IBOutlet weak var videoTopConst: NSLayoutConstraint!
     
     private var videoPlayer: AVPlayer!
     private let visualEffectView = UIVisualEffectView(effect: UIBlurEffect(style: .dark))
@@ -53,6 +54,7 @@ class Tutorial2ViewController: UIViewController {
         case 1334:
             videoHeight.constant = 380
             stackTopConst.constant = 10
+            videoTopConst.constant = 10
             break
         case 1792:
             videoHeight.constant = 530

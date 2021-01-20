@@ -10,6 +10,7 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+    let calendar = Calendar.current
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         
@@ -45,14 +46,23 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillEnterForeground(_ scene: UIScene) {
         // Called as the scene transitions from the background to the foreground.
         // Use this method to undo the changes made on entering the background.
+        let date = Date()
+        if let timeout = UserDefaults.standard.object(forKey: TIME_OUT) as? Date {
+            if date >= timeout {
+                let storyboard = UIStoryboard(name: "Main", bundle: nil)
+                let tabVC = storyboard.instantiateViewController(withIdentifier: "TabVC")
+                self.window?.rootViewController = tabVC
+                self.window?.makeKeyAndVisible()
+            }
+        }
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
         // Called as the scene transitions from the foreground to the background.
         // Use this method to save data, release shared resources, and store enough scene-specific state information
         // to restore the scene back to its current state.
+        let date = Date()
+        let timeout = calendar.date(byAdding: .hour, value: 1, to: date)
+        UserDefaults.standard.set(timeout, forKey: TIME_OUT)
     }
-
-
 }
-

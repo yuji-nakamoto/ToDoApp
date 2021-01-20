@@ -9,14 +9,12 @@ import Foundation
 import UIKit
 
 class CustomSlider: UISlider {
-    // バーの高さ
+    
     @IBInspectable var trackHeight: CGFloat = 4
-    // つまみの直径
     @IBInspectable var thumbRadius: CGFloat = 20
 
     private lazy var thumbView: UIView = {
         
-        // つまみのデザイン
         let thumb = UIView()
         thumb.layer.shadowOpacity = 1.0
         thumb.layer.shadowRadius = 3
@@ -30,11 +28,9 @@ class CustomSlider: UISlider {
         
         super.awakeFromNib()
         
-        // つまみの設定
         let thumb = thumbImage(diameter: thumbRadius)
         setThumbImage(thumb, for: .normal)
         
-        // （オプション）つまみのドラッグ中の設定（1.2倍大きくする）
         let heighLightThumb = thumbImage(diameter: thumbRadius * 1.2)
         setThumbImage(heighLightThumb, for: .highlighted)
     }
@@ -45,7 +41,6 @@ class CustomSlider: UISlider {
         thumbView.frame = CGRect(x: 0, y: 0, width: diameter, height: diameter)
         thumbView.layer.cornerRadius = diameter / 2
         
-        // つまみを描写（大きさ自体は直径の1.5倍にして、その分x、y座標をずらす。
         let renderer = UIGraphicsImageRenderer(bounds: CGRect(x: -(diameter * 0.5 / 2), y: -(diameter * 0.5 / 2), width: diameter * 1.5, height: diameter * 1.5))
         return renderer.image { rendererContext in
             thumbView.layer.render(in: rendererContext.cgContext)

@@ -18,26 +18,32 @@ class TempMemoHistoryTableViewController: UIViewController {
     @IBOutlet weak var bannerView: GADBannerView!
     @IBOutlet weak var topViewHeght: NSLayoutConstraint!
     @IBOutlet weak var topLineView: UIView!
+    @IBOutlet weak var bannerHeight: NSLayoutConstraint!
     
     private var tempMemoArray = [TemplateMemo]()
-    var templateId = ""
+    var templateId = defaults.object(forKey: ID) as! String
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupBanner()
         tableView.tableFooterView = UIView()
-        fetchTemplate()
+        fetchTemplateTitle()
         fetchTempHistory()
+        defaults.set(true, forKey: "cart")
     }
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        bannerViewIsHidden()
         selectColor()
         setColor()
     }
     
-    func fetchTemplate() {
-        
+    @IBAction func dismissButtonTapped(_ sender: Any) {
+        dismiss(animated: true, completion: nil)
+    }
+    
+    func fetchTemplateTitle() {
         Template.fetchSelectedTemplate { [self] (bool, template) in
             if bool == true {
                 titleLabel.text = template.name
@@ -46,7 +52,6 @@ class TempMemoHistoryTableViewController: UIViewController {
     }
     
     func fetchTempHistory() {
-        
         let realm = try! Realm()
         let tempMemos = realm.objects(TemplateMemo.self).filter("templateId == '\(templateId)'").filter("date > 0")
         tempMemoArray.removeAll()
@@ -57,36 +62,38 @@ class TempMemoHistoryTableViewController: UIViewController {
         tableView.reloadData()
     }
     
+    func bannerViewIsHidden() {
+        let constant: CGFloat = defaults.object(forKey: PURCHASED) != nil ? 0 : 50
+        bannerHeight.constant = constant
+    }
+    
     func setColor() {
         let separatorColor: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray3
-        let bannerColor: UIColor = userDefaults.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
+        let bannerColor: UIColor = defaults.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
+        let labelColor: UIColor = UserDefaults.standard.object(forKey: WHITE_COLOR) != nil ? UIColor(named: O_BLACK)! : .white
+        let lineColor: UIColor = defaults.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray4
+
         bannerView.backgroundColor = bannerColor
         tableView.separatorColor = separatorColor
-        
+        titleLabel.textColor = labelColor
+        tableView.backgroundColor = bannerColor
+        topLineView.backgroundColor = lineColor
+
         if UserDefaults.standard.object(forKey: GREEN_COLOR) != nil {
-            titleLabel.textColor = UIColor.white
             topView.backgroundColor = UIColor(named: EMERALD_GREEN_ALPHA)
             dismissButton.tintColor = UIColor.white
-            tableView.backgroundColor = .systemBackground
-            topLineView.backgroundColor = .systemGray5
         } else if UserDefaults.standard.object(forKey: WHITE_COLOR) != nil {
-            titleLabel.textColor = UIColor(named: O_BLACK)
             topView.backgroundColor = UIColor(named: O_WHITE_ALPHA)
             dismissButton.tintColor = UIColor(named: O_BLACK)
-            tableView.backgroundColor = .systemBackground
-            topLineView.backgroundColor = .systemGray5
         } else if UserDefaults.standard.object(forKey: PINK_COLOR) != nil {
-            titleLabel.textColor = UIColor.white
             topView.backgroundColor = UIColor(named: O_PINK)
             dismissButton.tintColor = UIColor.white
-            tableView.backgroundColor = .systemBackground
-            topLineView.backgroundColor = .systemGray5
+        } else if UserDefaults.standard.object(forKey: ORANGE_COLOR) != nil {
+            topView.backgroundColor = UIColor(named: O_ORANGE_ALPHA)
+            dismissButton.tintColor = UIColor.white
         } else {
-            titleLabel.textColor = UIColor.white
             topView.backgroundColor = UIColor(named: O_DARK3)
             dismissButton.tintColor = UIColor.systemBlue
-            tableView.backgroundColor = UIColor(named: O_DARK1)
-            topLineView.backgroundColor = .darkGray
         }
     }
     
@@ -94,10 +101,6 @@ class TempMemoHistoryTableViewController: UIViewController {
         bannerView.adUnitID = "ca-app-pub-4750883229624981/1980065426"
         bannerView.rootViewController = self
         bannerView.load(GADRequest())
-    }
-    
-    @IBAction func dismissButtonTapped(_ sender: Any) {
-        dismiss(animated: true, completion: nil)
     }
 }
 
@@ -111,5 +114,15 @@ extension TempMemoHistoryTableViewController: UITabBarDelegate, UITableViewDataS
         
         cell.configureTempCell(tempMemoArray[indexPath.row])
         return cell
+    }
+}
+
+extension TempMemoHistoryTableViewController {
+    override func dismiss(animated flag: Bool, completion: (() -> Void)? = nil) {
+        super.dismiss(animated: flag, completion: completion)
+        guard let presentationController = presentationController else {
+            return
+        }
+        presentationController.delegate?.presentationControllerDidDismiss?(presentationController)
     }
 }

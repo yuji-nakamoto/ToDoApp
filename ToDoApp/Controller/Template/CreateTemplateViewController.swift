@@ -30,6 +30,7 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
     @IBOutlet weak var noDataLabel: UILabel!
     @IBOutlet weak var topLineView: UIView!
     @IBOutlet weak var bottomLineView: UIView!
+    @IBOutlet weak var bannerHeight: NSLayoutConstraint!
     
     private var templateMemos = [TemplateMemo]()
     private let id = UUID().uuidString
@@ -39,7 +40,6 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
     override func viewDidLoad() {
         super.viewDidLoad()
         setup()
-        setupBanner()
         setNeedsStatusBarAppearanceUpdate()
     }
     
@@ -69,7 +69,7 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        let color: UIStatusBarStyle = userDefaults.object(forKey: WHITE_COLOR) != nil ? .darkContent : .lightContent
+        let color: UIStatusBarStyle = defaults.object(forKey: WHITE_COLOR) != nil ? .darkContent : .lightContent
         return color
     }
     
@@ -94,7 +94,11 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
                 self.navigationController?.popViewController(animated: true)
             }
         }
-        let cancel = UIAlertAction(title: "キャンセル", style: .cancel)
+        let cancel = UIAlertAction(title: "キャンセル", style: .cancel) { (_) in
+            dispatchQ.async {
+                self.setNeedsStatusBarAppearanceUpdate()
+            }
+        }
             
         alert.addAction(back)
         alert.addAction(cancel)
@@ -189,7 +193,7 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
         }
     }
     
-    private func setup() {
+    func setup() {
         navigationItem.title = "ひな形の作成"
         navigationItem.rightBarButtonItem?.setTitleTextAttributes([NSAttributedString.Key.font : UIFont(name: "Helvetica Bold", size: 15) as Any], for: .normal)
         UserDefaults.standard.removeObject(forKey: EDIT_TEMP)
@@ -215,65 +219,39 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
         notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification, object: nil)
     }
     
-    private func setColor() {
+    func setColor() {
         let placeholderColor: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .systemGray : .systemGray4
         let separatorColor: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray3
-        let bannerColor: UIColor = userDefaults.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
+        let bannerColor: UIColor = defaults.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
+        let labelColor: UIColor = defaults.object(forKey: DARK_COLOR) != nil ? .white : UIColor(named: O_BLACK)!
+        let lineColor: UIColor = defaults.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray5
+        let memoViewColor = defaults.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK2_ALPHA)! : UIColor(named: O_WHITE)!
+        let btnColor: UIColor = defaults.object(forKey: WHITE_COLOR) != nil || defaults.object(forKey: DARK_COLOR) != nil ? .systemBlue : .white
+
+        saveButton.tintColor = btnColor
+        memoLabel.textColor = labelColor
+        tempNameLabel.textColor = labelColor
         bannerView.backgroundColor = bannerColor
         tableView.separatorColor = separatorColor
+        tableView.backgroundColor = bannerColor
+        memoListView.backgroundColor = memoViewColor
+        topBaseView.backgroundColor = bannerColor
+        topLineView.backgroundColor = lineColor
+        bottomLineView.backgroundColor = lineColor
+        templateTextField.textColor = labelColor
+        templateTextField.backgroundColor = bannerColor
+        templateTextField.attributedPlaceholder = NSAttributedString(string: "例）カレーライスの食材",attributes: [NSAttributedString.Key.foregroundColor: placeholderColor])
         
         if UserDefaults.standard.object(forKey: GREEN_COLOR) != nil {
-            saveButton.tintColor = UIColor.white
             backButton.tintColor = UIColor.white
-            templateTextField.backgroundColor = UIColor.systemBackground
-            templateTextField.textColor = UIColor(named: O_BLACK)
-            templateTextField.attributedPlaceholder = NSAttributedString(string: "例）カレーライスの食材",attributes: [NSAttributedString.Key.foregroundColor: placeholderColor])
-            tempNameLabel.textColor = UIColor(named: O_BLACK)
-            topBaseView.backgroundColor = .systemBackground
-            tableView.backgroundColor = .systemBackground
-            memoListView.backgroundColor = UIColor(named: O_WHITE)
-            memoLabel.textColor = UIColor(named: O_BLACK)
-            topLineView.backgroundColor = .systemGray5
-            bottomLineView.backgroundColor = .systemGray5
         } else if UserDefaults.standard.object(forKey: WHITE_COLOR) != nil {
-            saveButton.tintColor = UIColor.systemBlue
             backButton.tintColor = UIColor(named: O_BLACK)
-            templateTextField.backgroundColor = UIColor.systemBackground
-            templateTextField.textColor = UIColor(named: O_BLACK)
-            templateTextField.attributedPlaceholder = NSAttributedString(string: "例）カレーライスの食材",attributes: [NSAttributedString.Key.foregroundColor: placeholderColor])
-            tempNameLabel.textColor = UIColor(named: O_BLACK)
-            topBaseView.backgroundColor = .systemBackground
-            tableView.backgroundColor = .systemBackground
-            memoListView.backgroundColor = UIColor(named: O_WHITE)
-            memoLabel.textColor = UIColor(named: O_BLACK)
-            topLineView.backgroundColor = .systemGray5
-            bottomLineView.backgroundColor = .systemGray5
         } else if UserDefaults.standard.object(forKey: PINK_COLOR) != nil {
-            saveButton.tintColor = UIColor.white
             backButton.tintColor = UIColor.white
-            templateTextField.backgroundColor = UIColor.systemBackground
-            templateTextField.textColor = UIColor(named: O_BLACK)
-            templateTextField.attributedPlaceholder = NSAttributedString(string: "例）カレーライスの食材",attributes: [NSAttributedString.Key.foregroundColor: placeholderColor])
-            tempNameLabel.textColor = UIColor(named: O_BLACK)
-            topBaseView.backgroundColor = .systemBackground
-            tableView.backgroundColor = .systemBackground
-            memoListView.backgroundColor = UIColor(named: O_WHITE)
-            memoLabel.textColor = UIColor(named: O_BLACK)
-            topLineView.backgroundColor = .systemGray5
-            bottomLineView.backgroundColor = .systemGray5
+        } else if UserDefaults.standard.object(forKey: ORANGE_COLOR) != nil {
+            backButton.tintColor = UIColor.white
         } else {
-            saveButton.tintColor = UIColor.systemBlue
             backButton.tintColor = UIColor.systemBlue
-            templateTextField.backgroundColor = UIColor(named: O_DARK1)
-            templateTextField.textColor = .white
-            templateTextField.attributedPlaceholder = NSAttributedString(string: "例）カレーライスの食材",attributes: [NSAttributedString.Key.foregroundColor: placeholderColor])
-            tempNameLabel.textColor = .white
-            topBaseView.backgroundColor = UIColor(named: O_DARK1)
-            tableView.backgroundColor = UIColor(named: O_DARK1)
-            memoListView.backgroundColor = UIColor(named: O_DARK2_ALPHA)
-            memoLabel.textColor = .white
-            topLineView.backgroundColor = .darkGray
-            bottomLineView.backgroundColor = .darkGray
         }
     }
     
@@ -293,7 +271,7 @@ class CreateTemplateViewController: UIViewController, UITextFieldDelegate, UITex
         return true
     }
     
-    private func setupBanner() {
+    func setupBanner() {
         bannerView.adUnitID = "ca-app-pub-4750883229624981/1980065426"
         bannerView.rootViewController = self
         bannerView.load(GADRequest())
@@ -379,30 +357,52 @@ extension CreateTemplateViewController: UITableViewDelegate, UITableViewDataSour
         return cell
     }
     
-    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
-        let tempMemo = templateMemos[sourceIndexPath.row]
-        templateMemos.remove(at: sourceIndexPath.row)
-        templateMemos.insert(tempMemo, at: destinationIndexPath.row)
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         
-        if sourceIndexPath.row == destinationIndexPath.row { return }
-
-        print("-------start-------")
+        if indexPath.row != templateMemos.count {
+            if editingStyle == .delete {
+                TemplateMemo.deleteTemplateMemoUid(uid: templateMemos[indexPath.row].uid) { [self] in
+                    templateMemos.remove(at: indexPath.row)
+                    tableView.deleteRows(at: [indexPath], with: .fade)
+                    tableView.reloadData()
+                }
+            }
+        }
+    }
+    
+    func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        if indexPath.row != templateMemos.count {
+            return .delete
+        }
+        return .none
+    }
+    
+    func tableView(_ tableView: UITableView, titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
+        return "削除"
+    }
+    
+    func tableView(_ tableView: UITableView, moveRowAt sourceIndexPath: IndexPath, to destinationIndexPath: IndexPath) {
+        guard sourceIndexPath.row != destinationIndexPath.row else { return }
+        
         let realm = try! Realm()
+        let tempMemo = templateMemos[sourceIndexPath.row]
         let tempMemos = realm.objects(TemplateMemo.self)
             .filter("sourceRow == \(sourceIndexPath.row)").filter("templateId == '\(id)'")
+        let tempMemos2 = realm.objects(TemplateMemo.self).filter("sorted == false").filter("templateId == '\(id)'")
+        
+        templateMemos.remove(at: sourceIndexPath.row)
+        templateMemos.insert(tempMemo, at: destinationIndexPath.row)
+                
         tempMemos.forEach { (t) in
 
             try! realm.write() {
                 t.sourceRow = destinationIndexPath.row
                 t.sorted = true
-                let tempMemos2 = realm.objects(TemplateMemo.self)
-                    .filter("sorted == false").filter("templateId == '\(id)'")
+                
                 tempMemos2.forEach { (t2) in
 
                     if t.sourceRow > t2.sourceRow {
-                        if t.originRow > t2.sourceRow {
-                            print("stay1: ", t2.name)
-                        } else {
+                        if t.originRow < t2.sourceRow {
                             t2.sourceRow = t2.sourceRow - 1
                             t2.originRow = t2.sourceRow
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -410,13 +410,9 @@ extension CreateTemplateViewController: UITableViewDelegate, UITableViewDataSour
                                     t.originRow = t.sourceRow
                                 }
                             }
-                            print("minus: ", t2.name)
                         }
-
                     } else if t.sourceRow < t2.sourceRow {
-                        if t.originRow < t2.sourceRow {
-                            print("stay2: ", t2.name)
-                        } else {
+                        if t.originRow > t2.sourceRow {
                             t2.sourceRow = t2.sourceRow + 1
                             t2.originRow = t2.sourceRow
                             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
@@ -424,7 +420,6 @@ extension CreateTemplateViewController: UITableViewDelegate, UITableViewDataSour
                                     t.originRow = t.sourceRow
                                 }
                             }
-                            print("plus: ", t2.name)
                         }
                     } else if t.sourceRow == t2.sourceRow {
                         if t.originRow < t2.sourceRow {
@@ -435,7 +430,6 @@ extension CreateTemplateViewController: UITableViewDelegate, UITableViewDataSour
                                     t.originRow = t.sourceRow
                                 }
                             }
-                            print("== minus: ", t2.name)
                         } else if t.originRow > t2.sourceRow {
                             t2.sourceRow = t2.sourceRow + 1
                             t2.originRow = t2.sourceRow
@@ -444,10 +438,8 @@ extension CreateTemplateViewController: UITableViewDelegate, UITableViewDataSour
                                     t.originRow = t.sourceRow
                                 }
                             }
-                            print("== plus: ", t2.name)
                         }
                     }
-
                     DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         try! realm.write() {
                             t.sorted = false

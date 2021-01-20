@@ -13,14 +13,16 @@ class ColorTableViewController: UITableViewController {
     @IBOutlet weak var colorLabel2: UILabel!
     @IBOutlet weak var colorLabel3: UILabel!
     @IBOutlet weak var colorLabel4: UILabel!
+    @IBOutlet weak var colorLabel5: UILabel!
     @IBOutlet weak var checkmark1: UIImageView!
     @IBOutlet weak var checkmark2: UIImageView!
     @IBOutlet weak var checkmark3: UIImageView!
     @IBOutlet weak var checkmark4: UIImageView!
+    @IBOutlet weak var checkmark5: UIImageView!
     @IBOutlet weak var backButton: UIBarButtonItem!
     
-    lazy var labels = [colorLabel1,colorLabel2,colorLabel3,colorLabel4]
-    lazy var checkmarks = [checkmark1,checkmark2,checkmark3,checkmark4]
+    lazy var labels = [colorLabel1,colorLabel2,colorLabel3,colorLabel4,colorLabel5]
+    lazy var checkmarks = [checkmark1,checkmark2,checkmark3,checkmark4,checkmark5]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -38,72 +40,69 @@ class ColorTableViewController: UITableViewController {
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        let color: UIStatusBarStyle = userDefaults.object(forKey: WHITE_COLOR) != nil ? .darkContent : .lightContent
+        let color: UIStatusBarStyle = defaults.object(forKey: WHITE_COLOR) != nil ? .darkContent : .lightContent
         return color
     }
     
     private func setupColor() {
-        let color: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .white : UIColor(named: O_BLACK)!
-        let tableViewColor: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
-        let separatorColor: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray3
+        let color: UIColor = defaults.object(forKey: DARK_COLOR) != nil ? .white : UIColor(named: O_BLACK)!
+        let tableViewColor: UIColor = defaults.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
+        let separatorColor: UIColor = defaults.object(forKey: DARK_COLOR) != nil ? .darkGray : .systemGray3
         
         labels.forEach({$0?.textColor = color})
         checkmarks.forEach({$0?.tintColor = color})
         tableView.backgroundColor = tableViewColor
         tableView.separatorColor = separatorColor
-        setNeedsStatusBarAppearanceUpdate()
         tableView.reloadData()
+        setNeedsStatusBarAppearanceUpdate()
     }
     
     func setup() {
         
-        if UserDefaults.standard.object(forKey: GREEN_COLOR) != nil {
+        if defaults.object(forKey: GREEN_COLOR) != nil {
+            checkmarks.forEach({$0?.isHidden = true})
             checkmark1.isHidden = false
-            checkmark2.isHidden = true
-            checkmark3.isHidden = true
-            checkmark4.isHidden = true
             backButton.tintColor = .white
             setupColor()
-        } else if UserDefaults.standard.object(forKey: WHITE_COLOR) != nil {
-            checkmark1.isHidden = true
+        } else if defaults.object(forKey: WHITE_COLOR) != nil {
+            checkmarks.forEach({$0?.isHidden = true})
             checkmark2.isHidden = false
-            checkmark3.isHidden = true
-            checkmark4.isHidden = true
             backButton.tintColor = UIColor(named: O_BLACK)
             setupColor()
-        } else if UserDefaults.standard.object(forKey: PINK_COLOR) != nil {
-            checkmark1.isHidden = true
-            checkmark2.isHidden = true
+        } else if defaults.object(forKey: PINK_COLOR) != nil {
+            checkmarks.forEach({$0?.isHidden = true})
             checkmark3.isHidden = false
-            checkmark4.isHidden = true
+            backButton.tintColor = .white
+            setupColor()
+        } else if defaults.object(forKey: ORANGE_COLOR) != nil {
+            checkmarks.forEach({$0?.isHidden = true})
+            checkmark4.isHidden = false
             backButton.tintColor = .white
             setupColor()
         } else {
-            checkmark1.isHidden = true
-            checkmark2.isHidden = true
-            checkmark3.isHidden = true
-            checkmark4.isHidden = false
+            checkmarks.forEach({$0?.isHidden = true})
+            checkmark5.isHidden = false
             backButton.tintColor = .systemBlue
             setupColor()
         }
     }
     
     func setFont() {
-        if UserDefaults.standard.object(forKey: SMALL1) != nil {
+        if defaults.object(forKey: SMALL1) != nil {
             labels.forEach({$0!.font = UIFont.systemFont(ofSize: 13)})
-        } else if UserDefaults.standard.object(forKey: SMALL2) != nil {
+        } else if defaults.object(forKey: SMALL2) != nil {
             labels.forEach({$0!.font = UIFont.systemFont(ofSize: 13, weight: .medium)})
-        } else if UserDefaults.standard.object(forKey: MIDIUM1) != nil {
+        } else if defaults.object(forKey: MIDIUM1) != nil {
             labels.forEach({$0!.font = UIFont.systemFont(ofSize: 15)})
-        } else if UserDefaults.standard.object(forKey: MIDIUM2) != nil {
+        } else if defaults.object(forKey: MIDIUM2) != nil {
             labels.forEach({$0!.font = UIFont.systemFont(ofSize: 15, weight: .medium)})
-        } else if UserDefaults.standard.object(forKey: MIDIUM3) != nil {
+        } else if defaults.object(forKey: MIDIUM3) != nil {
             labels.forEach({$0!.font = UIFont.systemFont(ofSize: 17)})
-        } else if UserDefaults.standard.object(forKey: MIDIUM4) != nil {
+        } else if defaults.object(forKey: MIDIUM4) != nil {
             labels.forEach({$0!.font = UIFont.systemFont(ofSize: 17, weight: .medium)})
-        } else if UserDefaults.standard.object(forKey: BIG1) != nil {
+        } else if defaults.object(forKey: BIG1) != nil {
             labels.forEach({$0!.font = UIFont.systemFont(ofSize: 19)})
-        } else if UserDefaults.standard.object(forKey: BIG2) != nil {
+        } else if defaults.object(forKey: BIG2) != nil {
             labels.forEach({$0!.font = UIFont.systemFont(ofSize: 19, weight: .medium)})
         }
     }
@@ -113,7 +112,7 @@ class ColorTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        let color: UIColor = UserDefaults.standard.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
+        let color: UIColor = defaults.object(forKey: DARK_COLOR) != nil ? UIColor(named: O_DARK1)! : .systemBackground
         cell.backgroundColor = color
     }
     
@@ -121,50 +120,57 @@ class ColorTableViewController: UITableViewController {
         tableView.deselectRow(at: indexPath, animated: true)
         
         if indexPath.row == 0 {
+            checkmarks.forEach({$0?.isHidden = true})
             checkmark1.isHidden = false
-            checkmark2.isHidden = true
-            checkmark3.isHidden = true
-            checkmark4.isHidden = true
-            UserDefaults.standard.set(true, forKey: GREEN_COLOR)
-            UserDefaults.standard.removeObject(forKey: WHITE_COLOR)
-            UserDefaults.standard.removeObject(forKey: PINK_COLOR)
-            UserDefaults.standard.removeObject(forKey: DARK_COLOR)
+            defaults.set(true, forKey: GREEN_COLOR)
+            defaults.removeObject(forKey: WHITE_COLOR)
+            defaults.removeObject(forKey: PINK_COLOR)
+            defaults.removeObject(forKey: DARK_COLOR)
+            defaults.removeObject(forKey: ORANGE_COLOR)
             backButton.tintColor = .white
             selectColor()
             setupColor()
         } else if indexPath.row == 1 {
-            checkmark1.isHidden = true
+            checkmarks.forEach({$0?.isHidden = true})
             checkmark2.isHidden = false
-            checkmark3.isHidden = true
-            checkmark4.isHidden = true
-            UserDefaults.standard.set(true, forKey: WHITE_COLOR)
-            UserDefaults.standard.removeObject(forKey: GREEN_COLOR)
-            UserDefaults.standard.removeObject(forKey: PINK_COLOR)
-            UserDefaults.standard.removeObject(forKey: DARK_COLOR)
+            defaults.set(true, forKey: WHITE_COLOR)
+            defaults.removeObject(forKey: GREEN_COLOR)
+            defaults.removeObject(forKey: PINK_COLOR)
+            defaults.removeObject(forKey: DARK_COLOR)
+            defaults.removeObject(forKey: ORANGE_COLOR)
             backButton.tintColor = UIColor(named: O_BLACK)
             selectColor()
             setupColor()
         } else if indexPath.row == 2 {
-            checkmark1.isHidden = true
-            checkmark2.isHidden = true
+            checkmarks.forEach({$0?.isHidden = true})
             checkmark3.isHidden = false
-            checkmark4.isHidden = true
-            UserDefaults.standard.set(true, forKey: PINK_COLOR)
-            UserDefaults.standard.removeObject(forKey: GREEN_COLOR)
-            UserDefaults.standard.removeObject(forKey: WHITE_COLOR)
-            UserDefaults.standard.removeObject(forKey: DARK_COLOR)
+            defaults.set(true, forKey: PINK_COLOR)
+            defaults.removeObject(forKey: GREEN_COLOR)
+            defaults.removeObject(forKey: WHITE_COLOR)
+            defaults.removeObject(forKey: DARK_COLOR)
+            defaults.removeObject(forKey: ORANGE_COLOR)
+            backButton.tintColor = .white
+            selectColor()
+            setupColor()
+        } else if indexPath.row == 3 {
+            checkmarks.forEach({$0?.isHidden = true})
+            checkmark4.isHidden = false
+            defaults.set(true, forKey: ORANGE_COLOR)
+            defaults.removeObject(forKey: GREEN_COLOR)
+            defaults.removeObject(forKey: WHITE_COLOR)
+            defaults.removeObject(forKey: DARK_COLOR)
+            defaults.removeObject(forKey: PINK_COLOR)
             backButton.tintColor = .white
             selectColor()
             setupColor()
         } else {
-            checkmark1.isHidden = true
-            checkmark2.isHidden = true
-            checkmark3.isHidden = true
-            checkmark4.isHidden = false
-            UserDefaults.standard.set(true, forKey: DARK_COLOR)
-            UserDefaults.standard.removeObject(forKey: GREEN_COLOR)
-            UserDefaults.standard.removeObject(forKey: WHITE_COLOR)
-            UserDefaults.standard.removeObject(forKey: PINK_COLOR)
+            checkmarks.forEach({$0?.isHidden = true})
+            checkmark5.isHidden = false
+            defaults.set(true, forKey: DARK_COLOR)
+            defaults.removeObject(forKey: GREEN_COLOR)
+            defaults.removeObject(forKey: WHITE_COLOR)
+            defaults.removeObject(forKey: PINK_COLOR)
+            defaults.removeObject(forKey: ORANGE_COLOR)
             backButton.tintColor = .systemBlue
             selectColor()
             setupColor()

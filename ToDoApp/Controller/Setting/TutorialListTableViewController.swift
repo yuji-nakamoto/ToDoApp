@@ -15,14 +15,18 @@ class TutorialListTableViewController: UITableViewController {
     @IBOutlet weak var label3: UILabel!
     @IBOutlet weak var label4: UILabel!
     @IBOutlet weak var label5: UILabel!
+    @IBOutlet weak var label6: UILabel!
+    @IBOutlet weak var label7: UILabel!
     @IBOutlet weak var arrow1: UIImageView!
     @IBOutlet weak var arrow2: UIImageView!
     @IBOutlet weak var arrow3: UIImageView!
     @IBOutlet weak var arrow4: UIImageView!
     @IBOutlet weak var arrow5: UIImageView!
+    @IBOutlet weak var arrow6: UIImageView!
+    @IBOutlet weak var arrow7: UIImageView!
     
-    lazy var labels = [label1,label2,label3,label4,label5]
-    lazy var arrows = [arrow1,arrow2,arrow3,arrow4,arrow5]
+    lazy var labels = [label1,label2,label3,label4,label5,label6,label7]
+    lazy var arrows = [arrow1,arrow2,arrow3,arrow4,arrow5,arrow6,arrow7]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -39,7 +43,7 @@ class TutorialListTableViewController: UITableViewController {
     }
     
     override var preferredStatusBarStyle: UIStatusBarStyle {
-        let color: UIStatusBarStyle = userDefaults.object(forKey: WHITE_COLOR) != nil ? .darkContent : .lightContent
+        let color: UIStatusBarStyle = defaults.object(forKey: WHITE_COLOR) != nil ? .darkContent : .lightContent
         return color
     }
     
@@ -116,6 +120,16 @@ class TutorialListTableViewController: UITableViewController {
             tutorial5VC.modalPresentationStyle = .automatic
             tutorial5VC.presentationController?.delegate = self
             self.present(tutorial5VC, animated: true, completion: nil)
+        } else if indexPath.row == 5 {
+            let tutorial6VC = storyboard.instantiateViewController(withIdentifier: "Tutorial6VC")
+            tutorial6VC.modalPresentationStyle = .automatic
+            tutorial6VC.presentationController?.delegate = self
+            self.present(tutorial6VC, animated: true, completion: nil)
+        } else {
+            let tutorial7VC = storyboard.instantiateViewController(withIdentifier: "Tutorial7VC")
+            tutorial7VC.modalPresentationStyle = .automatic
+            tutorial7VC.presentationController?.delegate = self
+            self.present(tutorial7VC, animated: true, completion: nil)
         }
     }
     
